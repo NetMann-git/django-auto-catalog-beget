@@ -1,0 +1,51 @@
+# Виртуальное окружение
+venv/
+.venv/
+env/
+.env
+
+# База данных
+db.sqlite3
+*.sqlite3
+
+# Настройки с секретами
+config/settings/local.py
+config/settings/dev_local.py
+*.local.py
+
+# Файлы Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Файлы IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Логи
+*.log
+
+# Статика и медиа
+static/
+media/
+staticfiles/
+
+# Временные файлы
+tmp/
+*.tmp
+
+# Системные файлы
+.DS_Store
+Thumbs.db
+
+# Переменные окружения
+.env
+.env.local
+
+# Файлы деплоя (для Beget)
+passenger_wsgi.py (если будете создавать)
+.htaccess
