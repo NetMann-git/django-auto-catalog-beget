@@ -126,6 +126,10 @@ USE_I18N = True
 
 USE_TZ = True
 
+# -----------------------------------------------------------------------------
+# Статика и медиа
+# -----------------------------------------------------------------------------
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
@@ -145,3 +149,74 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'  # Куда собирать статик
 STATICFILES_DIRS = [
     PROJECT_DIR / 'static',
 ]
+
+
+# -----------------------------------------------------------------------------
+# Хранилища
+# -----------------------------------------------------------------------------
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+    },
+}
+
+# -----------------------------------------------------------------------------
+# Логирование
+# -----------------------------------------------------------------------------
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "standard": {
+            "format": (
+                "[{asctime}] "
+                "{levelname} "
+                "{name}: "
+                "{message}"
+            ),
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": BASE_DIR / "logs" / "django.log",
+            "formatter": "standard",
+        },
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "standard",
+        },
+    },
+    "root": {
+        "handlers": [
+            "console",
+            "file",
+        ],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django": {
+            "handlers": [
+                "console",
+                "file",
+            ],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": [
+                "console",
+                "file",
+            ],
+            "level": "ERROR",
+            "propagate": False,
+        },
+    },
+}

@@ -30,12 +30,11 @@ __pycache__/
 *.log
 
 # Статика и медиа
-static/
 media/
 staticfiles/
 
 # Временные файлы
-tmp/
+
 *.tmp
 
 # Системные файлы
@@ -47,5 +46,5 @@ Thumbs.db
 .env.local
 
 # Файлы деплоя (для Beget)
-passenger_wsgi.py (если будете создавать)
+
 .htaccess
