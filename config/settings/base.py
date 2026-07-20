@@ -58,7 +58,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# -----------------------------------------------------------------------------
+# URL-конфигурация и WSGI
+# -----------------------------------------------------------------------------
+
 ROOT_URLCONF = 'config.urls'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 # -----------------------------------------------------------------------------
 # Шаблоны
@@ -82,7 +87,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+
 
 
 # Database
@@ -115,40 +120,33 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
+# -----------------------------------------------------------------------------
+# Интернационализация
+# -----------------------------------------------------------------------------
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
+LANGUAGE_CODE = "ru-ru"
+TIME_ZONE = "Europe/Moscow"
 USE_I18N = True
-
 USE_TZ = True
 
 # -----------------------------------------------------------------------------
 # Статика и медиа
 # -----------------------------------------------------------------------------
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = 'static/'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Статические файлы
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # Куда собирать статику
-
-# Дополнительные папки со статикой
-STATICFILES_DIRS = [
-    PROJECT_DIR / 'static',
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 ]
+
+STATICFILES_DIRS = [
+    PROJECT_DIR / "static",
+]
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_URL = "/static/"
+
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"
 
 
 # -----------------------------------------------------------------------------
@@ -220,3 +218,10 @@ LOGGING = {
         },
     },
 }
+
+
+# -----------------------------------------------------------------------------
+# Этого нет!!!!!! 
+# -----------------------------------------------------------------------------
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
