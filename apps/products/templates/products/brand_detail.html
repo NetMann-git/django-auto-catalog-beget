@@ -1,0 +1,32 @@
+<!-- apps/products/templates/products/brand_detail.html -->
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ brand.seo_title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ brand.name }}</h1>
+    {% if brand.logo %}
+        <img src="{{ brand.logo.url }}" alt="{{ brand.name }}" class="brand-logo">
+    {% endif %}
+    {% if brand.description %}
+        <div class="brand-description">{{ brand.description|linebreaks }}</div>
+    {% endif %}
+    {% if brand.country %}
+        <p><strong>Страна:</strong> {{ brand.country }}</p>
+    {% endif %}
+
+    <h2>Товары бренда</h2>
+    {% if products %}
+        <div class="product-grid">
+            {% for product in products %}
+                {% include "products/_product_card.html" with product=product %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Нет товаров этого бренда.</p>
+    {% endif %}
+</div>
+{% endblock %}

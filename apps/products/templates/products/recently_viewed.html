@@ -1,0 +1,41 @@
+<!-- apps/products/templates/products/recently_viewed.html -->
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'products/css/catalog.css' %}">
+    <link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
+{% endblock %}
+
+{% block title %}История просмотров{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>История просмотров</h1>
+    <div id="recently-viewed-container">
+        <!-- Блок с товарами -->
+        <div id="recently-viewed-products" {% if not products %}style="display:none;"{% endif %}>
+            <div id="recently-viewed-grid" class="product-grid">
+                {% for product in products %}
+                    <div class="product-item" data-product-id="{{ product.id }}">
+                        {% include "products/_product_card.html" with product=product %}
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="button" 
+                    id="clear-recently-viewed-history"
+                    class="btn btn-outline"
+                    data-url="{% url 'catalog:clear_recently_viewed_ajax' %}">
+                Очистить историю
+            </button>
+        </div>
+
+        <!-- Блок с сообщением о пустой истории -->
+        <div id="empty-history-message" {% if products %}style="display:none;"{% endif %}>
+            <p>Вы ещё не просматривали товары.</p>
+            <a href="{{ catalog_url }}" class="btn">Перейти в каталог</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

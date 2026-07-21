@@ -1,0 +1,59 @@
+<!-- apps/products/templates/products/_product_card.html -->
+
+{% load static %}
+
+<article class="dress-card" itemscope itemtype="https://schema.org/Product">
+
+    <div class="badges">
+        {% for badge in product.badges.all %}
+            <span class="badge badge-{{ badge.slug }}">{{ badge.title }}</span>
+        {% endfor %}
+    </div>
+
+    <!-- Кнопка сравнения -->
+    <button class="compare-btn {% if product.id in comparison_ids %}active{% endif %}"
+            data-product-id="{{ product.id }}"
+            data-url="{% url 'catalog:toggle_comparison_ajax' product.id %}"
+            type="button">
+        {% if product.id in comparison_ids %}
+            Убрать из сравнения
+        {% else %}
+            Сравнить
+        {% endif %}
+    </button>
+
+    <!-- Новая кнопка избранного -->
+    {% include "wishlist/_button.html" with product=product %}
+
+
+
+    {% if product.image %}
+        <a href="{{ product.get_absolute_url }}" class="dress-image-link">
+            <img src="{{ product.image.url }}" alt="{{ product.title }}" class="dress-card-image primary-image">
+        </a>
+    {% else %}
+        <div class="dress-image-placeholder">Нет фото</div>
+    {% endif %}
+
+    <div class="dress-card-content">
+        <h3 class="dress-title" itemprop="name">
+            <a href="{{ product.get_absolute_url }}">{{ product.title }}</a>
+        </h3>
+        <div class="dress-meta">
+            {% for attr in product.attributes.all %}
+                <span>{{ attr.attribute_type.name }}: {{ attr.attribute_value.value }}</span>
+            {% endfor %}
+        </div>
+        <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+            <meta itemprop="priceCurrency" content="RUB">
+            <span class="dress-price" itemprop="price">от {{ product.price }}</span>
+            <span class="currency">₽</span>
+        </div>
+        <div class="product-availability">
+            <span class="availability-status availability-{{ product.availability_status }}">
+                {{ product.get_availability_status_display }}
+            </span>
+        </div>
+    </div>
+
+</article>

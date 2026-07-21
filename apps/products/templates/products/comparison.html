@@ -1,0 +1,100 @@
+<!-- apps/products/templates/products/comparison.html -->
+
+{% extends "base.html" %}
+{% load static %}
+{% load comparison_filters %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'products/css/catalog.css' %}">
+    <link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
+{% endblock %}
+
+{% block title %}Сравнение товаров{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Сравнение товаров</h1>
+
+    <!-- Сообщение о пустом списке -->
+    <div id="empty-message" style="text-align: center; padding: 60px 20px; {% if products %}display:none;{% endif %}">
+        <p style="font-size: 18px; color: #888; margin-bottom: 20px;">
+            У вас пока нет товаров для сравнения.
+        </p>
+        <a href="{% url 'catalog:catalog' %}" class="btn" style="display: inline-block; padding: 12px 30px; background: #c0392b; color: white; text-decoration: none; border-radius: 6px;">
+            Перейти в каталог
+        </a>
+    </div>
+
+    <!-- Таблица сравнения -->
+    <div id="comparison-table-wrapper" {% if not products %}style="display:none;"{% endif %}>
+        <table class="comparison-table" id="comparison-table">
+            <thead>
+                <tr>
+                    <th>Характеристика</th>
+                    {% for product in products %}
+                        <th data-product-id="{{ product.id }}">
+                            <a href="{{ product.get_absolute_url }}">{{ product.title }}</a>
+                            <button class="compare-btn remove-btn"
+                                    data-product-id="{{ product.id }}"
+                                    data-url="{% url 'catalog:toggle_comparison_ajax' product.id %}"
+                                    type="button">✕</button>
+                        </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Цена</td>
+                    {% for product in products %}
+                        <td data-product-id="{{ product.id }}">{{ product.price }} {{ product.currency }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td>Наличие</td>
+                    {% for product in products %}
+                        <td data-product-id="{{ product.id }}">
+                            <span class="availability-status availability-{{ product.availability_status }}">
+                                {{ product.get_availability_status_display }}
+                            </span>
+                        </td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td>Категория</td>
+                    {% for product in products %}
+                        <td data-product-id="{{ product.id }}">{{ product.category.title|default:"—" }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td>Артикул</td>
+                    {% for product in products %}
+                        <td data-product-id="{{ product.id }}">{{ product.article|default:"—" }}</td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <td>Изображение</td>
+                    {% for product in products %}
+                        <td data-product-id="{{ product.id }}">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.title }}" width="80">
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+                <!-- Динамические характеристики -->
+                {% for row in attributes_rows %}
+                    <tr>
+                        <td>{{ row.name }}</td>
+                        {% for product in products %}
+                            <td data-product-id="{{ product.id }}">{{ row|get_item:product.id }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{% url 'catalog:catalog' %}" class="btn comparison-back-link">Вернуться в каталог</a>
+    </div>
+</div>
+{% endblock %}

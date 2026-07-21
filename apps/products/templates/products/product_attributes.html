@@ -1,0 +1,105 @@
+<!-- apps/products/templates/products/product_attributes.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'products/css/attributes.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'products/css/manage.css' %}">
+{% endblock %}
+
+{% block title %}Характеристики товара{% endblock %}
+
+{% block content %}
+<div class="attributes-container">
+    <h1>🏷️ Характеристики товара</h1>
+    <p class="subtitle">Товар: <strong>{{ product.title }}</strong></p>
+    
+    <!-- Форма добавления характеристики -->
+    <div class="attributes-form">
+        <h3>Добавить характеристику</h3>
+        <form method="post" id="attribute-form">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="field-group">
+                    <label for="attribute_type">Тип характеристики *</label>
+                    <select name="attribute_type" id="attribute_type" class="form-control" required>
+                        <option value="">Выберите тип...</option>
+                        {% for attr_type in attribute_types %}
+                            <option value="{{ attr_type.id }}">{{ attr_type.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label for="attribute_value">Значение *</label>
+                    <select name="attribute_value" id="attribute_value" class="form-control" required>
+                        <option value="">Сначала выберите тип...</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-add">➕ Добавить</button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Существующие характеристики -->
+    <h3>Текущие характеристики</h3>
+    {% if product_attributes %}
+        <table class="attributes-table">
+            <thead>
+                <tr>
+                    <th>Характеристика</th>
+                    <th>Значение</th>
+                    <th>Действие</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attr in product_attributes %}
+                    <tr>
+                        <td>{{ attr.attribute_type.name }}</td>
+                        <td>{{ attr.attribute_value.value|default:"—" }}</td>
+                        <td>
+                            <a href="{% url 'catalog:attribute_delete' attr.id %}" 
+                               onclick="return confirm('Удалить характеристику?')"
+                               class="btn-delete-small">
+                                🗑️
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="empty-message">Характеристики не добавлены</p>
+    {% endif %}
+    
+    <!-- Кнопки навигации -->
+    <div class="nav-buttons">
+        <a href="{% url 'catalog:product_edit' product.id %}" class="btn-back">← Назад к товару</a>
+        <a href="{% url 'catalog:product_list_manage' %}" class="btn-list">К списку товаров</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const typeSelect = document.getElementById('attribute_type');
+    const valueSelect = document.getElementById('attribute_value');
+    
+    const valuesData = {{ values_data|safe }};
+    
+    typeSelect.addEventListener('change', function() {
+        const typeId = this.value;
+        valueSelect.innerHTML = '<option value="">Сначала выберите тип...</option>';
+        
+        if (typeId && valuesData[typeId]) {
+            valuesData[typeId].forEach(function(value) {
+                const option = document.createElement('option');
+                option.value = value.id;
+                option.textContent = value.value;
+                valueSelect.appendChild(option);
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

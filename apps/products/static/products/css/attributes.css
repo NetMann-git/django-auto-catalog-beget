@@ -1,0 +1,191 @@
+/* static/products/css/attributes.css */
+
+.attributes-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+}
+
+.attributes-container h1 {
+    margin-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 15px;
+}
+
+.attributes-container .subtitle {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.attributes-form {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.attributes-form h3 {
+    margin-bottom: 15px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.form-row .field-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.form-row .field-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.form-row select,
+.form-row input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.form-row select:focus,
+.form-row input:focus {
+    outline: none;
+    border-color: #c0392b;
+    box-shadow: 0 0 0 3px rgba(192,57,43,0.1);
+}
+
+.btn-add {
+    padding: 10px 25px;
+    background: #c0392b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn-add:hover {
+    background: #a93226;
+}
+
+.attributes-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 15px 0;
+}
+
+.attributes-table th {
+    background: #f8f9fa;
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid #eee;
+}
+
+.attributes-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.attributes-table tr:hover {
+    background: #f8f9fa;
+}
+
+.empty-message {
+    color: #999;
+    padding: 20px 0;
+}
+
+.nav-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.btn-back {
+    padding: 10px 25px;
+    background: #c0392b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.btn-back:hover {
+    background: #a93226;
+}
+
+.btn-list {
+    padding: 10px 25px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.btn-list:hover {
+    background: #5a6268;
+}
+
+.btn-delete-small {
+    padding: 4px 10px;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-delete-small:hover {
+    background: #c0392b;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .form-row .field-group {
+        min-width: auto;
+    }
+    
+    .btn-add {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .attributes-table {
+        font-size: 14px;
+    }
+    
+    .attributes-table th,
+    .attributes-table td {
+        padding: 8px 10px;
+    }
+}

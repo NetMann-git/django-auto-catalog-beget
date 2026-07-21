@@ -1,0 +1,367 @@
+<!-- product_detail.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
+<link rel="stylesheet" href="{% static 'products/css/product.css' %}">
+<link rel="stylesheet" href="{% static 'products/css/catalog.css' %}">
+<link rel="stylesheet" href="{% static 'reviews/css/reviews.css' %}">
+{% endblock extra_css %}
+
+{% block content %}
+
+<div class="container">
+
+    <!-- Хлебные крошки -->
+    <nav class="breadcrumbs">
+        <a href="/">Главная</a>
+        <span>/</span>
+        <a href="/catalog/">Каталог</a>
+        <span>/</span>
+        <span>{{ product.title }}</span>
+    </nav>
+
+    <!-- Основной блок -->
+    <div class="dress-detail">
+
+        <!-- =======================================
+            ГАЛЕРЕЯ ФОТО (вертикальная)
+        ======================================= -->
+        <div class="dress-photo">
+            <div class="gallery-wrapper">
+                <!-- Миниатюры слева — только если есть галерея -->
+                {% if product.gallery.all %}
+                    <div class="gallery-thumbs-vertical">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}"
+                                data-full="{{ product.image.url }}"
+                                class="gallery-thumb-vertical active"
+                                alt="{{ product.title }}">
+                        {% endif %}
+                        {% for photo in product.gallery.all %}
+                            <img src="{{ photo.image.url }}"
+                                data-full="{{ photo.image.url }}"
+                                class="gallery-thumb-vertical"
+                                alt="{{ photo.alt|default:product.title }}">
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Главное изображение -->
+                <div class="main-image-wrapper">
+                    {% if product.image %}
+                        <img id="main-image"
+                            src="{{ product.image.url }}"
+                            alt="{{ product.title }}"
+                            class="main-image"
+                            style="cursor:pointer;">
+                        <!-- Стрелки навигации — только если есть несколько фото -->
+                        {% if product.gallery.all %}
+                            <button class="image-arrow prev-image" id="prev-image-btn">‹</button>
+                            <button class="image-arrow next-image" id="next-image-btn">›</button>
+                        {% endif %}
+                    {% else %}
+                        <div class="dress-image-placeholder">Нет фото</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Счётчик — только если есть несколько фото -->
+            {% if product.gallery.all %}
+            <div class="gallery-counter">
+                Фото <span id="current-photo">1</span> из <span id="total-photos">
+                    {% with total=product.gallery.all.count|add:1 %}
+                        {{ total }}
+                    {% endwith %}
+                </span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Информация о товаре -->
+        <div class="dress-info">
+
+            <h1>{{ product.title }}</h1>
+
+            <!-- Бренд -->
+            {% if product.brand %}
+                <div class="product-brand">Бренд: <a href="{{ product.brand.get_absolute_url }}">{{ product.brand.name }}</a></div>
+            {% endif %}
+
+            <!-- Бейджи -->
+            {% if product.badges.all %}
+            <div class="product-badges">
+                {% for badge in product.badges.all %}
+                    <span class="badge badge-{{ badge.slug }}">
+                        {{ badge.title }}
+                    </span>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Кнопка сравнения -->
+            <button class="compare-btn {% if product.id in comparison_ids %}active{% endif %}"
+                    data-product-id="{{ product.id }}"
+                    data-url="{% url 'catalog:toggle_comparison_ajax' product.id %}"
+                    type="button">
+                {% if product.id in comparison_ids %}
+                    Убрать из сравнения
+                {% else %}
+                    Сравнить
+                {% endif %}
+            </button>
+
+            <!-- Кнопка "Избранное" -->
+            {% include "wishlist/_button.html" with product=product %}
+
+            <!-- Цена -->
+            <div class="price-block">
+                <span class="price-label">Цена</span>
+                <div class="price">{{ product.price|floatformat:0 }} ₽</div>
+            </div>
+
+            <div class="product-availability">
+                <span class="availability-status availability-{{ product.availability_status }}">
+                    {{ product.get_availability_status_display }}
+                </span>
+            </div>
+
+            <!-- Кнопки -->
+            <div class="dress-actions">
+                <button type="button" class="btn" id="open-appointment-modal" data-product-id="{{ product.id }}">
+                    Записаться на примерку
+                </button>
+                <a href="/catalog/" class="btn-outline">Вернуться в каталог</a>
+                <button type="button" class="btn btn-outline" id="open-size-helper-modal">
+                    📐 Подобрать размер
+                </button>
+                <button type="button" class="btn btn-outline" id="open-size-table-modal">
+                    📊 Таблица размеров
+                </button>
+            </div>
+
+            <!-- Характеристики -->
+            <div class="dress-specs">
+                <h2>Характеристики</h2>
+
+                {% if product.article %}
+                <div class="spec-row">
+                    <span>Артикул</span>
+                    <strong>{{ product.article }}</strong>
+                </div>
+                {% endif %}
+
+                {% for attr in product.attributes.all %}
+                    <div class="spec-row">
+                        <span>{{ attr.attribute_type.name }}</span>
+                        <strong>{{ attr.attribute_value.value }}</strong>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Описание -->
+            {% if product.description %}
+            <section class="description-block">
+                <h2>Описание модели</h2>
+                <div class="description">{{ product.description|linebreaks }}</div>
+            </section>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <!-- Недавно просмотренные -->
+    {% if recently_viewed_products %}
+    <section class="recently-viewed">
+        <div class="recently-viewed-header">
+            <h2>Вы недавно смотрели</h2>
+            <button type="button" 
+                    id="clear-recently-viewed"
+                    class="btn-clear-history"
+                    data-url="{% url 'catalog:clear_recently_viewed_ajax' %}">
+                ✕ Очистить историю
+            </button>
+        </div>
+        <div id="recently-viewed-grid" class="dress-grid">
+            {% for product in recently_viewed_products %}
+                {% include "products/_product_card.html" with product=product %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Похожие товары -->
+    {% if similar_products %}
+    <section class="similar_products">
+        <h2 class="similar-title">Похожие платья</h2>
+        <div class="dress-grid">
+
+            {% for similar in similar_products %}
+            <article class="dress-card">
+
+                {% if similar.image %}
+                <a href="{{ similar.get_absolute_url }}">
+                    <img src="{{ similar.image.url }}" alt="{{ similar.title }}" class="dress-card-image">
+                </a>
+                {% endif %}
+
+                <div class="dress-card-content">
+                    <h3 class="dress-title">
+                        <a href="{{ similar.get_absolute_url }}">{{ similar.title }}</a>
+                    </h3>
+                    <div class="dress-price">{{ similar.price|floatformat:0 }} ₽</div>
+                    {% if similar.collection %}
+                    <div class="dress-meta"><span>{{ similar.collection }}</span></div>
+                    {% endif %}
+                    <a href="{{ similar.get_absolute_url }}" class="btn">Смотреть</a>
+                </div>
+
+            </article>
+            {% endfor %}
+
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- =======================================
+        ОТЗЫВЫ
+    ======================================= -->
+    <section class="reviews-section">
+        <h2>Отзывы</h2>
+
+        {% if product.reviews_count > 0 %}
+            <div class="reviews-summary">
+                <div class="rating-stars">
+                    ★★★★★
+                </div>
+                <div class="rating-average">
+                    {{ product.rating|floatformat:1 }} из 5
+                </div>
+                <div class="rating-count">
+                    ({{ product.reviews_count }} отзывов)
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Управление отзывами: фильтры и сортировка -->
+        <div class="reviews-controls">
+            <div class="reviews-filters">
+                <label for="rating-filter">Оценка:</label>
+                <select id="rating-filter" class="review-filter" data-param="rating">
+                    {% for option in rating_options %}
+                        <option value="{{ option.value }}" {% if selected_rating == option.value %}selected{% endif %}>
+                            {{ option.label }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label>
+                    <input type="checkbox" id="with-photos-filter" class="review-filter" data-param="with_photos" value="1" {% if selected_with_photos %}checked{% endif %}>
+                    Только с фото
+                </label>
+
+                <label>
+                    <input type="checkbox" id="verified-filter" class="review-filter" data-param="verified" value="1" {% if selected_verified %}checked{% endif %}>
+                    Только проверенные
+                </label>
+            </div>
+
+            <div class="reviews-sort">
+                <label for="sort-select">Сортировка:</label>
+                <select id="sort-select" class="review-filter" data-param="sort">
+                    {% for option in sort_options %}
+                        <option value="{{ option.value }}" {% if selected_sort == option.value %}selected{% endif %}>
+                            {{ option.label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Контейнер для списка отзывов -->
+        <div id="reviews-container" data-product-id="{{ product.id }}">
+            {% include "reviews/_review_list.html" with reviews=reviews %}
+        </div>
+
+        <!-- Форма добавления отзыва -->
+        <div class="review-form-wrapper">
+            <h3>Оставить отзыв</h3>
+            <form method="post" action="{% url 'reviews:add_review' product.id %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ review_form.as_p }}
+                <button type="submit" class="btn">Отправить отзыв</button>
+            </form>
+        </div>
+    </section>
+
+</div>
+
+<!-- =======================================
+    LIGHTBOX
+======================================= -->
+<div id="lightbox" class="lightbox">
+    <span class="lightbox-close">&times;</span>
+
+    <div class="lightbox-top">
+        <span class="lightbox-prev">&#10094;</span>
+        <div class="lightbox-counter">
+            Фото <span id="lightbox-current">1</span> из <span id="lightbox-total">0</span>
+        </div>
+        <span class="lightbox-next">&#10095;</span>
+    </div>
+
+    <img id="lightbox-image" class="lightbox-image" src="" alt="">
+
+    <div id="lightbox-thumbs" class="lightbox-thumbs"></div>
+</div>
+
+<!-- =======================================
+    LIGHTBOX ДЛЯ ОТЗЫВОВ
+======================================= -->
+<div id="review-lightbox" class="lightbox">
+    <span class="lightbox-close">&times;</span>
+    <div class="lightbox-top">
+        <span class="lightbox-prev">&#10094;</span>
+        <div class="lightbox-counter">
+            Фото <span id="review-lightbox-current">1</span> из <span id="review-lightbox-total">0</span>
+        </div>
+        <span class="lightbox-next">&#10095;</span>
+    </div>
+    <img id="review-lightbox-image" class="lightbox-image" src="" alt="">
+    <div id="review-lightbox-thumbs" class="lightbox-thumbs"></div>
+</div>
+
+<!-- =======================================
+    МОДАЛЬНОЕ ОКНО – ТАБЛИЦА РАЗМЕРОВ
+======================================= -->
+<div id="size-table-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="modal-close" data-modal="size-table-modal">&times;</span>
+        <div id="size-table-modal-body">
+            <div class="modal-loader">Загрузка...</div>
+        </div>
+    </div>
+</div>
+
+<!-- =======================================
+    МОДАЛЬНОЕ ОКНО – РАЗМЕРНЫЙ ПОМОЩНИК
+======================================= -->
+<div id="size-helper-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="modal-close" data-modal="size-helper-modal">&times;</span>
+        <div id="size-helper-modal-body">
+            <div class="modal-loader">Загрузка...</div>
+        </div>
+    </div>
+</div>
+
+<!-- Подключаем скрипты галереи и лайтбоксов -->
+<script src="{% static 'products/js/product_gallery.js' %}"></script>
+<script src="{% static 'products/js/review_lightbox.js' %}"></script>
+<script src="{% static 'reviews/js/review_vote.js' %}"></script>
+<script src="{% static 'reviews/js/review_filters.js' %}"></script>
+<script src="{% static 'appointments/js/modal_window.js' %}"></script>
+<script src="{% static 'products/js/product_detail.js' %}"></script>
+
+{% endblock %}

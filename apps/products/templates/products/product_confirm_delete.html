@@ -1,0 +1,25 @@
+<!-- apps/products/templates/products/product_confirm_delete.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'products/css/manage.css' %}">
+{% endblock %}
+
+{% block title %}Удаление товара{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+    <h1>🗑️ Удаление товара</h1>
+    <p>Вы уверены, что хотите удалить товар <strong>"{{ product.title }}"</strong>?</p>
+    <p style="color: #999; font-size: 14px;">Это действие невозможно отменить.</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="delete-actions">
+            <button type="submit" class="btn-delete-danger">Да, удалить</button>
+            <a href="{% url 'catalog:product_list_manage' %}" class="btn-cancel">Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

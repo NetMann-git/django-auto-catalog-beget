@@ -1,0 +1,34 @@
+/* static/products/css/availability.css */
+
+/* ========================================
+   СТАТУС НАЛИЧИЯ
+======================================== */
+
+.product-availability {
+    margin: 8px 0;
+    font-weight: 600;
+}
+
+.availability-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    color: #fff;
+}
+
+.availability-in_stock {
+    background: #4CAF50;  /* зелёный */
+}
+
+.availability-under_order {
+    background: #FF9800;  /* оранжевый */
+}
+
+.availability-last_size {
+    background: #2196F3;  /* синий */
+}
+
+.availability-out_of_stock {
+    background: #f44336;  /* красный */
+}

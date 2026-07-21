@@ -1,0 +1,21 @@
+<!-- apps\products\templates\products\catalog.html -->
+{% extends 'base.html' %}
+
+{% block title %}Каталог товаров{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Каталог товаров</h1>
+    
+    {% if categories %}
+        <ul>
+        {% for category in categories %}
+            <li>{{ category.title }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Категории пока не добавлены.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
