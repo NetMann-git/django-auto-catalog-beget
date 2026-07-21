@@ -15,13 +15,11 @@ from decouple import config
 import os
 
 # -----------------------------------------------------------------------------
-# Пути (автоматически определяются)
+# Пути
 # -----------------------------------------------------------------------------
 
-# Корень проекта (где лежат apps, config, manage.py)
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
 PROJECT_DIR = Path(__file__).resolve().parent.parent
-
+BASE_DIR = PROJECT_DIR.parent
 
 
 # Quick-start development settings - unsuitable for production
