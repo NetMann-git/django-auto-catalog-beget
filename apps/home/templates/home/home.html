@@ -1,13 +1,18 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load static %}
 
-{% block title %}Главная страница{% endblock %}
+{% block title %}Главная{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h1>{{ title }}</h1>
-    <p>{{ message }}</p>
-    <p>Текущая дата и время: {% now "d.m.Y H:i:s" %}</p>
-    <hr>
-    <p><small>Django 5.2.8 работает!</small></p>
+    <div style="text-align: center; padding: 60px 20px;">
+        <h1>Добро пожаловать в каталог</h1>
+        <p style="font-size: 18px; color: #666; margin: 20px 0;">
+            Здесь будут отображаться ваши товары
+        </p>
+        <a href="{% url 'catalog:catalog' %}" class="btn" style="display: inline-block; padding: 12px 30px; background: #c0392b; color: white; text-decoration: none; border-radius: 6px;">
+            Перейти в каталог
+        </a>
+    </div>
 </div>
 {% endblock %}
