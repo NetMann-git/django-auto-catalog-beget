@@ -1,0 +1,52 @@
+<!-- apps/reviews/templates/reviews/_review_list.html -->
+
+{% load static %}
+
+<div class="reviews-list">
+    {% for review in reviews %}
+        <div class="review-item">
+            <div class="review-votes">
+                <button class="vote-btn" data-review-id="{{ review.id }}" data-helpful="true">
+                    👍 <span class="helpful-count">{{ review.helpful_count }}</span>
+                </button>
+                <button class="vote-btn" data-review-id="{{ review.id }}" data-helpful="false">
+                    👎 <span class="unhelpful-count">{{ review.unhelpful_count }}</span>
+                </button>
+                <span class="vote-status" data-review-id="{{ review.id }}"></span>
+            </div>
+
+            <div class="review-header">
+                <span class="review-author">{{ review.get_author_name }}</span>
+                <span class="review-rating">★ {{ review.rating }}</span>
+                <span class="review-date">{{ review.created_at|date:"d.m.Y" }}</span>
+                {% if review.is_verified %}
+                    <span class="review-verified">✓ Проверенная покупка</span>
+                {% endif %}
+            </div>
+            <div class="review-title">{{ review.title }}</div>
+            <div class="review-text">{{ review.text|linebreaks }}</div>
+
+            {% if review.reply %}
+                <div class="review-reply">
+                    <strong>Ответ салона:</strong>
+                    {{ review.reply.text|linebreaks }}
+                </div>
+            {% endif %}
+
+            {% if review.images.all %}
+                <div class="review-images">
+                    {% for image in review.images.all %}
+                        <a href="{{ image.image.url }}" 
+                           class="review-image-link" 
+                           data-lightbox="review" 
+                           data-title="Фото из отзыва">
+                            <img src="{{ image.image.url }}" alt="Фото" class="review-image-thumb">
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    {% empty %}
+        <p class="no-reviews">Пока нет отзывов. Будьте первым!</p>
+    {% endfor %}
+</div>
