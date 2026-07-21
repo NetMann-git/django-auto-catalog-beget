@@ -34,7 +34,9 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
-# Application definition
+# -----------------------------------------------------------------------------
+# Приложения
+# -----------------------------------------------------------------------------
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -43,6 +45,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Сторонние
+    'smart_selects',
+
+    # Приложения проекта
     'apps.home',
 ]
 
