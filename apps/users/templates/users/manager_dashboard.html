@@ -1,0 +1,125 @@
+<!-- apps/users/templates/users/manager_dashboard.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'users/css/consultant.css' %}">
+{% endblock %}
+
+{% block title %}Панель менеджера{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>📊 Панель менеджера</h1>
+    <p style="color: #666; margin-bottom: 20px;">Расширенная статистика салона на {{ today|date:"d.m.Y" }}</p>
+    
+    <!-- Ссылка на управление товарами -->
+    <div style="margin: 20px 0; padding: 15px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #2196F3;">
+        <a href="{% url 'catalog:product_list_manage' %}" 
+           style="color: #1976D2; font-weight: bold; font-size: 18px; text-decoration: none;">
+            📦 Управление товарами
+        </a>
+        <span style="color: #666; margin-left: 15px; font-size: 14px;">
+            (добавление, редактирование, удаление)
+        </span>
+    </div>
+    
+    <!-- Основная статистика -->
+    <div class="stats-grid">
+        <div class="stat-card-primary">
+            <span class="stat-number">{{ stats.total }}</span>
+            <span class="stat-label">Всего записей</span>
+        </div>
+        <div class="stat-card-success">
+            <span class="stat-number">{{ stats.today }}</span>
+            <span class="stat-label">Записей сегодня</span>
+        </div>
+        <div class="stat-card-warning">
+            <span class="stat-number">{{ stats.week }}</span>
+            <span class="stat-label">За неделю</span>
+        </div>
+        <div class="stat-card-info">
+            <span class="stat-number">{{ stats.month }}</span>
+            <span class="stat-label">За месяц</span>
+        </div>
+        <div class="stat-card-danger">
+            <span class="stat-number">{{ stats.pending }}</span>
+            <span class="stat-label">Ожидают</span>
+        </div>
+        <div class="stat-card-primary">
+            <span class="stat-number">{{ stats.confirmed }}</span>
+            <span class="stat-label">Подтверждены</span>
+        </div>
+    </div>
+    
+    <!-- Графики и детали -->
+    <div class="section-grid">
+        <div class="section-card">
+            <h3>📌 Статусы записей</h3>
+            <ul>
+                <li><span>Ожидают</span> <span>{{ stats.pending }}</span></li>
+                <li><span>Подтверждены</span> <span>{{ stats.confirmed }}</span></li>
+                <li><span>Завершены</span> <span>{{ stats.completed }}</span></li>
+                <li><span>Отменены</span> <span>{{ stats.cancelled }}</span></li>
+            </ul>
+        </div>
+        
+        <div class="section-card">
+            <h3>👗 Популярные товары</h3>
+            {% if popular_products %}
+                <ul>
+                    {% for product in popular_products %}
+                        <li>
+                            <span>{{ product.product__title|truncatechars:30 }}</span>
+                            <span>{{ product.count }} записей</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p style="color: #999;">Нет данных</p>
+            {% endif %}
+        </div>
+        
+        <div class="section-card">
+            <h3>⭐ Отзывы</h3>
+            <ul>
+                <li><span>Всего отзывов</span> <span>{{ review_stats.total }}</span></li>
+                <li>
+                    <span>Средний рейтинг</span>
+                    <span class="star-rating">
+                        ★ {{ review_stats.avg_rating|floatformat:1 }}
+                    </span>
+                </li>
+                <li><span>С фото</span> <span>{{ review_stats.with_photo }}</span></li>
+                <li><span>Проверенные</span> <span>{{ review_stats.verified }}</span></li>
+            </ul>
+        </div>
+        
+        <div class="section-card">
+            <h3>👤 Активность продавцов</h3>
+            {% if consultant_activity %}
+                <ul>
+                    {% for consultant in consultant_activity %}
+                        <li>
+                            <span>{{ consultant.user__first_name|default:consultant.user__username }}</span>
+                            <span>{{ consultant.count }} записей</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p style="color: #999;">Нет данных</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Кнопки навигации -->
+    <div style="margin-top: 30px; display: flex; gap: 15px; flex-wrap: wrap;">
+        <a href="{% url 'users:consultant_dashboard' %}" style="background: #6c757d; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+            ← Панель продавца
+        </a>
+        <a href="{% url 'users:dashboard' %}" style="background: #c0392b; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+            Личный кабинет
+        </a>
+    </div>
+</div>
+{% endblock %}

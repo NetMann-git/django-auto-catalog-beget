@@ -1,0 +1,26 @@
+<!-- apps/appointments/templates/appointments/_appointment_form_ajax.html -->
+{% load static %}
+
+<div class="appointment-form-wrapper">
+    <h1>Записаться на примерку</h1>
+    {% if product %}
+        <p class="appointment-product">
+            Платье: <strong>{{ product.title }}</strong>
+            {% if product.price %}
+                — {{ product.price }} {{ product.currency }}
+            {% endif %}
+        </p>
+    {% endif %}
+
+    <form method="post" action="{% url 'appointments:submit' %}" class="appointment-form" id="appointment-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <!-- Контейнер для сообщения о загрузке слотов -->
+        <div id="slots-loading" style="display:none; color:#999;">Загрузка доступного времени...</div>
+        <!-- Контейнер для ошибок -->
+        <div id="slots-error" style="display:none; color:#e74c3c;"></div>
+
+        <button type="submit" class="btn btn-primary">Записаться</button>
+    </form>
+</div>

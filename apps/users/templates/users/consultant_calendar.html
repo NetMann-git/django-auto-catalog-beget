@@ -1,0 +1,101 @@
+<!-- apps/users/templates/users/consultant_calendar.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'users/css/consultant.css' %}">
+{% endblock %}
+
+{% block title %}Шахматка записей{% endblock %}
+
+{% block content %}
+<div class="calendar-container">
+    <h1>📅 Шахматка записей</h1>
+    
+    <div class="calendar-nav">
+        <a href="?date={{ prev_date|date:'Y-m-d' }}" class="btn">&larr; {{ prev_date|date:'d.m.Y' }}</a>
+        <span class="current-date">{{ date|date:'d.m.Y' }}</span>
+        <a href="?date={{ next_date|date:'Y-m-d' }}" class="btn">{{ next_date|date:'d.m.Y' }} &rarr;</a>
+    </div>
+    
+    <div class="calendar-grid">
+        <div class="calendar-header">
+            <span>Время</span>
+            <span>Статус</span>
+            <span>Действие</span>
+        </div>
+        
+        {% if working_hours %}
+            {% for slot in slots %}
+                <div class="calendar-row {% if slot.is_booked %}booked{% else %}free{% endif %}">
+                    <span class="slot-time">{{ slot.time }}</span>
+                    <span class="slot-status">
+                        {% if slot.is_booked %}
+                            🔴 Занято
+                        {% else %}
+                            🟢 Свободно
+                        {% endif %}
+                    </span>
+                    <span class="slot-action">
+                        {% if slot.is_booked %}
+                            <span class="booked-label">Недоступно</span>
+                        {% else %}
+                            <button type="button" class="btn-success open-slot-form"
+                                    data-date="{{ date|date:'Y-m-d' }}"
+                                    data-time="{{ slot.time }}">
+                                Записать
+                            </button>
+                        {% endif %}
+                    </span>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-working-hours">В этот день салон не работает.</div>
+        {% endif %}
+    </div>
+    
+    <div class="calendar-legend">
+        <span><span class="color-box free"></span> Свободно</span>
+        <span><span class="color-box booked"></span> Занято</span>
+    </div>
+    
+    <a href="{% url 'users:consultant_dashboard' %}" class="btn-back">← Назад в панель продавца</a>
+</div>
+
+<!-- Модальное окно для создания записи -->
+<div id="slot-form-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <h2>Создать запись</h2>
+        <form method="post" action="{% url 'users:consultant_create_appointment' %}">
+            {% csrf_token %}
+            <input type="hidden" name="date" id="slot-date">
+            <input type="hidden" name="time" id="slot-time">
+            
+            <div class="form-row">
+                <label for="slot-name">Имя *</label>
+                <input type="text" name="name" id="slot-name" required>
+            </div>
+            <div class="form-row">
+                <label for="slot-phone">Телефон *</label>
+                <input type="text" name="phone" id="slot-phone" required>
+            </div>
+            <div class="form-row">
+                <label for="slot-email">Email</label>
+                <input type="email" name="email" id="slot-email">
+            </div>
+            <div class="form-row">
+                <label for="slot-comment">Комментарий</label>
+                <textarea name="comment" id="slot-comment" rows="2"></textarea>
+            </div>
+            <div class="form-row">
+                <button type="submit" class="btn-success btn-success-full">Сохранить</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'users/js/consultant.js' %}"></script>
+{% endblock %}

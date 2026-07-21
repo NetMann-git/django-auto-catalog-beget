@@ -1,0 +1,39 @@
+<!-- apps/size_helper/templates/size_helper/_size_helper_modal.html -->
+
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'size_helper/css/size_helper.css' %}">
+
+<div class="size-helper-wrapper">
+    <h3>Размерный помощник</h3>
+    <p>Введите свои параметры, и мы подберём подходящий размер.</p>
+
+    <form id="size-helper-form-modal" class="size-helper-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="height-modal">Рост (см)</label>
+            <input type="number" id="height-modal" name="height" placeholder="170" required>
+        </div>
+        <div class="form-group">
+            <label for="bust-modal">Обхват груди (см)</label>
+            <input type="number" id="bust-modal" name="bust" placeholder="88" required>
+        </div>
+        <div class="form-group">
+            <label for="waist-modal">Талия (см)</label>
+            <input type="number" id="waist-modal" name="waist" placeholder="68" required>
+        </div>
+        <div class="form-group">
+            <label for="hips-modal">Бёдра (см)</label>
+            <input type="number" id="hips-modal" name="hips" placeholder="96" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Подобрать размер</button>
+    </form>
+
+    <div id="result-modal" class="result" style="display:none;">
+        <h3>Рекомендуемый размер: <span id="size-display-modal"></span></h3>
+        <p id="description-display-modal"></p>
+    </div>
+    <div id="error-message-modal" class="error-message" style="display:none;"></div>
+</div>
+
+<script src="{% static 'size_helper/js/size_helper_modal.js' %}"></script>

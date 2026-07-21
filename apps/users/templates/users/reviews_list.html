@@ -1,0 +1,30 @@
+<!-- apps/users/templates/users/reviews_list.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Мои отзывы{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Мои отзывы</h1>
+
+    {% if reviews %}
+        <div class="reviews-list">
+            {% for review in reviews %}
+                <div class="review-item">
+                    <div class="review-header">
+                        <span class="review-rating">★ {{ review.rating }}</span>
+                        <span class="review-date">{{ review.created_at|date:"d.m.Y" }}</span>
+                    </div>
+                    <div class="review-title">{{ review.title }}</div>
+                    <div class="review-text">{{ review.text|truncatewords:30 }}</div>
+                    <a href="{{ review.product.get_absolute_url }}" class="btn-outline">К товару</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Вы ещё не оставляли отзывы.</p>
+        <a href="{% url 'catalog:catalog' %}" class="btn">Перейти в каталог</a>
+    {% endif %}
+</div>
+{% endblock %}

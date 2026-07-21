@@ -1,0 +1,11 @@
+<!-- apps\wishlist\templates\wishlist\_button.html -->
+
+{% load static %}
+
+<button class="wishlist-btn {% if product.id in wishlist_ids %}active{% endif %}"
+        data-product-id="{{ product.id }}"
+        data-url="{% url 'wishlist:toggle' product.id %}"
+        type="button">
+    <span class="heart">{% if product.id in wishlist_ids %}❤️{% else %}🤍{% endif %}</span>
+    <span class="label">{% if product.id in wishlist_ids %}В избранном{% else %}В избранное{% endif %}</span>
+</button>

@@ -1,0 +1,38 @@
+<!-- apps\wishlist\templates\wishlist\wishlist.html -->
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'products/css/catalog.css' %}">
+    <link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
+{% endblock %}
+
+{% block title %}Избранное{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Избранное</h1>
+
+    <!-- Блок с карточками товаров (виден, если есть товары) -->
+    <div id="wishlist-products" {% if not products %}style="display:none;"{% endif %}>
+        <div class="product-grid" id="wishlist-grid">
+            {% for product in products %}
+                {% include "products/_product_card.html" with product=product %}
+            {% endfor %}
+        </div>
+        {% if is_guest %}
+            <p class="wishlist-note">
+                💡 Ваше избранное сохраняется временно. 
+                <a href="{% url 'users:login' %}?next={{ request.path }}">Войдите</a> или зарегистрируйтесь, чтобы сохранить его навсегда.
+            </p>
+        {% endif %}
+    </div>
+
+    <!-- Сообщение, если избранное пусто -->
+    <div id="empty-wishlist" {% if products %}style="display:none;"{% endif %}>
+        <p>У вас пока нет избранных товаров.</p>
+        <a href="{% url 'catalog:catalog' %}" class="btn">Перейти в каталог</a>
+    </div>
+</div>
+{% endblock %}

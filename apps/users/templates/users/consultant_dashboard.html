@@ -1,0 +1,117 @@
+<!-- apps/users/templates/users/consultant_dashboard.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'users/css/consultant.css' %}">
+{% endblock %}
+
+{% block title %}Панель продавца{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>📊 Панель продавца</h1>
+    
+    <!-- Ссылка на шахматку -->
+    <div style="margin: 20px 0; padding: 15px; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #4CAF50;">
+        <a href="{% url 'users:consultant_calendar' %}" 
+        style="color: #2e7d32; font-weight: bold; font-size: 18px; text-decoration: none;">
+            📅 Шахматка записей
+        </a>
+        <span style="color: #666; margin-left: 15px; font-size: 14px;">
+            (перейти к календарю слотов)
+        </span>
+    </div>
+    
+    <!-- Статистика -->
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <span class="stat-number">{{ stats.total }}</span>
+            <span class="stat-label">Всего записей</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">{{ stats.pending }}</span>
+            <span class="stat-label">Ожидают</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">{{ stats.today }}</span>
+            <span class="stat-label">На сегодня</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">{{ stats.confirmed }}</span>
+            <span class="stat-label">Подтверждены</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">{{ stats.completed }}</span>
+            <span class="stat-label">Завершены</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">{{ stats.cancelled }}</span>
+            <span class="stat-label">Отменены</span>
+        </div>
+    </div>
+    
+    <!-- Таблица записей -->
+    <h2>Все записи</h2>
+    
+    {% if appointments %}
+        <table class="appointments-table">
+            <thead>
+                <tr>
+                    <th>Клиент</th>
+                    <th>Товар</th>
+                    <th>Дата</th>
+                    <th>Время</th>
+                    <th>Телефон</th>
+                    <th>Статус</th>
+                    <th>Действие</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in appointments %}
+                <tr>
+                    <td>
+                        {% if appointment.user %}
+                            {{ appointment.user.get_full_name|default:appointment.user.username }}
+                        {% else %}
+                            {{ appointment.name }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if appointment.product %}
+                            {{ appointment.product.name|truncatechars:30 }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>{{ appointment.date|date:"d.m.Y" }}</td>
+                    <td>{{ appointment.time|time:"H:i" }}</td>
+                    <td>{{ appointment.phone|default:"—" }}</td>
+                    <td>
+                        <span class="status-badge status-{{ appointment.status }}">
+                            {{ appointment.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <form method="post" action="{% url 'users:appointment_update_status' appointment.id %}" class="status-form">
+                            {% csrf_token %}
+                            <select name="status">
+                                <option value="pending" {% if appointment.status == 'pending' %}selected{% endif %}>Ожидает</option>
+                                <option value="confirmed" {% if appointment.status == 'confirmed' %}selected{% endif %}>Подтверждена</option>
+                                <option value="completed" {% if appointment.status == 'completed' %}selected{% endif %}>Завершена</option>
+                                <option value="cancelled" {% if appointment.status == 'cancelled' %}selected{% endif %}>Отменена</option>
+                            </select>
+                            <button type="submit" class="btn-update">Изменить</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="empty-message">Записей пока нет</p>
+    {% endif %}
+    
+    <a href="{% url 'users:dashboard' %}" class="btn-back">← Назад в личный кабинет</a>
+</div>
+{% endblock %}

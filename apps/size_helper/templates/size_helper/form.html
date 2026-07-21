@@ -1,0 +1,50 @@
+<!-- apps/size_helper/templates/size_helper/form.html -->
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'size_helper/css/size_helper.css' %}">
+{% endblock %}
+
+{% block title %}Размерный помощник{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="size-helper-wrapper">
+        <h1>Размерный помощник</h1>
+        <p>Введите свои параметры, и мы подберём подходящий размер.</p>
+
+        <form id="size-helper-form" class="size-helper-form">
+            <div class="form-group">
+                <label for="height">Рост (см)</label>
+                <input type="number" id="height" name="height" placeholder="Например: 170" required>
+            </div>
+            <div class="form-group">
+                <label for="bust">Обхват груди (см)</label>
+                <input type="number" id="bust" name="bust" placeholder="Например: 88" required>
+            </div>
+            <div class="form-group">
+                <label for="waist">Талия (см)</label>
+                <input type="number" id="waist" name="waist" placeholder="Например: 68" required>
+            </div>
+            <div class="form-group">
+                <label for="hips">Бёдра (см)</label>
+                <input type="number" id="hips" name="hips" placeholder="Например: 96" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Подобрать размер</button>
+        </form>
+
+        <div id="result" class="result" style="display:none;">
+            <h3>Рекомендуемый размер: <span id="size-display"></span></h3>
+            <p id="description-display"></p>
+        </div>
+
+        <div id="error-message" class="error-message" style="display:none;"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'size_helper/js/size_helper.js' %}"></script>
+{% endblock %}

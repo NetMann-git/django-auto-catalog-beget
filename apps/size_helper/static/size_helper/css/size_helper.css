@@ -1,0 +1,149 @@
+/* apps/size_helper/static/size_helper/css/size_helper.css */
+
+/* ========================================
+   РАЗМЕРНЫЙ ПОМОЩНИК
+======================================== */
+
+.size-helper-wrapper {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.size-helper-wrapper h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.size-helper-wrapper p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.size-helper-form .form-group {
+    margin-bottom: 16px;
+}
+
+.size-helper-form label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.size-helper-form input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+.size-helper-form input:focus {
+    border-color: #c9a86a;
+    outline: none;
+}
+
+.size-helper-form .btn {
+    width: 100%;
+    padding: 12px;
+    background: #c0392b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.size-helper-form .btn:hover {
+    background: #a93226;
+}
+
+.result {
+    margin-top: 24px;
+    padding: 20px;
+    background: #e8f5e9;
+    border-radius: 8px;
+    border-left: 4px solid #4CAF50;
+}
+
+.result h3 {
+    color: #2e7d32;
+    margin-bottom: 6px;
+    font-size: 18px;
+}
+
+.result p {
+    color: #555;
+    margin: 0;
+}
+
+.error-message {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: #fde8e8;
+    border-radius: 6px;
+    color: #c0392b;
+}
+
+/* ========================================
+   ТАБЛИЦА РАЗМЕРОВ
+======================================== */
+
+.size-table-wrapper {
+    padding: 10px 0;
+}
+
+.size-table-wrapper h3 {
+    font-size: 22px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.size-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.size-table th {
+    background: #f8f9fa;
+    padding: 10px 14px;
+    text-align: center;
+    font-weight: 600;
+    border-bottom: 2px solid #ddd;
+}
+
+.size-table td {
+    padding: 10px 14px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.size-table tr:hover {
+    background: #f5f5f5;
+}
+
+.size-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* ========================================
+   АДАПТИВНОСТЬ
+======================================== */
+
+@media (max-width: 768px) {
+    .size-helper-wrapper {
+        padding: 20px 10px;
+    }
+
+    .size-table {
+        font-size: 13px;
+    }
+
+    .size-table th,
+    .size-table td {
+        padding: 6px 10px;
+    }
+}

@@ -1,0 +1,18 @@
+<!-- apps/appointments/templates/admin/appointments/appointment/change_list.html -->
+
+{% extends "admin/change_list.html" %}
+
+{% block object-tools %}
+    <div class="object-tools">
+        <ul class="object-tools-items">
+            <li>
+                <a href="{% url 'admin:appointments_calendar' %}" 
+                   class="btn btn-primary" 
+                   style="padding: 8px 16px; background: #4CAF50; color: white; border-radius: 4px; text-decoration: none;">
+                    📅 Шахматка
+                </a>
+            </li>
+            {{ block.super }}
+        </ul>
+    </div>
+{% endblock %}

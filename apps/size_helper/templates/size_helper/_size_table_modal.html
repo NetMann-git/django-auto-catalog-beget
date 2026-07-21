@@ -1,0 +1,30 @@
+<!-- apps/size_helper/templates/size_helper/_size_table_modal.html -->
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'size_helper/css/size_helper.css' %}">
+
+<div class="size-table-wrapper">
+    <h3>Таблица размеров</h3>
+    <table class="size-table">
+        <thead>
+            <tr>
+                <th>Размер (RU)</th>
+                <th>Грудь (см)</th>
+                <th>Талия (см)</th>
+                <th>Бёдра (см)</th>
+                <th>Рост (см)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for size in sizes %}
+            <tr>
+                <td>{{ size.size }}</td>
+                <td>{{ size.chest }}</td>
+                <td>{{ size.waist }}</td>
+                <td>{{ size.hips }}</td>
+                <td>{{ size.height_min }}–{{ size.height_max }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

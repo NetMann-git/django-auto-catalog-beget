@@ -1,0 +1,145 @@
+<!-- apps/appointments/templates/admin/appointments/calendar.html -->
+
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<div class="appointment-calendar">
+    <h1>Календарь записи на примерку</h1>
+
+    <div class="calendar-nav">
+        <a href="?date={{ prev_date|date:'Y-m-d' }}" class="btn">&larr; {{ prev_date|date:'d.m.Y' }}</a>
+        <span class="current-date">{{ date|date:'d.m.Y' }}</span>
+        <a href="?date={{ next_date|date:'Y-m-d' }}" class="btn">{{ next_date|date:'d.m.Y' }} &rarr;</a>
+    </div>
+
+    <div class="calendar-grid">
+        <div class="calendar-header">
+            <span>Время</span>
+            <span>Статус</span>
+            <span>Действие</span>
+        </div>
+
+        {% if working_hours %}
+            {% for slot in slots %}
+                <div class="calendar-row {% if slot.is_booked %}booked{% else %}free{% endif %}">
+                    <span class="slot-time">{{ slot.time }}</span>
+                    <span class="slot-status">
+                        {% if slot.is_booked %}
+                            🔴 Занято
+                        {% else %}
+                            🟢 Свободно
+                        {% endif %}
+                    </span>
+                    <span class="slot-action">
+                        {% if slot.is_booked %}
+                            <span class="booked-label">Недоступно</span>
+                        {% else %}
+                            <button type="button" class="btn btn-success open-slot-form"
+                                    data-date="{{ date|date:'Y-m-d' }}"
+                                    data-time="{{ slot.time }}">
+                                Записать
+                            </button>
+                        {% endif %}
+                    </span>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-working-hours">В этот день салон не работает.</p>
+        {% endif %}
+    </div>
+
+    <div class="calendar-legend">
+        <span><span class="color-box free"></span> Свободно</span>
+        <span><span class="color-box booked"></span> Занято</span>
+    </div>
+
+    <!-- Модальное окно для создания записи -->
+    <div id="slot-form-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2>Создать запись</h2>
+            <form method="post" action="{% url 'admin:appointments_create_from_slot' %}">
+                {% csrf_token %}
+                <input type="hidden" name="date" id="slot-date">
+                <input type="hidden" name="time" id="slot-time">
+
+                <div class="form-row">
+                    <label for="slot-name">Имя *</label>
+                    <input type="text" name="name" id="slot-name" required>
+                </div>
+                <div class="form-row">
+                    <label for="slot-phone">Телефон *</label>
+                    <input type="text" name="phone" id="slot-phone" required>
+                </div>
+                <div class="form-row">
+                    <label for="slot-email">Email</label>
+                    <input type="email" name="email" id="slot-email">
+                </div>
+                <div class="form-row">
+                    <label for="slot-comment">Комментарий</label>
+                    <textarea name="comment" id="slot-comment" rows="2"></textarea>
+                </div>
+                <div class="form-row">
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .appointment-calendar { padding: 20px; max-width: 800px; margin: 0 auto; }
+    .calendar-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .calendar-grid { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
+    .calendar-header { display: grid; grid-template-columns: 1fr 1fr 1fr; background: #f5f5f5; padding: 10px; font-weight: bold; }
+    .calendar-row { display: grid; grid-template-columns: 1fr 1fr 1fr; padding: 10px; border-bottom: 1px solid #eee; align-items: center; }
+    .calendar-row.booked { background: #fde8e8; }
+    .calendar-row.free { background: #e8f5e9; }
+    .slot-time { font-weight: 500; }
+    .slot-status { font-size: 14px; }
+    .btn { padding: 6px 16px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; }
+    .btn-success { background: #4CAF50; color: white; }
+    .btn-success:hover { background: #388E3C; }
+    .btn-danger { background: #e74c3c; color: white; }
+    .btn-danger:hover { background: #c0392b; }
+    .booked-label { color: #999; font-size: 14px; }
+    .calendar-legend { display: flex; gap: 20px; margin-top: 20px; }
+    .color-box { display: inline-block; width: 20px; height: 20px; border-radius: 4px; vertical-align: middle; }
+    .color-box.free { background: #e8f5e9; border: 1px solid #4CAF50; }
+    .color-box.booked { background: #fde8e8; border: 1px solid #e74c3c; }
+
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+    .modal-content { background: white; padding: 30px; border-radius: 8px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; }
+    .modal-close { float: right; font-size: 28px; cursor: pointer; }
+    .form-row { margin-bottom: 12px; }
+    .form-row label { display: block; font-weight: 600; margin-bottom: 4px; }
+    .form-row input, .form-row textarea { width: 100%; padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('slot-form-modal');
+    const closeBtn = modal.querySelector('.modal-close');
+    const openButtons = document.querySelectorAll('.open-slot-form');
+
+    openButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('slot-date').value = this.dataset.date;
+            document.getElementById('slot-time').value = this.dataset.time;
+            modal.style.display = 'flex';
+        });
+    });
+
+    closeBtn.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

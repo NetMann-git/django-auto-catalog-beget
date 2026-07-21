@@ -52,8 +52,12 @@ INSTALLED_APPS = [
     # Приложения проекта
     'apps.home',
     'apps.products',
-    'apps.reviews'
-
+    'apps.wishlist',
+    'apps.reviews',
+    'apps.appointments',
+    'apps.size_helper',
+    'apps.users',
+    'apps.search',
 ]
 
 MIDDLEWARE = [
@@ -79,17 +83,20 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            BASE_DIR / 'config' / 'templates',  # изменено с PROJECT_DIR / 'templates'
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [
+            BASE_DIR / 'config' / 'templates',
         ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+                "apps.wishlist.context_processors.wishlist_count",
+                "apps.products.context_processors.comparison_ids",
+                "apps.products.context_processors.recently_viewed_ids",
             ],
         },
     },

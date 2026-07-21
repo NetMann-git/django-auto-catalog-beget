@@ -1,0 +1,511 @@
+/* static/users/css/consultant.css */
+
+/* Панель продавца + Шахматка + Модальное окно + Панель менеджера */
+
+/* ===== СТАТИСТИКА (общая для продавца и менеджера) ===== */
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.stat-card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #e9ecef;
+}
+
+.stat-number {
+    display: block;
+    font-size: 28px;
+    font-weight: bold;
+    color: #c0392b;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.stat-card a {
+    color: #c0392b;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.stat-card a:hover {
+    text-decoration: underline;
+}
+
+/* ===== ПАНЕЛЬ ПРОДАВЦА ===== */
+.appointments-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.appointments-table th,
+.appointments-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.appointments-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+}
+
+.appointments-table tr:hover {
+    background: #f5f5f5;
+}
+
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-confirmed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-completed {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.status-cancelled {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-form {
+    display: inline-block;
+}
+
+.status-form select {
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    font-size: 13px;
+}
+
+.btn-update {
+    padding: 5px 15px;
+    background: #c0392b;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.btn-update:hover {
+    background: #a93226;
+}
+
+.btn-back {
+    display: inline-block;
+    margin: 20px 0;
+    padding: 10px 20px;
+    background: #6c757d;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.btn-back:hover {
+    background: #5a6268;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+}
+
+/* ===== ШАХМАТКА (календарь) ===== */
+.calendar-container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+}
+
+.calendar-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.calendar-nav .btn {
+    padding: 8px 20px;
+    background: #f0f0f0;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #333;
+}
+
+.calendar-nav .btn:hover {
+    background: #ddd;
+}
+
+.current-date {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.calendar-grid {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.calendar-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background: #f5f5f5;
+    padding: 12px;
+    font-weight: bold;
+}
+
+.calendar-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.calendar-row:last-child {
+    border-bottom: none;
+}
+
+.calendar-row.booked {
+    background: #fde8e8;
+}
+
+.calendar-row.free {
+    background: #e8f5e9;
+}
+
+.slot-time {
+    font-weight: 500;
+}
+
+.btn-success {
+    padding: 6px 16px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 13px;
+}
+
+.btn-success:hover {
+    background: #388E3C;
+}
+
+.btn-success-full {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.booked-label {
+    color: #999;
+    font-size: 14px;
+}
+
+.calendar-legend {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+    padding: 10px 0;
+}
+
+.color-box {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+.color-box.free {
+    background: #e8f5e9;
+    border: 1px solid #4CAF50;
+}
+
+.color-box.booked {
+    background: #fde8e8;
+    border: 1px solid #e74c3c;
+}
+
+.no-working-hours {
+    padding: 40px;
+    text-align: center;
+    color: #999;
+}
+
+/* ===== МОДАЛЬНОЕ ОКНО (для шахматки) ===== */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.modal[style*="display: flex"] {
+    display: flex !important;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    cursor: pointer;
+    color: #999;
+    background: none;
+    border: none;
+}
+
+.modal-close:hover {
+    color: #333;
+}
+
+.modal-content .form-row {
+    margin-bottom: 12px;
+}
+
+.modal-content .form-row label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.modal-content .form-row input,
+.modal-content .form-row textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* ===== ПАНЕЛЬ МЕНЕДЖЕРА ===== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.stat-card-primary,
+.stat-card-success,
+.stat-card-danger,
+.stat-card-warning,
+.stat-card-info {
+    padding: 25px 20px;
+    border-radius: 12px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.stat-card-primary:hover,
+.stat-card-success:hover,
+.stat-card-danger:hover,
+.stat-card-warning:hover,
+.stat-card-info:hover {
+    transform: translateY(-5px);
+}
+
+.stat-card-primary .stat-number,
+.stat-card-success .stat-number,
+.stat-card-danger .stat-number,
+.stat-card-warning .stat-number,
+.stat-card-info .stat-number {
+    display: block;
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.stat-card-primary .stat-label,
+.stat-card-success .stat-label,
+.stat-card-danger .stat-label,
+.stat-card-warning .stat-label,
+.stat-card-info .stat-label {
+    display: block;
+    font-size: 16px;
+    opacity: 0.95;
+    margin-top: 5px;
+    color: white;
+}
+
+.stat-card-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.stat-card-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.stat-card-danger {
+    background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+}
+
+.stat-card-warning {
+    background: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
+}
+
+.stat-card-info {
+    background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+}
+
+.section-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.section-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.section-card h3 {
+    margin-bottom: 15px;
+    color: #333;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+    font-size: 18px;
+}
+
+.section-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.section-card li {
+    padding: 10px 0;
+    border-bottom: 1px solid #f5f5f5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.section-card li:last-child {
+    border-bottom: none;
+}
+
+.section-card li span:first-child {
+    color: #555;
+}
+
+.section-card li span:last-child {
+    font-weight: 600;
+    color: #333;
+}
+
+.star-rating {
+    color: #f5c842;
+    font-size: 20px;
+}
+
+/* ===== АДАПТИВНОСТЬ ===== */
+@media (max-width: 768px) {
+    .appointments-table {
+        font-size: 14px;
+    }
+    
+    .appointments-table th,
+    .appointments-table td {
+        padding: 8px;
+    }
+    
+    .status-form {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .calendar-header,
+    .calendar-row {
+        grid-template-columns: 1fr 1fr 1fr;
+        font-size: 14px;
+        padding: 8px;
+    }
+    
+    .section-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+    }
+    
+    .stat-card-primary .stat-number,
+    .stat-card-success .stat-number,
+    .stat-card-danger .stat-number,
+    .stat-card-warning .stat-number,
+    .stat-card-info .stat-number {
+        font-size: 30px;
+    }
+    
+    .stat-card-primary .stat-label,
+    .stat-card-success .stat-label,
+    .stat-card-danger .stat-label,
+    .stat-card-warning .stat-label,
+    .stat-card-info .stat-label {
+        font-size: 14px;
+    }
+    
+    .modal-content {
+        margin: 10px;
+        padding: 20px;
+    }
+}
