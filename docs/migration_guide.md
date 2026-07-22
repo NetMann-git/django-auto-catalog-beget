@@ -1,5 +1,3 @@
-Хорошо! Дополню инструкцию разделом с ручной выгрузкой каждой модели отдельно, как в предыдущей версии.
-
 ---
 
 # 📋 Инструкция по переносу данных между проектами Django
@@ -16,6 +14,7 @@
 8. [Проверка после переноса](#8-проверка-после-переноса)
 9. [Возможные проблемы и решения](#9-возможные-проблемы-и-решения)
 10. [Специальный скрипт для загрузки пользователей](#10-специальный-скрипт-для-загрузки-пользователей)
+11. [Деплой на хостинг Beget](#11-деплой-на-хостинг-beget)
 
 ---
 
@@ -546,6 +545,146 @@ python load_users_without_signals.py
 
 ---
 
+## 11. Деплой на хостинг Beget
+
+### 11.1 Подготовка на сервере
+
+**Подключитесь к серверу:**
+```bash
+ssh ваше_имя_пользователя@moreug.beget.tech
+```
+
+**Перейдите в папку проекта:**
+```bash
+cd ~/moreug.beget.tech/public_html/catalog-clean
+```
+
+**Переключитесь на ветку `prod` и обновите код:**
+```bash
+git checkout prod
+git pull origin prod
+```
+
+---
+
+### 11.2 Установка зависимостей и миграции
+
+**Активируйте виртуальное окружение:**
+```bash
+source ~/moreug.beget.tech/public_html/venv/bin/activate
+```
+
+**Установите зависимости:**
+```bash
+pip install -r requirements.txt
+```
+
+**Примените миграции:**
+```bash
+python manage.py migrate --settings=config.settings.prod
+```
+
+**Создайте суперпользователя:**
+```bash
+python manage.py createsuperuser --settings=config.settings.prod
+```
+
+---
+
+### 11.3 Загрузка фикстур (демо-данных)
+
+**Скопируйте файлы `.json` на сервер (локально):**
+```bash
+scp *.json ваше_имя_пользователя@moreug.beget.tech:~/moreug.beget.tech/public_html/catalog-clean/
+```
+
+**На сервере загрузите фикстуры в правильном порядке:**
+```bash
+# 1. Независимые модели
+python manage.py loaddata categories.json --settings=config.settings.prod
+python manage.py loaddata brands.json --settings=config.settings.prod
+python manage.py loaddata badges.json --settings=config.settings.prod
+python manage.py loaddata attribute_types.json --settings=config.settings.prod
+
+# 2. Зависят от предыдущих
+python manage.py loaddata attribute_values.json --settings=config.settings.prod
+
+# 3. Товары и связанные данные
+python manage.py loaddata products.json --settings=config.settings.prod
+python manage.py loaddata gallery.json --settings=config.settings.prod
+python manage.py loaddata product_attributes.json --settings=config.settings.prod
+
+# 4. Отзывы (после пользователей!)
+python manage.py loaddata users.json --settings=config.settings.prod
+python manage.py loaddata profiles.json --settings=config.settings.prod
+python manage.py loaddata reviews.json --settings=config.settings.prod
+python manage.py loaddata review_images.json --settings=config.settings.prod
+python manage.py loaddata review_votes.json --settings=config.settings.prod
+python manage.py loaddata review_replies.json --settings=config.settings.prod
+
+# 5. Записи на примерку
+python manage.py loaddata appointments.json --settings=config.settings.prod
+python manage.py loaddata working_hours.json --settings=config.settings.prod
+```
+
+---
+
+### 11.4 Копирование медиа-файлов и симлинк
+
+**Скопируйте папку `media/` на сервер (локально):**
+```bash
+scp -r F:\Projects\moreug.beget.tech\public_html\catalog-clean\media\* ваше_имя_пользователя@moreug.beget.tech:~/moreug.beget.tech/public_html/catalog-clean/media/
+```
+
+**Создайте симлинк для медиа (на сервере):**
+```bash
+cd ~/moreug.beget.tech/public_html/
+rm -rf media/                      # удаляем старую папку, если есть
+ln -s catalog-clean/media media    # создаём симлинк
+```
+
+**Проверьте:**
+```bash
+ls -la media/
+# должно показывать: media -> catalog-clean/media/
+```
+
+**Права на папку `media/`:**
+```bash
+chmod -R 755 ~/moreug.beget.tech/public_html/catalog-clean/media/
+```
+
+---
+
+### 11.5 Сборка статики и перезапуск
+
+**Соберите статику:**
+```bash
+python manage.py collectstatic --settings=config.settings.prod --noinput
+```
+
+**Перезапустите приложение:**
+```bash
+touch ~/moreug.beget.tech/public_html/catalog-clean/config/tmp/restart.txt
+```
+
+---
+
+### 11.6 Проверка
+
+Откройте в браузере:
+```
+https://moreug.beget.tech
+```
+
+Проверьте:
+- [ ] Главная страница
+- [ ] Каталог товаров
+- [ ] Страницы товаров (фото должны отображаться)
+- [ ] Админка
+
+---
+
 ## 12. Быстрый чек-лист перед переносом
 
 - [ ] В старом проекте выполнены все миграции
@@ -556,6 +695,7 @@ python load_users_without_signals.py
 - [ ] Или готовы импортировать каждую модель вручную через `loaddata`
 - [ ] Сигналы отключены перед загрузкой пользователей
 - [ ] Медиа-файлы скопированы после загрузки данных
+- [ ] Симлинк для `media/` создан на сервере
 - [ ] Суперпользователь создан в новом проекте
 
 ---
