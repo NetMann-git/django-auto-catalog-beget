@@ -1,21 +1,425 @@
 <!-- apps\products\templates\products\catalog.html -->
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}Каталог товаров{% endblock %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'products/css/catalog.css' %}">
+<link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
+{% endblock extra_css %}
 
 {% block content %}
-<div class="container">
-    <h1>Каталог товаров</h1>
-    
-    {% if categories %}
-        <ul>
-        {% for category in categories %}
-            <li>{{ category.title }}</li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>Категории пока не добавлены.</p>
-    {% endif %}
-</div>
-{% endblock %}
 
+<div class="container">
+
+    <h1>{{ page.title }}</h1>
+
+    <p>{{ page.intro }}</p>
+    
+    <div class="catalog-layout">
+
+        <aside class="catalog-sidebar">
+
+            <form method="get" class="catalog-filters">
+
+                <h2 class="filters-title">
+                    Фильтры
+                </h2>
+
+                <div class="search-field">
+                    <input
+                        type="text"
+                        name="q"
+                        placeholder="Поиск по названию..."
+                        value="{{ search_query }}"
+                    >
+                    <button type="submit">Найти</button>
+                </div>
+
+                <label class="filter-label">Категория</label>
+                <select name="category" onchange="this.form.submit()">
+                    <option value="">Все категории</option>
+                    {% for category in categories %}
+                        <option value="{{ category.pk }}"
+                            {% if selected_category|stringformat:"s" == category.pk|stringformat:"s" %}selected{% endif %}>
+                            {{ category.title }}
+                        </option>
+                    {% endfor %}
+                </select>              
+                
+                <label class="filter-label">
+                    Силуэт
+                </label>
+                
+                <select name="silhouette" onchange="this.form.submit()">
+
+                    <option value="">Все силуэты</option>
+
+                    {% for value in silhouettes %}
+                        <option value="{{ value }}" {% if selected_silhouette == value %}selected{% endif %}>
+                            {{ value }}
+                        </option>
+                    {% endfor %}
+
+                </select>
+
+                <label class="filter-label">Бренд</label>
+                <select name="brand" onchange="this.form.submit()">
+                    <option value="">Все бренды</option>
+                    {% for brand in brands %}
+                        <option value="{{ brand.pk }}" {% if selected_brand|stringformat:"s" == brand.pk|stringformat:"s" %}selected{% endif %}>
+                            {{ brand.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label class="filter-label">
+                    Коллекция
+                </label>
+
+                <select name="collection" onchange="this.form.submit()">
+
+                    <option value="">Все коллекции</option>
+
+                    {% for value in collections %}
+                        <option value="{{ value }}" {% if selected_collection == value %}selected{% endif %}>
+                            {{ value }}
+                        </option>
+                    {% endfor %}
+
+                </select>
+
+                <label class="filter-label">
+                    Цвет
+                </label>
+
+                <select name="color" onchange="this.form.submit()">
+
+                    <option value="">Все цвета</option>
+
+                    {% for color in colors %}
+                        <option
+                            value="{{ color }}"
+                            {% if selected_color == color %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ color }}
+                        </option>
+                    {% endfor %}
+
+                </select>
+
+                <label class="filter-label">Наличие</label>
+                <select name="availability" onchange="this.form.submit()">
+                    <option value="">Все</option>
+                    {% for value, label in availabilities %}
+                        <option value="{{ value }}" {% if selected_availability == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label class="filter-label">
+                    Цена
+                </label>
+               
+                <input
+                    type="number"
+                    name="price_min"
+                    placeholder="Цена от"
+                    value="{{ selected_price_min }}"
+                >
+
+                <input
+                    type="number"
+                    name="price_max"
+                    placeholder="Цена до"
+                    value="{{ selected_price_max }}"
+                >
+
+                <button type="submit" class="btn">
+                    Применить
+                </button>
+
+            </form>
+
+        </aside>
+
+        <main class="catalog-content">
+
+            <h2 class="catalog-section-title">
+                Модели платьев
+            </h2>
+
+            <div class="catalog-toolbar">
+
+                <div class="catalog-toolbar-left">
+
+                    <p class="catalog-count">
+                        Найдено моделей: {{ page_obj.paginator.count }}
+                    </p>
+
+                    {% if selected_silhouette or selected_collection or selected_color or selected_price_min or selected_price_max or selected_category or selected_brand %}
+
+                        <a href="?" class="clear-filters">
+                            ✕ Очистить все
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+                <form method="get">
+
+                    {% if selected_category %}
+                        <input type="hidden" name="category" value="{{ selected_category }}">
+                    {% endif %}
+                    
+                    {% if selected_silhouette %}
+                    <input
+                        type="hidden"
+                        name="silhouette"
+                        value="{{ selected_silhouette }}"
+                    >
+                    {% endif %}
+
+                    {% if selected_brand %}
+                        <input type="hidden" name="brand" value="{{ selected_brand }}">
+                    {% endif %}
+
+                    {% if selected_collection %}
+                    <input
+                        type="hidden"
+                        name="collection"
+                        value="{{ selected_collection }}"
+                    >
+                    {% endif %}                    
+
+                    {% if selected_color %}
+                    <input
+                        type="hidden"
+                        name="color"
+                        value="{{ selected_color }}"
+                    >
+                    {% endif %}
+                    
+                    {% if selected_availability %}
+                        <input type="hidden" name="availability" value="{{ selected_availability }}">
+                    {% endif %}
+
+                    {% if selected_price_min %}
+                    <input
+                        type="hidden"
+                        name="price_min"
+                        value="{{ selected_price_min }}"
+                    >
+                    {% endif %} 
+
+                    {% if selected_price_max %}
+                    <input
+                        type="hidden"
+                        name="price_max"
+                        value="{{ selected_price_max }}"
+                    >
+                    {% endif %} 
+
+                    <select name="sort" onchange="this.form.submit()">
+
+                        <option value="">По умолчанию</option>
+
+                        <option value="price_asc"
+                            {% if selected_sort == "price_asc" %}
+                                selected
+                            {% endif %}
+                        >
+                            Цена ↑
+                        </option>
+
+                        <option value="price_desc"
+                            {% if selected_sort == "price_desc" %}
+                                selected
+                            {% endif %}
+                        >
+                            Цена ↓
+                        </option>
+
+                        <option value="title_asc"
+                            {% if selected_sort == "title_asc" %}
+                                selected
+                            {% endif %}
+                        >
+                            Название А-Я
+                        </option>
+
+                        <option value="title_desc"
+                            {% if selected_sort == "title_desc" %}
+                                selected
+                            {% endif %}
+                        >
+                            Название Я-А
+                        </option>
+
+                    </select>
+
+                </form>
+
+            </div>
+
+  
+            <!-- Активные фильтры -->
+            {% if selected_silhouette or selected_collection or selected_color or selected_price_min or selected_price_max or selected_category or selected_brand or selected_availability %}
+
+            <div class="active-filters">
+
+                {% if selected_silhouette %}
+                    <a class="filter-chip"
+                        href="?{% if selected_collection %}collection={{ selected_collection }}&{% endif %}{% if selected_color %}color={{ selected_color }}&{% endif %}{% if selected_price_min %}price_min={{ selected_price_min }}&{% endif %}{% if selected_price_max %}price_max={{ selected_price_max }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}{% endif %}">
+                        Силуэт: {{ selected_silhouette }} ✕
+                    </a>
+                {% endif %}
+
+                {% if selected_collection %}
+                    <a class="filter-chip"
+                        href="?{% if selected_silhouette %}silhouette={{ selected_silhouette }}&{% endif %}{% if selected_color %}color={{ selected_color }}&{% endif %}{% if selected_price_min %}price_min={{ selected_price_min }}&{% endif %}{% if selected_price_max %}price_max={{ selected_price_max }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}{% endif %}">
+                        Коллекция: {{ selected_collection }} ✕
+                    </a>
+                {% endif %}
+
+                {% if selected_color %}
+                    <a class="filter-chip"
+                        href="?{% if selected_silhouette %}silhouette={{ selected_silhouette }}&{% endif %}{% if selected_collection %}collection={{ selected_collection }}&{% endif %}{% if selected_price_min %}price_min={{ selected_price_min }}&{% endif %}{% if selected_price_max %}price_max={{ selected_price_max }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}{% endif %}">
+                        Цвет: {{ selected_color }} ✕
+                    </a>
+                {% endif %}
+
+                {% if selected_price_min %}
+                    <a class="filter-chip"
+                        href="?{% if selected_silhouette %}silhouette={{ selected_silhouette }}&{% endif %}{% if selected_collection %}collection={{ selected_collection }}&{% endif %}{% if selected_color %}color={{ selected_color }}&{% endif %}{% if selected_price_max %}price_max={{ selected_price_max }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}{% endif %}">
+                        Цена от: {{ selected_price_min }} ✕
+                    </a>
+                {% endif %}
+
+                {% if selected_price_max %}
+                    <a class="filter-chip"
+                        href="?{% if selected_silhouette %}silhouette={{ selected_silhouette }}&{% endif %}{% if selected_collection %}collection={{ selected_collection }}&{% endif %}{% if selected_color %}color={{ selected_color }}&{% endif %}{% if selected_price_min %}price_min={{ selected_price_min }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}{% endif %}">
+                        Цена до: {{ selected_price_max }} ✕
+                    </a>
+                {% endif %}
+
+                {% if selected_category %}
+                    <a class="filter-chip"
+                        href="?{% if selected_silhouette %}silhouette={{ selected_silhouette }}&{% endif %}{% if selected_collection %}collection={{ selected_collection }}&{% endif %}{% if selected_color %}color={{ selected_color }}&{% endif %}{% if selected_price_min %}price_min={{ selected_price_min }}&{% endif %}{% if selected_price_max %}price_max={{ selected_price_max }}&{% endif %}{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}{% endif %}">
+                        Категория: {{ selected_category }} ✕
+                    </a>
+                {% endif %}
+
+                {% if selected_brand %}
+                    <a class="filter-chip"
+                        href="?{% if selected_silhouette %}silhouette={{ selected_silhouette }}&{% endif %}{% if selected_collection %}collection={{ selected_collection }}&{% endif %}{% if selected_color %}color={{ selected_color }}&{% endif %}{% if selected_price_min %}price_min={{ selected_price_min }}&{% endif %}{% if selected_price_max %}price_max={{ selected_price_max }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}{% endif %}">
+                        Бренд: {{ selected_brand_name }} ✕
+                    </a>
+                {% endif %}
+
+                {% if selected_availability %}
+                    <a class="filter-chip"
+                        href="?{% if selected_silhouette %}silhouette={{ selected_silhouette }}&{% endif %}{% if selected_collection %}collection={{ selected_collection }}&{% endif %}{% if selected_color %}color={{ selected_color }}&{% endif %}{% if selected_price_min %}price_min={{ selected_price_min }}&{% endif %}{% if selected_price_max %}price_max={{ selected_price_max }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}{% endif %}">
+                        Наличие: {{ selected_availability_label }} ✕
+                    </a>
+                {% endif %}
+
+
+            </div>
+
+            {% endif %}
+
+            <div class="dress-grid">
+
+                {% for product in products %}
+
+                    {% include "products/_product_card.html" with product=product %}
+
+                {% empty %}
+
+                    <p>Платья не найдены.</p>
+
+                {% endfor %}
+
+            </div> <!-- dress-grid -->
+  
+        <!-- сюда вставим пагинацию -->
+
+        {% if page_obj.has_other_pages %}
+
+        <nav class="pagination">
+
+            {% if page_obj.has_previous %}
+                <!-- Первая страница -->
+                <a
+                    class="page-link"
+                    href="?page=1{% if query_params %}&{{ query_params }}{% endif %}"
+                >
+                    «
+                </a>
+                <!-- Предыдущая -->
+                <a
+                    class="page-link"
+                    href="?page={{ page_obj.previous_page_number }}{% if query_params %}&{{ query_params }}{% endif %}"
+                >
+                    ←
+                </a>
+
+            {% endif %}
+
+
+            {% for num in page_obj.paginator.page_range %}
+
+                {% if num == page_obj.number %}
+
+                    <span class="page-link active">
+                        {{ num }}
+                    </span>
+
+                {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+                    <!-- Номер страницы -->
+                    <a
+                        class="page-link"
+                        href="?page={{ num }}{% if query_params %}&{{ query_params }}{% endif %}"
+                    >
+                        {{ num }}
+                    </a>
+
+                {% endif %}
+
+            {% endfor %}
+
+
+            {% if page_obj.has_next %}
+                <!-- Следующая -->
+                <a
+                    class="page-link"
+                    href="?page={{ page_obj.next_page_number }}{% if query_params %}&{{ query_params }}{% endif %}"
+                >
+                    →
+                </a>
+                <!-- Последняя -->
+                <a
+                    class="page-link"
+                    href="?page={{ page_obj.paginator.num_pages }}{% if query_params %}&{{ query_params }}{% endif %}"
+                >
+                    »
+                </a>
+
+            {% endif %}
+
+        </nav>
+
+        {% endif %}
+
+        </main>
+
+    </div>
+ 
+</div>
+
+{% endblock %}

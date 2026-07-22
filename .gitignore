@@ -48,3 +48,7 @@ Thumbs.db
 # Файлы деплоя (для Beget)
 
 .htaccess
+
+# Файлы cache
+cache/
+*.djcache
