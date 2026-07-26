@@ -1,0 +1,74 @@
+/* config/static/css/themes/wedding.css */
+
+/* ============================================================
+   ТЕМА: СВАДЕБНЫЙ САЛОН (золото, нежность, романтика)
+   ============================================================ */
+
+:root {
+  /* Основные цвета бренда */
+  --color-primary: #C9A96E;                /* Золото */
+  --color-primary-light: #E8D5B5;
+  --color-primary-dark: #B8944A;
+  --color-primary-bg: rgba(201, 169, 110, 0.10);
+
+  --color-secondary: #E8D0D0;             /* Пыльная роза */
+  --color-secondary-light: #F5E8E8;
+  --color-secondary-dark: #D4B8B8;
+
+  /* Акценты и статусы */
+  --color-accent: #D4AF37;                /* Металлик-золото */
+  --color-success: #8FBC8F;               /* Приглушённый зелёный */
+  --color-warning: #E6C88A;
+  --color-danger: #D4857B;
+
+  /* Нейтральная палитра (слегка тёплые оттенки) */
+  --color-white: #FFFFFF;
+  --color-black: #2D2D2D;
+  --color-gray-50: #FDF9F5;              /* Тёплый почти белый */
+  --color-gray-100: #F8F2EC;
+  --color-gray-200: #F0E6DD;
+  --color-gray-300: #E2D4C6;
+  --color-gray-400: #C4B5A5;
+  --color-gray-500: #9C8D7E;
+  --color-gray-600: #7A6D60;
+  --color-gray-700: #5C5247;
+  --color-gray-800: #3E362E;
+  --color-gray-900: #2D2D2D;
+
+  /* Фоны */
+  --bg-body: #FFFBF5;
+  --bg-card: #FFFFFF;
+  --bg-header: rgba(255, 255, 255, 0.92);
+  --bg-footer: #3E362E;
+
+  /* Текст */
+  --text-primary: #2D2D2D;
+  --text-secondary: #7A6D60;
+  --text-light: #B5A692;
+  --text-on-primary: #FFFFFF;
+
+  /* Градиенты */
+  --gradient-primary: linear-gradient(135deg, #C9A96E 0%, #E8D5B5 50%, #C9A96E 100%);
+
+  /* Тени (с тёплым отливом) */
+  --shadow-sm: 0 1px 3px rgba(200, 170, 150, 0.12);
+  --shadow-md: 0 4px 12px rgba(200, 170, 150, 0.15);
+  --shadow-lg: 0 8px 24px rgba(200, 170, 150, 0.18);
+  --shadow-xl: 0 12px 36px rgba(200, 170, 150, 0.20);
+
+  /* Типографика */
+  --font-serif: 'Playfair Display', 'Georgia', serif;
+  --font-display: var(--font-serif);
+  --font-script: 'Great Vibes', 'Alex Brush', cursive;  /* для декоративных заголовков */
+
+  /* Дополнительные декоративные переменные */
+  --decoration-line-color: var(--color-primary-light);
+}
+
+/* Лёгкая декоративная текстура фона (по желанию) */
+body {
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(245, 224, 210, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(245, 224, 210, 0.25) 0%, transparent 50%);
+  background-attachment: fixed;
+}
