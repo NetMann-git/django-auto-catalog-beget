@@ -35,10 +35,14 @@
     {% endif %}
 
     {% block global_css %}
+
+        <link rel="stylesheet" href="{% static 'css/core/variables.css' %}">
+        <link rel="stylesheet" href="{% static 'css/core/components.css' %}">   
         <link rel="stylesheet" type="text/css" href="{% static 'css/config.css' %}">
         <link rel="stylesheet" type="text/css" href="{% static 'search/css/search.css' %}">
         <link rel="stylesheet" type="text/css" href="{% static 'css/modal.css' %}">
-    
+
+
     {% endblock %}
 
     {% block extra_css %}{% endblock %}
@@ -81,8 +85,8 @@
         История просмотров (<span id="recently-viewed-count">{{ recently_viewed_ids|length }}</span>)
     </a>
 
-    <button type="button" class="appointment-link-btn" id="open-appointment-modal-header">
-        Записаться на примерку
+    <button type="button" class="btn btn-primary" id="open-appointment-modal-header">
+        <span>Записаться на примерку</span>
     </button>
 
     {% if user.is_authenticated %}
