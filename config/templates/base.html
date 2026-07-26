@@ -38,8 +38,13 @@
 
         <link rel="stylesheet" href="{% static 'css/core/variables.css' %}">
         <link rel="stylesheet" href="{% static 'css/core/components.css' %}"> 
-        <!-- ВРЕМЕННО: тема свадебного салона (заменить на динамическую) -->
-        <link rel="stylesheet" href="{% static 'css/themes/wedding.css' %}">  
+
+        {% if current_theme %}
+            <link rel="stylesheet" href="{% static 'css/themes/'|add:current_theme|add:'.css' %}">
+        {% else %}
+            <link rel="stylesheet" href="{% static 'css/themes/default.css' %}">
+        {% endif %}
+ 
         <link rel="stylesheet" type="text/css" href="{% static 'css/config.css' %}">
         <link rel="stylesheet" type="text/css" href="{% static 'search/css/search.css' %}">
         <link rel="stylesheet" type="text/css" href="{% static 'css/modal.css' %}">
@@ -50,7 +55,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 
-<body class="{% block body_class %}{% endblock %}">
+<body class="{% block body_class %}{% endblock %} {{ current_theme }}-theme">
 
     <script>
     function getCookie(name) {
