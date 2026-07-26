@@ -1,0 +1,51 @@
+<!-- config/templates/includes/header.html -->
+
+{% load static %}
+<header class="site-header">
+    <div class="container header-inner">
+        <!-- Логотип / название -->
+        <a href="/" class="logo">
+            {% if site_name %}{{ site_name }}{% else %}Каталог{% endif %}
+        </a>
+
+        <!-- Поиск -->
+        <div id="search-container" class="search-container">
+            <input type="text" id="search-input" placeholder="Поиск по каталогу..." autocomplete="off">
+            <div id="search-results" class="search-results" style="display:none;"></div>
+        </div>
+
+        <!-- Навигация -->
+        <nav class="main-nav">
+            <a href="{% url 'catalog:comparison' %}" class="nav-link">
+                <span>Сравнение</span>
+                <span class="badge-count" id="comparison-count">{{ comparison_ids|length }}</span>
+            </a>
+            <a href="{% url 'wishlist:list' %}" class="nav-link">
+                <span>Избранное</span>
+                <span class="badge-count" id="wishlist-count">{{ wishlist_count|default:0 }}</span>
+            </a>
+            <a href="{% url 'catalog:recently_viewed' %}" class="nav-link">
+                <span>История</span>
+                <span class="badge-count" id="recently-viewed-count">{{ recently_viewed_ids|length }}</span>
+            </a>
+        </nav>
+
+        <!-- Действия -->
+        <div class="header-actions">
+            <button type="button" class="btn btn-primary" id="open-appointment-modal-header">
+                <span>Записаться на примерку</span>
+            </button>
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'users:dashboard' %}" class="nav-link">Личный кабинет</a>
+                <form method="post" action="{% url 'users:logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-ghost">Выйти</button>
+                </form>
+            {% else %}
+                <a href="{% url 'users:login' %}" class="nav-link">Войти</a>
+                <a href="{% url 'users:register' %}" class="btn btn-outline">Регистрация</a>
+            {% endif %}
+        </div>
+    </div>
+</header>
