@@ -2,58 +2,87 @@
 
 {% load static %}
 
-<article class="dress-card" itemscope itemtype="https://schema.org/Product">
+<article class="card product-card"
+         data-product-id="{{ product.id }}"
+         itemscope itemtype="https://schema.org/Product">
 
-    <div class="badges">
-        {% for badge in product.badges.all %}
-            <span class="badge badge-{{ badge.slug }}">{{ badge.title }}</span>
-        {% endfor %}
-    </div>
-
-    <!-- Кнопка сравнения -->
-    <button class="compare-btn {% if product.id in comparison_ids %}active{% endif %}"
-            data-product-id="{{ product.id }}"
-            data-url="{% url 'catalog:toggle_comparison_ajax' product.id %}"
-            type="button">
-        {% if product.id in comparison_ids %}
-            Убрать из сравнения
+    <!-- Блок изображения -->
+    <div class="card-image">
+        {% if product.image %}
+            <img src="{{ product.image.url }}"
+                 alt="{{ product.title }}"
+                 itemprop="image"
+                 loading="lazy">
         {% else %}
-            Сравнить
+            <div class="card-image-placeholder">
+                <span>Нет фото</span>
+            </div>
         {% endif %}
-    </button>
 
-    <!-- Новая кнопка избранного -->
-    {% include "wishlist/_button.html" with product=product %}
-
-
-
-    {% if product.image %}
-        <a href="{{ product.get_absolute_url }}" class="dress-image-link">
-            <img src="{{ product.image.url }}" alt="{{ product.title }}" class="dress-card-image primary-image">
-        </a>
-    {% else %}
-        <div class="dress-image-placeholder">Нет фото</div>
-    {% endif %}
-
-    <div class="dress-card-content">
-        <h3 class="dress-title" itemprop="name">
-            <a href="{{ product.get_absolute_url }}">{{ product.title }}</a>
-        </h3>
-        <div class="dress-meta">
-            {% for attr in product.attributes.all %}
-                <span>{{ attr.attribute_type.name }}: {{ attr.attribute_value.value }}</span>
+        <!-- Бейджи -->
+        <div class="card-badges">
+            {% for badge in product.badges.all %}
+                <span class="badge badge-{{ badge.slug }}">{{ badge.title }}</span>
             {% endfor %}
         </div>
-        <div itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-            <meta itemprop="priceCurrency" content="RUB">
-            <span class="dress-price" itemprop="price">от {{ product.price }}</span>
-            <span class="currency">₽</span>
-        </div>
-        <div class="product-availability">
-            <span class="availability-status availability-{{ product.availability_status }}">
-                {{ product.get_availability_status_display }}
-            </span>
+
+        <!-- Кнопки действий -->
+        <div class="card-actions">
+            {% include "wishlist/_button.html" with product=product %}
+
+            <button class="card-action-btn compare-btn {% if product.id in comparison_ids %}active{% endif %}"
+                    data-product-id="{{ product.id }}"
+                    data-url="{% url 'catalog:toggle_comparison_ajax' product.id %}"
+                    type="button"
+                    title="{% if product.id in comparison_ids %}Убрать из сравнения{% else %}Добавить к сравнению{% endif %}"
+                    aria-label="Переключить сравнение">
+                <svg class="icon icon-compare" viewBox="0 0 24 24" width="18" height="18">
+                    <path d="M10 3H4v6h6V3zm10 0h-6v6h6V3zM10 13H4v6h6v-6zm10 0h-6v6h6v-6z"/>
+                </svg>
+            </button>
+
+            {% if show_remove_btn %}
+                <button class="card-action-btn remove-btn"
+                        data-product-id="{{ product.id }}"
+                        title="Удалить из списка"
+                        aria-label="Удалить">
+                    <svg class="icon icon-close" viewBox="0 0 24 24" width="18" height="18">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                </button>
+            {% endif %}
         </div>
     </div>
 
+    <!-- Информация о товаре -->
+    <div class="card-content">
+        <h3 class="card-title" itemprop="name">
+            <a href="{{ product.get_absolute_url }}" itemprop="url">
+                {{ product.title }}
+            </a>
+        </h3>
+
+        <div class="card-price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+            <span class="current-price" itemprop="price" content="{{ product.price }}">
+                {{ product.price|floatformat:0 }} ₽
+            </span>
+            <meta itemprop="priceCurrency" content="RUB">
+        </div>
+
+        <div class="card-availability">
+            {% if product.availability_status == 'in_stock' %}
+                <span class="availability-badge in-stock">В наличии</span>
+            {% elif product.availability_status == 'under_order' %}
+                <span class="availability-badge on-order">Под заказ</span>
+            {% elif product.availability_status == 'last_size' %}
+                <span class="availability-badge last-size">Последний размер</span>
+            {% elif product.availability_status == 'out_of_stock' %}
+                <span class="availability-badge out-of-stock">Нет в наличии</span>
+            {% endif %}
+        </div>
+
+        <a href="{{ product.get_absolute_url }}" class="btn btn-outline btn-quick-view">
+            Подробнее
+        </a>
+    </div>
 </article>
