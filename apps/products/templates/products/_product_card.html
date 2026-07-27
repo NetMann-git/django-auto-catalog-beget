@@ -11,10 +11,11 @@
        aria-label="Подробнее о {{ product.title }}">
         <div class="card-image">
             {% if product.image %}
-                <img src="{{ product.image.url }}"
-                     alt="{{ product.title }}"
-                     itemprop="image"
-                     loading="lazy">
+                <img src="{% thumbnail product.image 400x533 crop %}"
+                    alt="{{ product.title }}"
+                    itemprop="image"
+                    loading="lazy"
+                    decoding="async">
             {% else %}
                 <div class="card-image-placeholder">
                     <span>Нет фото</span>
