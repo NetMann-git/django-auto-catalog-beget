@@ -48,6 +48,7 @@ INSTALLED_APPS = [
 
     # Сторонние
     'smart_selects',
+    'easy_thumbnails',
 
     # Приложения проекта
     'apps.home',
