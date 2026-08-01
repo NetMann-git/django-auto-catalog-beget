@@ -178,6 +178,7 @@
   position: relative;
   overflow: hidden;
   aspect-ratio: 3 / 4;          /* вертикальный формат */
+  max-height: 500px;
   background: var(--color-gray-100);
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
@@ -185,6 +186,7 @@
 .card-image img {
   width: 100%;
   height: 100%;
+  max-height: 500px;
   object-fit: cover;
   transition: transform 0.4s ease;
 }
@@ -407,3 +409,30 @@
   font-size: 1rem;
   line-height: 1;
 }
+
+/* Сетка товаров */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+/* Бейджи товаров */
+.badge {
+  display: inline-block;
+  padding: 0.25em 0.75em;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: var(--color-primary);
+  color: var(--text-on-primary);
+}
+
+/* Цвета бейджей */
+.badge-hit-prodazh { background: #e74c3c; }
+.badge-novinka { background: #2ecc71; }
+.badge-akciya { background: #f39c12; }
+.badge-eksklyuziv { background: #9b59b6; }
+.badge-premium { background: #e67e22; }
