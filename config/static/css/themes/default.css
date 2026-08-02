@@ -1,0 +1,11 @@
+/* config/static/css/themes/default.css */
+
+/* Дефолтная тема — используется, если не задана другая.
+   Все переменные уже определены в core/variables.css */
+
+:root {
+  --color-primary: #2563EB;
+  --color-primary-light: #3B82F6;
+  --color-primary-dark: #1D4ED8;
+  /* остальные значения по умолчанию */
+}

@@ -52,6 +52,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Поддержка дополнительных кнопок записи (hero, CTA)
+    document.querySelectorAll('.appointment-trigger').forEach(btn => {
+        btn.addEventListener('click', function() {
+            openModal(null);
+        });
+    });
+
     function closeModal() {
         modal.style.display = 'none';
         document.body.style.overflow = '';

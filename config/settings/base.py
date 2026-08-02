@@ -48,6 +48,7 @@ INSTALLED_APPS = [
 
     # Сторонние
     'smart_selects',
+    'easy_thumbnails',
 
     # Приложения проекта
     'apps.home',
@@ -97,6 +98,7 @@ TEMPLATES = [
                 "apps.wishlist.context_processors.wishlist_count",
                 "apps.products.context_processors.comparison_ids",
                 "apps.products.context_processors.recently_viewed_ids",
+                'config.context_processors.theme_context',
             ],
         },
     },
@@ -252,7 +254,12 @@ LOGIN_REDIRECT_URL = '/account/dashboard/'
 LOGIN_URL = '/accounts/login/'
 LOGOUT_REDIRECT_URL = '/'
 
+# -----------------------------------------------------------------------------
+# Тема оформления сайта
+# Значения: 'default', 'wedding', 'auto', 'construction' и др.
+# -----------------------------------------------------------------------------
 
+CURRENT_THEME = 'wedding'
 
 # -----------------------------------------------------------------------------
 # Этого нет!!!!!! 

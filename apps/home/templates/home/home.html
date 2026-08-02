@@ -1,18 +1,119 @@
-{% extends "base.html" %}
-{% load static %}
+<!-- apps\home\templates\home\home.html -->
 
-{% block title %}Главная{% endblock %}
+{% extends 'base.html' %}
+{% load static %}
+{% load thumbnail %}
+
+{% block title %}Wedding Salon — Свадебные платья{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'home/css/home.css' %}">
+{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div style="text-align: center; padding: 60px 20px;">
-        <h1>Добро пожаловать в каталог</h1>
-        <p style="font-size: 18px; color: #666; margin: 20px 0;">
-            Здесь будут отображаться ваши товары
-        </p>
-        <a href="{% url 'catalog:catalog' %}" class="btn" style="display: inline-block; padding: 12px 30px; background: #c0392b; color: white; text-decoration: none; border-radius: 6px;">
-            Перейти в каталог
-        </a>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <h1 class="hero-title">Найдите платье своей мечты</h1>
+        <p class="hero-subtitle">Эксклюзивные свадебные платья от ведущих дизайнеров</p>
+        <button class="btn btn-primary btn-lg appointment-trigger">Записаться на примерку</button>
     </div>
-</div>
+</section>
+
+<!-- ===== КАТЕГОРИИ ===== -->
+{% if categories %}
+<section class="section categories-section">
+    <div class="container">
+        <h2 class="section-title">Категории</h2>
+        <div class="categories-grid">
+            {% for category in categories %}
+            <a href="{{ category.get_absolute_url }}" class="category-card">
+                {% if category.image %}
+                <img src="{{ category.image.url }}" alt="{{ category.name }}" loading="lazy">
+                {% endif %}
+                <span class="category-name">{{ category.name }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ===== ПОПУЛЯРНЫЕ ПЛАТЬЯ ===== -->
+{% if featured_products %}
+<section class="section featured-section">
+    <div class="container">
+        <h2 class="section-title">Популярные платья</h2>
+        <div class="products-grid">
+            {% for product in featured_products %}
+                {% include "products/_product_card.html" with product=product %}
+            {% endfor %}
+        </div>
+        <div class="section-cta">
+            <a href="{% url 'catalog:catalog' %}" class="btn btn-outline btn-lg">Смотреть весь каталог</a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ===== ПРЕИМУЩЕСТВА ===== -->
+<section class="section advantages-section">
+    <div class="container">
+        <h2 class="section-title">Почему выбирают нас</h2>
+        <div class="advantages-grid">
+            <div class="advantage-card">
+                <span class="advantage-icon">✨</span>
+                <h3 class="advantage-title">Эксклюзивные коллекции</h3>
+                <p class="advantage-text">Платья от ведущих мировых дизайнеров, которые вы не найдёте в других салонах</p>
+            </div>
+            <div class="advantage-card">
+                <span class="advantage-icon">👗</span>
+                <h3 class="advantage-title">Индивидуальный пошив</h3>
+                <p class="advantage-text">Подгоним платье точно по вашей фигуре или создадим уникальную модель</p>
+            </div>
+            <div class="advantage-card">
+                <span class="advantage-icon">📅</span>
+                <h3 class="advantage-title">Удобная примерка</h3>
+                <p class="advantage-text">Запишитесь онлайн на удобное время, мы всё подготовим к вашему визиту</p>
+            </div>
+            <div class="advantage-card">
+                <span class="advantage-icon">💝</span>
+                <h3 class="advantage-title">Забота о невесте</h3>
+                <p class="advantage-text">Поможем подобрать аксессуары, фату, туфли — полный образ</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== ОТЗЫВЫ ===== -->
+{% if reviews %}
+<section class="section reviews-section">
+    <div class="container">
+        <h2 class="section-title">Отзывы наших невест</h2>
+        <div class="reviews-grid">
+            {% for review in reviews %}
+            <div class="review-card">
+                {% if review.images.first %}
+                <img src="{% thumbnail review.images.first.image 100x100 crop %}" alt="Фото отзыва" class="review-photo" loading="lazy">
+                {% endif %}
+                <p class="review-text">«{{ review.text|truncatewords:30 }}»</p>
+                <span class="review-author">— {{ review.user.get_full_name|default:review.user.username }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ===== CTA ===== -->
+<section class="section cta-section">
+    <div class="container">
+        <h2 class="cta-title">Готовы найти своё платье?</h2>
+        <p class="cta-subtitle">Запишитесь на примерку уже сегодня — мы подберём идеальный образ для вашего особенного дня</p>
+        <button class="btn btn-primary btn-lg appointment-trigger">Записаться на примерку</button>
+    </div>
+</section>
+
 {% endblock %}
