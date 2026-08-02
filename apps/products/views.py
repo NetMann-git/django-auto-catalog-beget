@@ -26,11 +26,13 @@ from .forms import ProductForm, GalleryImageForm
 
 from .models import Product, ProductGalleryImage, AttributeType, AttributeValue, ProductAttribute
 
+from .repository import CatalogRepository
+
 
 
 def brand_detail(request, slug):
     brand = get_object_or_404(Brand, slug=slug)
-    products = Product.objects.filter(brand=brand, is_active=True)
+    products = CatalogRepository.by_brand(brand)
     context = {
         'brand': brand,
         'products': products,
