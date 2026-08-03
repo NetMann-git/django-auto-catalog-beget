@@ -4,20 +4,21 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
 
+from .constants import ROLE_CHOICES, ROLE_CUSTOMER
+
+
 class Profile(models.Model):
-    ROLE_CHOICES = [
-        ('customer', 'Покупатель'),
-        ('consultant', 'Консультант'),
-        ('manager', 'Менеджер'),
-        ('admin', 'Администратор'),
-    ]
 
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='profile'
     )
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='customer')
+    role = models.CharField(
+    max_length=20,
+    choices=ROLE_CHOICES,
+    default=ROLE_CUSTOMER,
+    )
     phone = models.CharField(max_length=20, blank=True, verbose_name='Телефон')
     photo = models.ImageField(upload_to='profiles/', blank=True, null=True)
     bio = models.TextField(blank=True, verbose_name='О себе')

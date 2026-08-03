@@ -44,3 +44,5 @@ try:
     from .local import *
 except ImportError:
     pass
+
+DEBUG = True
