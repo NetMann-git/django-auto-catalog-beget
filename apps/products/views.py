@@ -26,11 +26,15 @@ from .forms import ProductForm, GalleryImageForm
 
 from .models import Product, ProductGalleryImage, AttributeType, AttributeValue, ProductAttribute
 
+from .repository import CatalogRepository
+
+from apps.users.decorators import role_required
+
 
 
 def brand_detail(request, slug):
     brand = get_object_or_404(Brand, slug=slug)
-    products = Product.objects.filter(brand=brand, is_active=True)
+    products = CatalogRepository.by_brand(brand)
     context = {
         'brand': brand,
         'products': products,
@@ -266,12 +270,9 @@ def product_list_manage(request):
     }
     return render(request, 'products/manage_list.html', context)
 
-@login_required
+@role_required("manager", "admin")
 def product_create(request):
     """Создание нового товара."""
-    if request.user.profile.role not in ['manager', 'admin']:
-        messages.error(request, 'У вас нет доступа к этой странице.')
-        return redirect('users:dashboard')
     
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)

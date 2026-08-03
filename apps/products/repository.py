@@ -44,3 +44,12 @@ class CatalogRepository:
     @staticmethod
     def featured(limit=8):
         return CatalogQuerySet.featured(limit)
+
+    @staticmethod
+    def by_brand(brand):
+        """
+        Возвращает активные товары указанного бренда.
+        """
+        return CatalogQuerySet._with_related(
+            CatalogQuerySet._base_queryset().filter(brand=brand)
+        )

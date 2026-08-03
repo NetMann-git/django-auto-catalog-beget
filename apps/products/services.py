@@ -17,11 +17,16 @@ class ProductService:
             similar = []
 
             # Получаем коллекцию и силуэт через ProductAttribute
-            collection_attr = product.attributes.filter(attribute_type__slug='collection').first()
-            silhouette_attr = product.attributes.filter(attribute_type__slug='silhouette').first()
-
-            collection_value = collection_attr.attribute_value.value if collection_attr else None
-            silhouette_value = silhouette_attr.attribute_value.value if silhouette_attr else None
+            
+            collection_value = ProductService._get_attribute_value(
+                product,
+                "collection",
+            )
+            
+            silhouette_value = ProductService._get_attribute_value(
+                product,
+                "silhouette",
+            )
 
             # 1. Та же коллекция + тот же силуэт
             if collection_value and silhouette_value:
@@ -78,3 +83,16 @@ class ProductService:
         return {
             "similar_products": ProductService.get_similar_products(product),
         }
+
+    @staticmethod
+    def _get_attribute_value(product, slug):
+        """
+        Возвращает значение характеристики товара по slug.
+        """
+        attribute = (
+            product.attributes
+            .filter(attribute_type__slug=slug)
+            .select_related("attribute_value")
+            .first()
+        )
+        return attribute.attribute_value.value if attribute else None

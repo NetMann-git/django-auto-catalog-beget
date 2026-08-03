@@ -76,3 +76,12 @@ class CatalogQuerySet:
                 )
             )[:limit]
         )
+
+    @staticmethod
+    def by_brand(brand):
+        """
+        Возвращает активные товары указанного бренда.
+        """
+        return CatalogQuerySet._with_related(
+            CatalogQuerySet._base_queryset().filter(brand=brand)
+        )
