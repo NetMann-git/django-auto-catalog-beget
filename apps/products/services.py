@@ -1,7 +1,11 @@
 # apps/products/services.py
 from django.core.cache import cache
 
-from apps.products.repository import CatalogRepository
+from .cache_keys import (
+    CACHE_TIMEOUT,
+    SIMILAR_PRODUCTS_PREFIX,
+)
+from .repository import CatalogRepository
 
 
 class ProductService:
@@ -10,7 +14,7 @@ class ProductService:
 
     @staticmethod
     def get_similar_products(product, limit=4):
-        cache_key = f"similar_{product.pk}"
+        cache_key = f"{SIMILAR_PRODUCTS_PREFIX}{product.pk}"
         similar = cache.get(cache_key)
         if similar is None:
             queryset = CatalogRepository.related(product)
@@ -75,7 +79,7 @@ class ProductService:
                     .distinct()[:limit - len(similar)]
                 )
 
-            cache.set(cache_key, similar, 600)
+            cache.set(cache_key, similar, CACHE_TIMEOUT)
         return similar
 
     @staticmethod

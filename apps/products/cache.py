@@ -2,6 +2,11 @@
 
 from django.core.cache import cache
 
+from .cache_keys import (
+    CATALOG_QUERYSET_KEY,
+    CATALOG_FILTERS_KEY,
+)
+
 
 class CatalogCache:
     """
@@ -13,5 +18,5 @@ class CatalogCache:
         """
         Очищает кэш каталога и фильтров.
         """
-        cache.delete("catalog_queryset")
-        cache.delete("catalog_filters")
+        cache.delete(CATALOG_QUERYSET_KEY)
+        cache.delete(CATALOG_FILTERS_KEY)
