@@ -1,7 +1,10 @@
 # apps/products/services.py
 from django.core.cache import cache
 
-from .cache_keys import SIMILAR_PRODUCTS_PREFIX
+from .cache_keys import (
+    CACHE_TIMEOUT,
+    SIMILAR_PRODUCTS_PREFIX,
+)
 from .repository import CatalogRepository
 
 
@@ -76,7 +79,7 @@ class ProductService:
                     .distinct()[:limit - len(similar)]
                 )
 
-            cache.set(cache_key, similar, 600)
+            cache.set(cache_key, similar, CACHE_TIMEOUT)
         return similar
 
     @staticmethod

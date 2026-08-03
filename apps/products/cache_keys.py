@@ -11,3 +11,5 @@ CATALOG_QUERYSET_KEY = "catalog_queryset"
 CATALOG_FILTERS_KEY = "catalog_filters"
 
 SIMILAR_PRODUCTS_PREFIX = "similar_"
+
+CACHE_TIMEOUT = 600

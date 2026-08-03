@@ -5,6 +5,7 @@ from apps.products.querysets import CatalogQuerySet
 from apps.products.models import Brand
 
 from .cache_keys import (
+    CACHE_TIMEOUT,
     CATALOG_QUERYSET_KEY,
     CATALOG_FILTERS_KEY,
 )
@@ -17,7 +18,7 @@ class CatalogRepository:
         queryset = cache.get(cache_key)
         if queryset is None:
             queryset = CatalogQuerySet.catalog_queryset()
-            cache.set(cache_key, queryset, 600)
+            cache.set(cache_key, queryset, CACHE_TIMEOUT)
         return queryset
 
     @staticmethod
@@ -35,7 +36,7 @@ class CatalogRepository:
                 "categories": Category.objects.order_by("title"),
                 "availabilities": Product.AVAILABILITY_CHOICES,
             }
-            cache.set(cache_key, data, 600)
+            cache.set(cache_key, data, CACHE_TIMEOUT)
         return data
 
     @staticmethod
