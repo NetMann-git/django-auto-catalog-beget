@@ -362,12 +362,9 @@ def gallery_delete(request, image_id):
     return redirect('catalog:product_edit', product_id=product_id)
 
 
-@login_required
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
 def product_attributes(request, product_id):
     """Управление характеристиками товара."""
-    if request.user.profile.role not in ['manager', 'admin']:
-        messages.error(request, 'У вас нет доступа к этой странице.')
-        return redirect('users:dashboard')
     
     product = get_object_or_404(Product, id=product_id)
     attribute_types = AttributeType.objects.all()
