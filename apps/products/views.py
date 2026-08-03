@@ -29,7 +29,7 @@ from .models import Product, ProductGalleryImage, AttributeType, AttributeValue,
 from .repository import CatalogRepository
 
 from apps.users.decorators import role_required
-
+from apps.users.constants import ROLE_MANAGER, ROLE_ADMIN
 
 
 def brand_detail(request, slug):
@@ -270,7 +270,7 @@ def product_list_manage(request):
     }
     return render(request, 'products/manage_list.html', context)
 
-@role_required("manager", "admin")
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
 def product_create(request):
     """Создание нового товара."""
     
