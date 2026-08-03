@@ -350,12 +350,9 @@ def gallery_add(request, product_id):
     return redirect('catalog:product_edit', product_id=product.id)
 
 
-@login_required
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
 def gallery_delete(request, image_id):
     """Удаление изображения из галереи."""
-    if request.user.profile.role not in ['manager', 'admin']:
-        messages.error(request, 'У вас нет доступа к этой странице.')
-        return redirect('users:dashboard')
     
     image = get_object_or_404(ProductGalleryImage, id=image_id)
     product_id = image.product.id
