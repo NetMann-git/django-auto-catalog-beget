@@ -300,12 +300,8 @@ def product_edit(request, product_id):
     
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES, instance=product)
-
         if form.is_valid():
             form.save()
-
-            CatalogCache.clear_catalog()
-
             messages.success(request, f'Товар "{product.title}" успешно обновлён!')
             return redirect('catalog:product_edit', product_id=product.id)
     else:
@@ -322,19 +318,28 @@ def product_edit(request, product_id):
 @role_required(ROLE_MANAGER, ROLE_ADMIN)
 def product_delete(request, product_id):
     """Удаление товара."""
-    
+
     product = get_object_or_404(Product, id=product_id)
-    
+
     if request.method == 'POST':
         product_title = product.title
+
         product.delete()
+
+        CatalogCache.clear_catalog()
+
         messages.success(request, f'Товар "{product_title}" удалён.')
         return redirect('catalog:product_list_manage')
-    
+
     context = {
         'product': product,
     }
-    return render(request, 'products/product_confirm_delete.html', context)
+
+    return render(
+        request,
+        'products/product_confirm_delete.html',
+        context,
+    )
 
 
 @role_required(ROLE_MANAGER, ROLE_ADMIN)
