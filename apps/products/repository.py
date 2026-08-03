@@ -1,14 +1,19 @@
 # apps/products/repository.py
+
 from django.core.cache import cache
 from apps.products.querysets import CatalogQuerySet
 from apps.products.models import Brand
 
+from .cache_keys import (
+    CATALOG_QUERYSET_KEY,
+    CATALOG_FILTERS_KEY,
+)
 
 class CatalogRepository:
 
     @staticmethod
     def catalog():
-        cache_key = "catalog_queryset"
+        cache_key = CATALOG_QUERYSET_KEY
         queryset = cache.get(cache_key)
         if queryset is None:
             queryset = CatalogQuerySet.catalog_queryset()
@@ -17,7 +22,7 @@ class CatalogRepository:
 
     @staticmethod
     def filters():
-        cache_key = "catalog_filters"
+        cache_key = CATALOG_FILTERS_KEY
         data = cache.get(cache_key)
         if data is None:
             from apps.products.models import Category
