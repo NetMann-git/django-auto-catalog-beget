@@ -300,8 +300,12 @@ def product_edit(request, product_id):
     
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES, instance=product)
+
         if form.is_valid():
             form.save()
+
+            CatalogCache.clear_catalog()
+
             messages.success(request, f'Товар "{product.title}" успешно обновлён!')
             return redirect('catalog:product_edit', product_id=product.id)
     else:
