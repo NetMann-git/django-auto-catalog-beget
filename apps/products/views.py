@@ -30,6 +30,7 @@ from .repository import CatalogRepository
 
 from apps.users.decorators import role_required
 from apps.users.constants import ROLE_MANAGER, ROLE_ADMIN
+from .cache import CatalogCache
 
 
 def brand_detail(request, slug):
@@ -270,16 +271,20 @@ def product_list_manage(request):
 @role_required(ROLE_MANAGER, ROLE_ADMIN)
 def product_create(request):
     """Создание нового товара."""
-    
+
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
+
         if form.is_valid():
             product = form.save()
+
+            CatalogCache.clear_catalog()
+
             messages.success(request, f'Товар "{product.title}" успешно создан!')
             return redirect('catalog:product_edit', product_id=product.id)
     else:
         form = ProductForm()
-    
+
     context = {
         'form': form,
         'title': 'Создание товара',
