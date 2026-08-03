@@ -242,12 +242,9 @@ def comparison_list(request):
     }
     return render(request, 'products/comparison.html', context)
 
-@login_required
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
 def product_list_manage(request):
     """Список товаров для управления (менеджер)."""
-    if request.user.profile.role not in ['manager', 'admin']:
-        messages.error(request, 'У вас нет доступа к этой странице.')
-        return redirect('users:dashboard')
     
     products = Product.objects.all().order_by('-id')  # ИСПРАВЛЕНО
     
