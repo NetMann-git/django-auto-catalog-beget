@@ -405,12 +405,9 @@ def product_attributes(request, product_id):
     }
     return render(request, 'products/product_attributes.html', context)
 
-@login_required
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
 def attribute_delete(request, attribute_id):
     """Удаление характеристики товара."""
-    if request.user.profile.role not in ['manager', 'admin']:
-        messages.error(request, 'У вас нет доступа к этой странице.')
-        return redirect('users:dashboard')
     
     attribute = get_object_or_404(ProductAttribute, id=attribute_id)
     product_id = attribute.product.id
