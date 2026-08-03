@@ -6,8 +6,12 @@ from django.core.cache import cache
 class CatalogCache:
     """
     Работа с кэшем каталога.
-
-    Пока класс пустой.
-    Методы будем добавлять постепенно.
     """
-    pass
+
+    @staticmethod
+    def clear_catalog():
+        """
+        Очищает кэш каталога и фильтров.
+        """
+        cache.delete("catalog_queryset")
+        cache.delete("catalog_filters")
