@@ -290,12 +290,9 @@ def product_create(request):
     return render(request, 'products/product_form.html', context)
 
 
-@login_required
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
 def product_edit(request, product_id):
     """Редактирование товара."""
-    if request.user.profile.role not in ['manager', 'admin']:
-        messages.error(request, 'У вас нет доступа к этой странице.')
-        return redirect('users:dashboard')
     
     product = get_object_or_404(Product, id=product_id)
     
@@ -316,12 +313,9 @@ def product_edit(request, product_id):
     return render(request, 'products/product_form.html', context)
 
 
-@login_required
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
 def product_delete(request, product_id):
     """Удаление товара."""
-    if request.user.profile.role not in ['manager', 'admin']:
-        messages.error(request, 'У вас нет доступа к этой странице.')
-        return redirect('users:dashboard')
     
     product = get_object_or_404(Product, id=product_id)
     
