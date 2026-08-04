@@ -109,13 +109,12 @@ def product_detail(request, slug):
     recently_viewed = SessionService.get_recently_viewed(request)
 
     # Получаем товары для блока «Недавно просмотренные» (без текущего)
-    recent_ids = [pid for pid in recently_viewed if pid != product.id]
-    recent_products = Product.objects.filter(id__in=recent_ids, is_active=True)
-    # Сохраняем порядок из сессии
-    order = {pid: i for i, pid in enumerate(recently_viewed)}
-    recent_products = sorted(recent_products, key=lambda p: order.get(p.id, 999))
-    context['recently_viewed_products'] = recent_products
-
+    context["recently_viewed_products"] = (
+        ProductService.get_recently_viewed_products(
+            request,
+            product,
+        )
+    )
 
     # Отзывы – фильтрация и сортировка
     reviews_qs = product.reviews.filter(is_published=True)
