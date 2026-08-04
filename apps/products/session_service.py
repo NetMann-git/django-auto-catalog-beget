@@ -19,3 +19,18 @@ class SessionService:
         Возвращает список недавно просмотренных товаров.
         """
         return request.session.get(RECENTLY_VIEWED_KEY, [])
+
+    @staticmethod
+    def save_recently_viewed(request, product_id, limit):
+        """
+        Добавляет товар в историю просмотров.
+        """
+
+        recently_viewed = SessionService.get_recently_viewed(request)
+
+        if product_id in recently_viewed:
+            recently_viewed.remove(product_id)
+
+        recently_viewed.insert(0, product_id)
+
+        request.session[RECENTLY_VIEWED_KEY] = recently_viewed[:limit]
