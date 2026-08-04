@@ -9,6 +9,7 @@ from .cache_keys import (
     CATALOG_QUERYSET_KEY,
     CATALOG_FILTERS_KEY,
 )
+from apps.products.constants import AVAILABILITY_CHOICES
 
 class CatalogRepository:
 
@@ -34,7 +35,7 @@ class CatalogRepository:
                 "collections": CatalogRepository.distinct("collection"),
                 "colors": CatalogRepository.distinct("color"),
                 "categories": Category.objects.order_by("title"),
-                "availabilities": Product.AVAILABILITY_CHOICES,
+                "availabilities": AVAILABILITY_CHOICES,
             }
             cache.set(cache_key, data, CACHE_TIMEOUT)
         return data
