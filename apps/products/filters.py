@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.db.models.functions import Lower
 from apps.products.models import Product
 
+from apps.products.constants import AVAILABILITY_CHOICES
 
 class CatalogFilter:
     """
@@ -105,7 +106,7 @@ class CatalogFilter:
             "selected_color": self.color,
             "selected_sort": self.sort,
             "selected_availability": self.availability,
-            "selected_availability_label": dict(Product.AVAILABILITY_CHOICES).get(self.availability, self.availability),
+            "selected_availability_label": dict(AVAILABILITY_CHOICES).get(self.availability, self.availability),
             "selected_price_min": self.price_min,
             "selected_price_max": self.price_max,
         }

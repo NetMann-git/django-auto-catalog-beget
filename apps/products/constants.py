@@ -12,3 +12,15 @@ CURRENCY_CHOICES = [
     ('EUR', 'EUR €'),
     ('RUB', 'RUB ₽'),
 ]
+
+AVAILABILITY_IN_STOCK = "in_stock"
+AVAILABILITY_UNDER_ORDER = "under_order"
+AVAILABILITY_LAST_SIZE = "last_size"
+AVAILABILITY_OUT_OF_STOCK = "out_of_stock"
+
+AVAILABILITY_CHOICES = [
+    (AVAILABILITY_IN_STOCK, "В наличии"),
+    (AVAILABILITY_UNDER_ORDER, "Под заказ"),
+    (AVAILABILITY_LAST_SIZE, "Последний размер"),
+    (AVAILABILITY_OUT_OF_STOCK, "Нет в наличии"),
+]
