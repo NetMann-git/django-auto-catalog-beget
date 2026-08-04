@@ -1,4 +1,4 @@
-
+# apps/products/session_service.py
 
 """
 Работа с данными каталога, хранящимися в пользовательской сессии.
@@ -13,4 +13,9 @@ class SessionService:
     Сервис для работы с пользовательской сессией.
     """
 
-    pass
+    @staticmethod
+    def get_recently_viewed(request):
+        """
+        Возвращает список недавно просмотренных товаров.
+        """
+        return request.session.get(RECENTLY_VIEWED_KEY, [])
