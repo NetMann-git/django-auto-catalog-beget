@@ -7,8 +7,40 @@ from .cache_keys import (
 )
 from .repository import CatalogRepository
 
+from .session_service import SessionService
+from apps.products.models import Product
+
 
 class ProductService:
+
+    @staticmethod
+    def get_recently_viewed_products(request, current_product):
+        """
+        Возвращает список недавно просмотренных товаров,
+        исключая текущий товар.
+        """
+
+        recently_viewed = SessionService.get_recently_viewed(request)
+
+        recent_ids = [
+            pid for pid in recently_viewed
+            if pid != current_product.id
+        ]
+
+        recent_products = Product.objects.filter(
+            id__in=recent_ids,
+            is_active=True,
+        )
+
+        order = {
+            pid: i
+            for i, pid in enumerate(recently_viewed)
+        }
+
+        return sorted(
+            recent_products,
+            key=lambda p: order.get(p.id, 999),
+        )
 
     @staticmethod
     def _similar_ids(similar):
