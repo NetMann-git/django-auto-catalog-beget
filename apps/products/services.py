@@ -18,6 +18,19 @@ class ProductService:
         return [product.id for product in similar]
 
     @staticmethod
+    def _extend_similar(similar, queryset, limit):
+        """
+        Добавляет товары в список similar,
+        исключая уже найденные.
+        """
+        ids = ProductService._similar_ids(similar)
+
+        similar.extend(
+            queryset.exclude(id__in=ids)
+            .distinct()[:limit - len(similar)]
+        )
+
+    @staticmethod
     def get_similar_products(product, limit=4):
         cache_key = f"{SIMILAR_PRODUCTS_PREFIX}{product.pk}"
         similar = cache.get(cache_key)
@@ -51,37 +64,32 @@ class ProductService:
 
             # 2. Та же коллекция
             if len(similar) < limit and collection_value:
-                ids = ProductService._similar_ids(similar)
-                similar.extend(
-                    queryset
-                    .filter(
-                        attributes__attribute_type__slug='collection',
+                ProductService._extend_similar(
+                    similar,
+                    queryset.filter(
+                        attributes__attribute_type__slug="collection",
                         attributes__attribute_value__value=collection_value,
-                    )
-                    .exclude(id__in=ids)
-                    .distinct()[:limit - len(similar)]
+                    ),
+                    limit,
                 )
 
             # 3. Тот же силуэт
             if len(similar) < limit and silhouette_value:
-                ids = ProductService._similar_ids(similar)
-                similar.extend(
-                    queryset
-                    .filter(
-                        attributes__attribute_type__slug='silhouette',
+                ProductService._extend_similar(
+                    similar,
+                    queryset.filter(
+                        attributes__attribute_type__slug="silhouette",
                         attributes__attribute_value__value=silhouette_value,
-                    )
-                    .exclude(id__in=ids)
-                    .distinct()[:limit - len(similar)]
+                    ),
+                    limit,
                 )
 
             # 4. Любые товары (запасной вариант)
             if len(similar) < limit:
-                ids = ProductService._similar_ids(similar)
-                similar.extend(
-                    queryset
-                    .exclude(id__in=ids)
-                    .distinct()[:limit - len(similar)]
+                ProductService._extend_similar(
+                    similar,
+                    queryset,
+                    limit,
                 )
 
             cache.set(cache_key, similar, CACHE_TIMEOUT)
