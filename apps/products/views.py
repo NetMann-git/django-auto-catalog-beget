@@ -106,7 +106,6 @@ def product_detail(request, slug):
         MAX_RECENTLY_VIEWED,
     )
 
-    recently_viewed = SessionService.get_recently_viewed(request)
 
     # Получаем товары для блока «Недавно просмотренные» (без текущего)
     context["recently_viewed_products"] = (
