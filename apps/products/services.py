@@ -10,7 +10,12 @@ from .repository import CatalogRepository
 
 class ProductService:
 
-    
+    @staticmethod
+    def _similar_ids(similar):
+        """
+        Возвращает список id найденных товаров.
+        """
+        return [product.id for product in similar]
 
     @staticmethod
     def get_similar_products(product, limit=4):
@@ -46,7 +51,7 @@ class ProductService:
 
             # 2. Та же коллекция
             if len(similar) < limit and collection_value:
-                ids = [obj.id for obj in similar]
+                ids = ProductService._similar_ids(similar)
                 similar.extend(
                     queryset
                     .filter(
@@ -59,7 +64,7 @@ class ProductService:
 
             # 3. Тот же силуэт
             if len(similar) < limit and silhouette_value:
-                ids = [obj.id for obj in similar]
+                ids = ProductService._similar_ids(similar)
                 similar.extend(
                     queryset
                     .filter(
@@ -72,7 +77,7 @@ class ProductService:
 
             # 4. Любые товары (запасной вариант)
             if len(similar) < limit:
-                ids = [obj.id for obj in similar]
+                ids = ProductService._similar_ids(similar)
                 similar.extend(
                     queryset
                     .exclude(id__in=ids)
