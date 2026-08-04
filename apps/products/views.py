@@ -100,14 +100,13 @@ def product_detail(request, slug):
     context.update(ProductService.context(product))
     
     # Сохраняем товар в список недавно просмотренных
+    SessionService.save_recently_viewed(
+        request,
+        product.id,
+        MAX_RECENTLY_VIEWED,
+    )
+
     recently_viewed = SessionService.get_recently_viewed(request)
-    if product.id in recently_viewed:
-        recently_viewed.remove(product.id)  # перемещаем в начало
-    recently_viewed.insert(0, product.id)
-    # Ограничиваем количество
-    if len(recently_viewed) > MAX_RECENTLY_VIEWED:
-        recently_viewed = recently_viewed[:MAX_RECENTLY_VIEWED]
-    request.session['recently_viewed'] = recently_viewed
 
     # Получаем товары для блока «Недавно просмотренные» (без текущего)
     recent_ids = [pid for pid in recently_viewed if pid != product.id]
