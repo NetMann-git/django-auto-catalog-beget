@@ -2,14 +2,12 @@
 
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from django.conf import settings
+
 
 from .constants import MAX_COMPARISON_ITEMS, MAX_RECENTLY_VIEWED
 from .services import ProductService
 from .context import CatalogContextBuilder
 
-from django.views.decorators.cache import cache_page
-from django.views.decorators.csrf import csrf_exempt
 
 from django.urls import reverse
 from apps.products.models import Brand
