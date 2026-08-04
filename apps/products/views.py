@@ -3,11 +3,9 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
-
 from .constants import MAX_COMPARISON_ITEMS, MAX_RECENTLY_VIEWED
 from .services import ProductService
 from .context import CatalogContextBuilder
-
 
 from django.urls import reverse
 from apps.products.models import Brand
@@ -30,6 +28,7 @@ from apps.users.decorators import role_required
 from apps.users.constants import ROLE_MANAGER, ROLE_ADMIN
 from .cache import CatalogCache
 
+from .session_service import SessionService
 
 def brand_detail(request, slug):
     brand = get_object_or_404(Brand, slug=slug)
@@ -101,7 +100,7 @@ def product_detail(request, slug):
     context.update(ProductService.context(product))
     
     # Сохраняем товар в список недавно просмотренных
-    recently_viewed = request.session.get('recently_viewed', [])
+    recently_viewed = SessionService.get_recently_viewed(request)
     if product.id in recently_viewed:
         recently_viewed.remove(product.id)  # перемещаем в начало
     recently_viewed.insert(0, product.id)
