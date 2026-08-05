@@ -62,3 +62,16 @@ class SessionService:
             SessionService.save_comparison(request, comparison)
 
         return comparison
+
+    @staticmethod
+    def remove_from_comparison(request, product_id):
+        """
+        Удаляет товар из списка сравнения.
+        """
+        comparison = SessionService.get_comparison(request)
+
+        if product_id in comparison:
+            comparison.remove(product_id)
+            SessionService.save_comparison(request, comparison)
+
+        return comparison
