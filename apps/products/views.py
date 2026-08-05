@@ -208,7 +208,7 @@ def remove_from_comparison(request, product_id):
 
 
 def comparison_list(request):
-    ids = request.session.get('comparison', [])
+    ids = SessionService.get_comparison(request)
     products = Product.objects.filter(id__in=ids, is_active=True)
     # Сохраняем порядок, заданный пользователем
     order = {id: i for i, id in enumerate(ids)}
