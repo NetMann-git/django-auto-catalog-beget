@@ -189,8 +189,7 @@ def add_to_comparison(request, product_id):
         return redirect(request.META.get('HTTP_REFERER', 'catalog:catalog'))
     
     if product_id not in comparison:
-        comparison.append(product_id)
-        SessionService.save_comparison(request, comparison)
+        SessionService.add_to_comparison(request, product_id)
         messages.success(request, f"Товар «{product.title}» добавлен к сравнению.")
     else:
         messages.info(request, f"Товар «{product.title}» уже в списке сравнения.")
