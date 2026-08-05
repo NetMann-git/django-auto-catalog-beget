@@ -64,7 +64,7 @@ def toggle_comparison_ajax(request, product_id):
         is_added = True
         message = f"Товар «{product.title}» добавлен к сравнению."
 
-    request.session['comparison'] = comparison
+    SessionService.save_comparison(request, comparison)
     count = len(comparison)
 
     return JsonResponse({
