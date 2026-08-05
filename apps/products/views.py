@@ -202,7 +202,7 @@ def remove_from_comparison(request, product_id):
     comparison = SessionService.get_comparison(request)
     if product_id in comparison:
         comparison.remove(product_id)
-        request.session['comparison'] = comparison
+        SessionService.save_comparison(request, comparison)
         messages.success(request, "Товар удалён из сравнения.")
     return redirect(request.META.get('HTTP_REFERER', 'catalog:catalog'))
 
