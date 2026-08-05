@@ -41,3 +41,11 @@ class SessionService:
         Возвращает список товаров для сравнения.
         """
         return request.session.get(COMPARISON_KEY, [])
+
+    @staticmethod
+    def save_comparison(request, comparison):
+        """
+        Сохраняет список товаров для сравнения в сессии.
+        """
+        request.session[COMPARISON_KEY] = comparison
+        request.session.modified = True
