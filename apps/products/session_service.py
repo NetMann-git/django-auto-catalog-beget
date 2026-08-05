@@ -34,3 +34,10 @@ class SessionService:
         recently_viewed.insert(0, product_id)
 
         request.session[RECENTLY_VIEWED_KEY] = recently_viewed[:limit]
+
+    @staticmethod
+    def get_comparison(request):
+        """
+        Возвращает список товаров для сравнения.
+        """
+        return request.session.get(COMPARISON_KEY, [])
