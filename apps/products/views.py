@@ -47,7 +47,7 @@ def toggle_comparison_ajax(request, product_id):
     Возвращает JSON с новым состоянием и количеством товаров.
     """
     product = get_object_or_404(Product, id=product_id, is_active=True)
-    comparison = request.session.get('comparison', [])
+    comparison = SessionService.get_comparison(request)
     is_added = False
 
     if product_id in comparison:
@@ -181,7 +181,7 @@ def clear_recently_viewed_ajax(request):
 
 def add_to_comparison(request, product_id):
     product = get_object_or_404(Product, id=product_id, is_active=True)
-    comparison = request.session.get('comparison', [])
+    comparison = SessionService.get_comparison(request)
     
     # Проверка лимита (добавляем)
     if len(comparison) >= MAX_COMPARISON_ITEMS:
@@ -199,7 +199,7 @@ def add_to_comparison(request, product_id):
 
 
 def remove_from_comparison(request, product_id):
-    comparison = request.session.get('comparison', [])
+    comparison = SessionService.get_comparison(request)
     if product_id in comparison:
         comparison.remove(product_id)
         request.session['comparison'] = comparison
