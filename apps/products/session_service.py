@@ -49,3 +49,16 @@ class SessionService:
         """
         request.session[COMPARISON_KEY] = comparison
         request.session.modified = True
+
+    @staticmethod
+    def add_to_comparison(request, product_id):
+        """
+        Добавляет товар в список сравнения.
+        """
+        comparison = SessionService.get_comparison(request)
+
+        if product_id not in comparison:
+            comparison.append(product_id)
+            SessionService.save_comparison(request, comparison)
+
+        return comparison
