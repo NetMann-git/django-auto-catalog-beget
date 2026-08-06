@@ -46,3 +46,13 @@ class ReviewService:
             )
 
         return queryset
+
+    @staticmethod
+    def apply_sorting(
+        queryset,
+        request,
+    ):
+        """
+        Применяет сортировку отзывов.
+        """
+        return queryset
