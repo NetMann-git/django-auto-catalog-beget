@@ -136,17 +136,16 @@ def product_detail(request, slug):
     with_photos = request.GET.get("with_photos")
     verified = request.GET.get("verified")   
 
+    reviews_qs = ReviewService.apply_sorting(
+        reviews_qs,
+        request,
+    )
 
-    # Сортировка
-    sort_by = request.GET.get('sort', '-helpful_count')
-    if sort_by == 'created_at':
-        reviews_qs = reviews_qs.order_by('-created_at')
-    elif sort_by == 'rating':
-        reviews_qs = reviews_qs.order_by('-rating')
-    elif sort_by == 'helpful_count':
-        reviews_qs = reviews_qs.order_by('-helpful_count')
-    else:
-        reviews_qs = reviews_qs.order_by('-helpful_count', '-created_at')
+    sort_by = request.GET.get(
+        "sort",
+        "-helpful_count",
+    )
+
 
     context["reviews"] = reviews_qs
     context["selected_sort"] = sort_by
