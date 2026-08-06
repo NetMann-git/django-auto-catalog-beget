@@ -125,19 +125,9 @@ def product_detail(request, slug):
     )
 
     # Отзывы – фильтрация и сортировка
-    reviews_qs = ReviewService.queryset(product)
     
-    reviews_qs = ReviewService.apply_filters(
-        reviews_qs,
-        request,
-    )
-
-    rating_filter = request.GET.get("rating")
-    with_photos = request.GET.get("with_photos")
-    verified = request.GET.get("verified")   
-
-    reviews_qs = ReviewService.apply_sorting(
-        reviews_qs,
+    reviews_qs = ReviewService.get_reviews(
+        product,
         request,
     )
 
@@ -145,6 +135,11 @@ def product_detail(request, slug):
         "sort",
         "-helpful_count",
     )
+
+
+    rating_filter = request.GET.get("rating")
+    with_photos = request.GET.get("with_photos")
+    verified = request.GET.get("verified")   
 
 
     context["reviews"] = reviews_qs
