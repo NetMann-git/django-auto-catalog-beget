@@ -74,3 +74,24 @@ class ReviewService:
             )
 
         return queryset
+
+    @staticmethod
+    def get_reviews(product, request):
+        """
+        Возвращает опубликованные отзывы
+        с учётом фильтрации и сортировки.
+        """
+
+        queryset = ReviewService.queryset(product)
+
+        queryset = ReviewService.apply_filters(
+            queryset,
+            request,
+        )
+
+        queryset = ReviewService.apply_sorting(
+            queryset,
+            request,
+        )
+
+        return queryset
