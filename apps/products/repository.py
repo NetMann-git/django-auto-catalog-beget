@@ -28,7 +28,7 @@ class CatalogRepository:
         data = cache.get(cache_key)
         if data is None:
             from apps.products.models import Category
-            from apps.products.models import Product
+
             data = {
                 "silhouettes": CatalogRepository.distinct("silhouette"),
                 "brands": Brand.objects.order_by("name"),
