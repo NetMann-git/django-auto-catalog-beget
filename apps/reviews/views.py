@@ -12,12 +12,14 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse
 from apps.products.models import Product
 
+from apps.reviews.services import ReviewService
+
 def filter_reviews(request, product_id):
     """
     Возвращает HTML-фрагмент со списком отфильтрованных и отсортированных отзывов.
     """
     product = get_object_or_404(Product, id=product_id, is_active=True)
-    reviews_qs = product.reviews.filter(is_published=True)
+    reviews_qs = ReviewService.queryset(product)
 
     # Фильтры
     rating_filter = request.GET.get('rating')

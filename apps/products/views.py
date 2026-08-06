@@ -29,6 +29,8 @@ from .cache import CatalogCache
 
 from .session_service import SessionService
 
+from apps.reviews.services import ReviewService
+
 def brand_detail(request, slug):
     brand = get_object_or_404(Brand, slug=slug)
     products = CatalogRepository.by_brand(brand)
@@ -123,7 +125,7 @@ def product_detail(request, slug):
     )
 
     # Отзывы – фильтрация и сортировка
-    reviews_qs = product.reviews.filter(is_published=True)
+    reviews_qs = ReviewService.queryset(product)
 
     # Фильтры
     rating_filter = request.GET.get('rating')
