@@ -126,19 +126,16 @@ def product_detail(request, slug):
 
     # Отзывы – фильтрация и сортировка
     reviews_qs = ReviewService.queryset(product)
+    
+    reviews_qs = ReviewService.apply_filters(
+        reviews_qs,
+        request,
+    )
 
-    # Фильтры
-    rating_filter = request.GET.get('rating')
-    if rating_filter and rating_filter.isdigit():
-        reviews_qs = reviews_qs.filter(rating=int(rating_filter))
+    rating_filter = request.GET.get("rating")
+    with_photos = request.GET.get("with_photos")
+    verified = request.GET.get("verified")   
 
-    with_photos = request.GET.get('with_photos')
-    if with_photos == '1':
-        reviews_qs = reviews_qs.filter(images__isnull=False).distinct()
-
-    verified = request.GET.get('verified')
-    if verified == '1':
-        reviews_qs = reviews_qs.filter(is_verified=True)
 
     # Сортировка
     sort_by = request.GET.get('sort', '-helpful_count')
