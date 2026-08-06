@@ -51,7 +51,10 @@ def toggle_comparison_ajax(request, product_id):
     is_added = False
 
     if product_id in comparison:
-        comparison.remove(product_id)
+        comparison = SessionService.remove_from_comparison(
+            request,
+            product_id,
+        )
         message = f"Товар «{product.title}» удалён из сравнения."
     else:
         # Проверка лимита для AJAX
@@ -60,11 +63,14 @@ def toggle_comparison_ajax(request, product_id):
                 'error': True,
                 'message': f'Можно добавить не более {MAX_COMPARISON_ITEMS} товаров.'
             }, status=400)
-        comparison.append(product_id)
+
+        comparison = SessionService.add_to_comparison(
+            request,
+            product_id,
+        )
         is_added = True
         message = f"Товар «{product.title}» добавлен к сравнению."
 
-    SessionService.save_comparison(request, comparison)
     count = len(comparison)
 
     return JsonResponse({
@@ -200,8 +206,10 @@ def add_to_comparison(request, product_id):
 def remove_from_comparison(request, product_id):
     comparison = SessionService.get_comparison(request)
     if product_id in comparison:
-        comparison.remove(product_id)
-        SessionService.save_comparison(request, comparison)
+        comparison = SessionService.remove_from_comparison(
+            request,
+            product_id,
+        )
         messages.success(request, "Товар удалён из сравнения.")
     return redirect(request.META.get('HTTP_REFERER', 'catalog:catalog'))
 
