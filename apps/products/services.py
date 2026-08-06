@@ -10,6 +10,10 @@ from .repository import CatalogRepository
 from .session_service import SessionService
 from apps.products.models import Product
 
+from .constants import (
+    ATTRIBUTE_COLLECTION,
+    ATTRIBUTE_SILHOUETTE,
+)
 
 class ProductService:
 
@@ -68,22 +72,22 @@ class ProductService:
             
             collection_value = ProductService._get_attribute_value(
                 product,
-                "collection",
+                ATTRIBUTE_COLLECTION,
             )
             
             silhouette_value = ProductService._get_attribute_value(
                 product,
-                "silhouette",
+                ATTRIBUTE_SILHOUETTE,
             )
 
             # 1. Та же коллекция + тот же силуэт
             if collection_value and silhouette_value:
                 similar = list(
                     queryset.filter(
-                        attributes__attribute_type__slug='collection',
+                        attributes__attribute_type__slug=ATTRIBUTE_COLLECTION,
                         attributes__attribute_value__value=collection_value,
                     ).filter(
-                        attributes__attribute_type__slug='silhouette',
+                        attributes__attribute_type__slug=ATTRIBUTE_SILHOUETTE,
                         attributes__attribute_value__value=silhouette_value,
                     ).distinct()[:limit]
                 )
@@ -93,7 +97,7 @@ class ProductService:
                 ProductService._extend_similar(
                     similar,
                     queryset.filter(
-                        attributes__attribute_type__slug="collection",
+                        attributes__attribute_type__slug=ATTRIBUTE_COLLECTION,
                         attributes__attribute_value__value=collection_value,
                     ),
                     limit,
@@ -104,7 +108,7 @@ class ProductService:
                 ProductService._extend_similar(
                     similar,
                     queryset.filter(
-                        attributes__attribute_type__slug="silhouette",
+                        attributes__attribute_type__slug=ATTRIBUTE_SILHOUETTE,
                         attributes__attribute_value__value=silhouette_value,
                     ),
                     limit,

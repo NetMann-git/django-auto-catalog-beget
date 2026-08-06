@@ -24,3 +24,6 @@ AVAILABILITY_CHOICES = [
     (AVAILABILITY_LAST_SIZE, "Последний размер"),
     (AVAILABILITY_OUT_OF_STOCK, "Нет в наличии"),
 ]
+
+ATTRIBUTE_COLLECTION = "collection"
+ATTRIBUTE_SILHOUETTE = "silhouette"
