@@ -121,11 +121,6 @@ class ProductService:
             cache.set(cache_key, similar, CACHE_TIMEOUT)
         return similar
 
-    @staticmethod
-    def context(product):
-        return {
-            "similar_products": ProductService.get_similar_products(product),
-        }
 
     @staticmethod
     def _get_attribute_value(product, slug):

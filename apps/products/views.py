@@ -102,7 +102,9 @@ def recently_viewed_list(request):
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug, is_active=True)
     context = {"product": product, "page": product}
-    context.update(ProductService.context(product))
+    context["similar_products"] = (
+        ProductService.get_similar_products(product)
+    )
     
     # Сохраняем товар в список недавно просмотренных
     SessionService.save_recently_viewed(
