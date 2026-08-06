@@ -42,12 +42,6 @@ class ProductService:
             key=lambda p: order.get(p.id, 999),
         )
 
-    @staticmethod
-    def _similar_ids(similar):
-        """
-        Возвращает список id найденных товаров.
-        """
-        return [product.id for product in similar]
 
     @staticmethod
     def _extend_similar(similar, queryset, limit):
@@ -55,7 +49,7 @@ class ProductService:
         Добавляет товары в список similar,
         исключая уже найденные.
         """
-        ids = ProductService._similar_ids(similar)
+        ids = [product.id for product in similar]
 
         similar.extend(
             queryset.exclude(id__in=ids)
