@@ -59,7 +59,10 @@ def toggle_comparison_ajax(request, product_id):
         message = f"Товар «{product.title}» удалён из сравнения."
     else:
         # Проверка лимита для AJAX
-        if len(comparison) >= MAX_COMPARISON_ITEMS:
+        if not SessionService.can_add_to_comparison(
+            request,
+            MAX_COMPARISON_ITEMS,
+        ):
             return JsonResponse({
                 'error': True,
                 'message': f'Можно добавить не более {MAX_COMPARISON_ITEMS} товаров.'
@@ -184,7 +187,10 @@ def add_to_comparison(request, product_id):
     comparison = SessionService.get_comparison(request)
     
     # Проверка лимита (добавляем)
-    if len(comparison) >= MAX_COMPARISON_ITEMS:
+    if not SessionService.can_add_to_comparison(
+        request,
+        MAX_COMPARISON_ITEMS,
+    ):
         messages.warning(request, f"Можно добавить не более {MAX_COMPARISON_ITEMS} товаров для сравнения.")
         return redirect(request.META.get('HTTP_REFERER', 'catalog:catalog'))
     

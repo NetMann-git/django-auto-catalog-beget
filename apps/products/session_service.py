@@ -75,3 +75,19 @@ class SessionService:
             SessionService.save_comparison(request, comparison)
 
         return comparison
+
+    @staticmethod
+    def can_add_to_comparison(
+        request,
+        limit,
+    ):
+        """
+        Проверяет, можно ли добавить ещё один товар
+        в список сравнения.
+        """
+
+        comparison = SessionService.get_comparison(
+            request,
+        )
+
+        return len(comparison) < limit
