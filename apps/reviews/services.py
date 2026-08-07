@@ -27,9 +27,19 @@ class ReviewService:
         rating_filter = request.GET.get("rating")
 
         if rating_filter and rating_filter.isdigit():
-            queryset = queryset.filter(
-                rating=int(rating_filter)
-            )
+            rating_value = int(rating_filter)
+
+            if rating_value == 5:
+                queryset = queryset.filter(rating=5)
+
+            elif rating_value == 4:
+                queryset = queryset.filter(rating__gte=4)
+
+            elif rating_value == 3:
+                queryset = queryset.filter(rating__gte=3)
+
+            else:
+                queryset = queryset.filter(rating=rating_value)
 
         with_photos = request.GET.get("with_photos")
 
@@ -55,19 +65,36 @@ class ReviewService:
 
         sort_by = request.GET.get(
             "sort",
-            "-helpful_count",
+            "-helpful_count,-created_at",
         )
 
-        if sort_by == "created_at":
-            queryset = queryset.order_by("-created_at")
+        sort_fields = (
+            sort_by.split(",")
+            if "," in sort_by
+            else [sort_by]
+        )
 
-        elif sort_by == "rating":
-            queryset = queryset.order_by("-rating")
+        ordered = False
 
-        elif sort_by == "helpful_count":
-            queryset = queryset.order_by("-helpful_count")
+        for field in sort_fields:
 
-        else:
+            if field == "-created_at":
+                queryset = queryset.order_by("-created_at")
+                ordered = True
+
+            elif field == "-rating":
+                queryset = queryset.order_by("-rating")
+                ordered = True
+
+            elif field == "rating":
+                queryset = queryset.order_by("rating")
+                ordered = True
+
+            elif field == "-helpful_count":
+                queryset = queryset.order_by("-helpful_count")
+                ordered = True
+
+        if not ordered or sort_by == "-helpful_count,-created_at":
             queryset = queryset.order_by(
                 "-helpful_count",
                 "-created_at",
