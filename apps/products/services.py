@@ -18,32 +18,47 @@ from .constants import (
 class ProductService:
 
     @staticmethod
-    def get_recently_viewed_products(request, current_product):
+    def get_recently_viewed_products(
+        request,
+        current_product=None,
+    ):
         """
-        Возвращает список недавно просмотренных товаров,
-        исключая текущий товар.
+        Возвращает недавно просмотренные товары
+        в порядке, заданном сессией.
+
+        Если указан current_product,
+        он исключается из результата.
         """
 
-        recently_viewed = SessionService.get_recently_viewed(request)
+        recently_viewed = SessionService.get_recently_viewed(
+            request,
+        )
 
-        recent_ids = [
-            pid for pid in recently_viewed
-            if pid != current_product.id
-        ]
+        recent_ids = recently_viewed
 
-        recent_products = Product.objects.filter(
+        if current_product:
+            recent_ids = [
+                product_id
+                for product_id in recently_viewed
+                if product_id != current_product.id
+            ]
+
+        products = Product.objects.filter(
             id__in=recent_ids,
             is_active=True,
         )
 
         order = {
-            pid: i
-            for i, pid in enumerate(recently_viewed)
+            product_id: index
+            for index, product_id in enumerate(recently_viewed)
         }
 
         return sorted(
-            recent_products,
-            key=lambda p: order.get(p.id, 999),
+            products,
+            key=lambda product: order.get(
+                product.id,
+                999,
+            ),
         )
 
 
@@ -138,3 +153,4 @@ class ProductService:
             .first()
         )
         return attribute.attribute_value.value if attribute else None
+    

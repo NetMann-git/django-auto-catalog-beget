@@ -31,6 +31,9 @@ from .session_service import SessionService
 
 from apps.reviews.services import ReviewService
 
+from .comparison_service import ComparisonService
+
+
 def brand_detail(request, slug):
     brand = get_object_or_404(Brand, slug=slug)
     products = CatalogRepository.by_brand(brand)
@@ -92,16 +95,21 @@ def recently_viewed_list(request):
     """
     Страница со списком всех просмотренных товаров.
     """
-    ids = request.session.get('recently_viewed', [])
-    products = Product.objects.filter(id__in=ids, is_active=True)
-    # Сохраняем порядок из сессии (сначала последние просмотренные)
-    order = {id: i for i, id in enumerate(ids)}
-    products = sorted(products, key=lambda p: order.get(p.id, 999))
+
+    products = ProductService.get_recently_viewed_products(
+        request,
+    )
+
     context = {
         'products': products,
         'catalog_url': reverse('catalog:catalog'),
     }
-    return render(request, 'products/recently_viewed.html', context)
+
+    return render(
+        request,
+        'products/recently_viewed.html',
+        context,
+    )
 
 # @cache_page(60 * 5)  # 5 минут
 def product_detail(request, slug):
@@ -183,24 +191,66 @@ def clear_recently_viewed_ajax(request):
     return JsonResponse({'success': True, 'count': 0})
 
 def add_to_comparison(request, product_id):
-    product = get_object_or_404(Product, id=product_id, is_active=True)
+    """
+    Добавляет товар в список сравнения.
+    """
+    product = get_object_or_404(
+        Product,
+        id=product_id,
+        is_active=True,
+    )
+
     comparison = SessionService.get_comparison(request)
-    
-    # Проверка лимита (добавляем)
+
+    # Товар уже находится в сравнении
+    if product_id in comparison:
+        messages.info(
+            request,
+            f"Товар «{product.title}» уже в списке сравнения.",
+        )
+
+        return redirect(
+            request.META.get(
+                "HTTP_REFERER",
+                "catalog:catalog",
+            )
+        )
+
+    # Проверяем лимит ДО добавления товара
     if not SessionService.can_add_to_comparison(
         request,
         MAX_COMPARISON_ITEMS,
     ):
-        messages.warning(request, f"Можно добавить не более {MAX_COMPARISON_ITEMS} товаров для сравнения.")
-        return redirect(request.META.get('HTTP_REFERER', 'catalog:catalog'))
-    
-    if product_id not in comparison:
-        SessionService.add_to_comparison(request, product_id)
-        messages.success(request, f"Товар «{product.title}» добавлен к сравнению.")
-    else:
-        messages.info(request, f"Товар «{product.title}» уже в списке сравнения.")
-    
-    return redirect(request.META.get('HTTP_REFERER', 'catalog:catalog'))
+        messages.warning(
+            request,
+            f"Можно добавить не более "
+            f"{MAX_COMPARISON_ITEMS} товаров для сравнения.",
+        )
+
+        return redirect(
+            request.META.get(
+                "HTTP_REFERER",
+                "catalog:catalog",
+            )
+        )
+
+    # Добавляем товар
+    SessionService.add_to_comparison(
+        request,
+        product_id,
+    )
+
+    messages.success(
+        request,
+        f"Товар «{product.title}» добавлен к сравнению.",
+    )
+
+    return redirect(
+        request.META.get(
+            "HTTP_REFERER",
+            "catalog:catalog",
+        )
+    )
 
 
 def remove_from_comparison(request, product_id):
@@ -215,34 +265,22 @@ def remove_from_comparison(request, product_id):
 
 
 def comparison_list(request):
-    ids = SessionService.get_comparison(request)
-    products = Product.objects.filter(id__in=ids, is_active=True)
-    # Сохраняем порядок, заданный пользователем
-    order = {id: i for i, id in enumerate(ids)}
-    products = sorted(products, key=lambda p: order.get(p.id, 999))
+    products = ComparisonService.get_products(request)
 
-    # Собираем все характеристики для выбранных товаров
-    attributes_data = {}
-    for product in products:
-        for attr in product.attributes.select_related('attribute_type').all():
-            key = attr.attribute_type.name
-            if key not in attributes_data:
-                attributes_data[key] = {}
-            attributes_data[key][product.id] = attr.attribute_value.value if attr.attribute_value else '—'
-
-    # Формируем список строк для шаблона (упорядочиваем по типу)
-    attributes_rows = []
-    for attr_name, values in attributes_data.items():
-        row = {'name': attr_name}
-        for product in products:
-            row[product.id] = values.get(product.id, '—')
-        attributes_rows.append(row)
+    attributes_rows = ComparisonService.get_attributes_rows(
+        products,
+    )
 
     context = {
         'products': products,
         'attributes_rows': attributes_rows,
     }
-    return render(request, 'products/comparison.html', context)
+
+    return render(
+        request,
+        'products/comparison.html',
+        context,
+    )
 
 @role_required(ROLE_MANAGER, ROLE_ADMIN)
 def product_list_manage(request):
