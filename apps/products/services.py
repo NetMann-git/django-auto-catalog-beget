@@ -1,16 +1,83 @@
 # apps/products/services.py
 from django.core.cache import cache
 
-from apps.products.repository import CatalogRepository
+from .cache_keys import (
+    CACHE_TIMEOUT,
+    SIMILAR_PRODUCTS_PREFIX,
+)
+from .repository import CatalogRepository
 
+from .session_service import SessionService
+from apps.products.models import Product
+
+from .constants import (
+    ATTRIBUTE_COLLECTION,
+    ATTRIBUTE_SILHOUETTE,
+)
 
 class ProductService:
 
-    
+    @staticmethod
+    def get_recently_viewed_products(
+        request,
+        current_product=None,
+    ):
+        """
+        Возвращает недавно просмотренные товары
+        в порядке, заданном сессией.
+
+        Если указан current_product,
+        он исключается из результата.
+        """
+
+        recently_viewed = SessionService.get_recently_viewed(
+            request,
+        )
+
+        recent_ids = recently_viewed
+
+        if current_product:
+            recent_ids = [
+                product_id
+                for product_id in recently_viewed
+                if product_id != current_product.id
+            ]
+
+        products = Product.objects.filter(
+            id__in=recent_ids,
+            is_active=True,
+        )
+
+        order = {
+            product_id: index
+            for index, product_id in enumerate(recently_viewed)
+        }
+
+        return sorted(
+            products,
+            key=lambda product: order.get(
+                product.id,
+                999,
+            ),
+        )
+
+
+    @staticmethod
+    def _extend_similar(similar, queryset, limit):
+        """
+        Добавляет товары в список similar,
+        исключая уже найденные.
+        """
+        ids = [product.id for product in similar]
+
+        similar.extend(
+            queryset.exclude(id__in=ids)
+            .distinct()[:limit - len(similar)]
+        )
 
     @staticmethod
     def get_similar_products(product, limit=4):
-        cache_key = f"similar_{product.pk}"
+        cache_key = f"{SIMILAR_PRODUCTS_PREFIX}{product.pk}"
         similar = cache.get(cache_key)
         if similar is None:
             queryset = CatalogRepository.related(product)
@@ -20,69 +87,59 @@ class ProductService:
             
             collection_value = ProductService._get_attribute_value(
                 product,
-                "collection",
+                ATTRIBUTE_COLLECTION,
             )
             
             silhouette_value = ProductService._get_attribute_value(
                 product,
-                "silhouette",
+                ATTRIBUTE_SILHOUETTE,
             )
 
             # 1. Та же коллекция + тот же силуэт
             if collection_value and silhouette_value:
                 similar = list(
                     queryset.filter(
-                        attributes__attribute_type__slug='collection',
+                        attributes__attribute_type__slug=ATTRIBUTE_COLLECTION,
                         attributes__attribute_value__value=collection_value,
                     ).filter(
-                        attributes__attribute_type__slug='silhouette',
+                        attributes__attribute_type__slug=ATTRIBUTE_SILHOUETTE,
                         attributes__attribute_value__value=silhouette_value,
                     ).distinct()[:limit]
                 )
 
             # 2. Та же коллекция
             if len(similar) < limit and collection_value:
-                ids = [obj.id for obj in similar]
-                similar.extend(
-                    queryset
-                    .filter(
-                        attributes__attribute_type__slug='collection',
+                ProductService._extend_similar(
+                    similar,
+                    queryset.filter(
+                        attributes__attribute_type__slug=ATTRIBUTE_COLLECTION,
                         attributes__attribute_value__value=collection_value,
-                    )
-                    .exclude(id__in=ids)
-                    .distinct()[:limit - len(similar)]
+                    ),
+                    limit,
                 )
 
             # 3. Тот же силуэт
             if len(similar) < limit and silhouette_value:
-                ids = [obj.id for obj in similar]
-                similar.extend(
-                    queryset
-                    .filter(
-                        attributes__attribute_type__slug='silhouette',
+                ProductService._extend_similar(
+                    similar,
+                    queryset.filter(
+                        attributes__attribute_type__slug=ATTRIBUTE_SILHOUETTE,
                         attributes__attribute_value__value=silhouette_value,
-                    )
-                    .exclude(id__in=ids)
-                    .distinct()[:limit - len(similar)]
+                    ),
+                    limit,
                 )
 
             # 4. Любые товары (запасной вариант)
             if len(similar) < limit:
-                ids = [obj.id for obj in similar]
-                similar.extend(
-                    queryset
-                    .exclude(id__in=ids)
-                    .distinct()[:limit - len(similar)]
+                ProductService._extend_similar(
+                    similar,
+                    queryset,
+                    limit,
                 )
 
-            cache.set(cache_key, similar, 600)
+            cache.set(cache_key, similar, CACHE_TIMEOUT)
         return similar
 
-    @staticmethod
-    def context(product):
-        return {
-            "similar_products": ProductService.get_similar_products(product),
-        }
 
     @staticmethod
     def _get_attribute_value(product, slug):
@@ -96,3 +153,4 @@ class ProductService:
             .first()
         )
         return attribute.attribute_value.value if attribute else None
+    

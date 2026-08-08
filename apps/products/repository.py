@@ -1,36 +1,43 @@
 # apps/products/repository.py
+
 from django.core.cache import cache
 from apps.products.querysets import CatalogQuerySet
 from apps.products.models import Brand
 
+from .cache_keys import (
+    CACHE_TIMEOUT,
+    CATALOG_QUERYSET_KEY,
+    CATALOG_FILTERS_KEY,
+)
+from apps.products.constants import AVAILABILITY_CHOICES
 
 class CatalogRepository:
 
     @staticmethod
     def catalog():
-        cache_key = "catalog_queryset"
+        cache_key = CATALOG_QUERYSET_KEY
         queryset = cache.get(cache_key)
         if queryset is None:
             queryset = CatalogQuerySet.catalog_queryset()
-            cache.set(cache_key, queryset, 600)
+            cache.set(cache_key, queryset, CACHE_TIMEOUT)
         return queryset
 
     @staticmethod
     def filters():
-        cache_key = "catalog_filters"
+        cache_key = CATALOG_FILTERS_KEY
         data = cache.get(cache_key)
         if data is None:
             from apps.products.models import Category
-            from apps.products.models import Product
+
             data = {
                 "silhouettes": CatalogRepository.distinct("silhouette"),
                 "brands": Brand.objects.order_by("name"),
                 "collections": CatalogRepository.distinct("collection"),
                 "colors": CatalogRepository.distinct("color"),
                 "categories": Category.objects.order_by("title"),
-                "availabilities": Product.AVAILABILITY_CHOICES,
+                "availabilities": AVAILABILITY_CHOICES,
             }
-            cache.set(cache_key, data, 600)
+            cache.set(cache_key, data, CACHE_TIMEOUT)
         return data
 
     @staticmethod

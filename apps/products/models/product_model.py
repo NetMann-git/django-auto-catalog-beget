@@ -6,11 +6,11 @@ from .badge import Badge
 from .category import Category
 from .brand import Brand
 
-CURRENCY_CHOICES = [
-    ('USD', 'USD $'),
-    ('EUR', 'EUR €'),
-    ('RUB', 'RUB ₽'),
-]
+from apps.products.constants import (
+    CURRENCY_CHOICES,
+    AVAILABILITY_CHOICES,
+    AVAILABILITY_IN_STOCK,
+)
 
 
 class Product(models.Model):
@@ -79,17 +79,10 @@ class Product(models.Model):
         verbose_name="Показывать на главной"
     )
 
-    AVAILABILITY_CHOICES = [
-        ('in_stock', 'В наличии'),
-        ('under_order', 'Под заказ'),
-        ('last_size', 'Последний размер'),
-        ('out_of_stock', 'Нет в наличии'),
-    ]
-
     availability_status = models.CharField(
         max_length=20,
         choices=AVAILABILITY_CHOICES,
-        default='in_stock',
+        default=AVAILABILITY_IN_STOCK,
         verbose_name='Наличие',
     )
 

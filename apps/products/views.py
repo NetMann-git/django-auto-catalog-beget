@@ -2,21 +2,16 @@
 
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-from django.conf import settings
 
 from .constants import MAX_COMPARISON_ITEMS, MAX_RECENTLY_VIEWED
 from .services import ProductService
 from .context import CatalogContextBuilder
-
-from django.views.decorators.cache import cache_page
-from django.views.decorators.csrf import csrf_exempt
 
 from django.urls import reverse
 from apps.products.models import Brand
 
 from apps.reviews.forms import ReviewForm
 
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -29,7 +24,14 @@ from .models import Product, ProductGalleryImage, AttributeType, AttributeValue,
 from .repository import CatalogRepository
 
 from apps.users.decorators import role_required
+from apps.users.constants import ROLE_MANAGER, ROLE_ADMIN
+from .cache import CatalogCache
 
+from .session_service import SessionService
+
+from apps.reviews.services import ReviewService
+
+from .comparison_service import ComparisonService
 
 
 def brand_detail(request, slug):
@@ -49,24 +51,33 @@ def toggle_comparison_ajax(request, product_id):
     Возвращает JSON с новым состоянием и количеством товаров.
     """
     product = get_object_or_404(Product, id=product_id, is_active=True)
-    comparison = request.session.get('comparison', [])
+    comparison = SessionService.get_comparison(request)
     is_added = False
 
     if product_id in comparison:
-        comparison.remove(product_id)
+        comparison = SessionService.remove_from_comparison(
+            request,
+            product_id,
+        )
         message = f"Товар «{product.title}» удалён из сравнения."
     else:
         # Проверка лимита для AJAX
-        if len(comparison) >= MAX_COMPARISON_ITEMS:
+        if not SessionService.can_add_to_comparison(
+            request,
+            MAX_COMPARISON_ITEMS,
+        ):
             return JsonResponse({
                 'error': True,
                 'message': f'Можно добавить не более {MAX_COMPARISON_ITEMS} товаров.'
             }, status=400)
-        comparison.append(product_id)
+
+        comparison = SessionService.add_to_comparison(
+            request,
+            product_id,
+        )
         is_added = True
         message = f"Товар «{product.title}» добавлен к сравнению."
 
-    request.session['comparison'] = comparison
     count = len(comparison)
 
     return JsonResponse({
@@ -84,68 +95,63 @@ def recently_viewed_list(request):
     """
     Страница со списком всех просмотренных товаров.
     """
-    ids = request.session.get('recently_viewed', [])
-    products = Product.objects.filter(id__in=ids, is_active=True)
-    # Сохраняем порядок из сессии (сначала последние просмотренные)
-    order = {id: i for i, id in enumerate(ids)}
-    products = sorted(products, key=lambda p: order.get(p.id, 999))
+
+    products = ProductService.get_recently_viewed_products(
+        request,
+    )
+
     context = {
         'products': products,
         'catalog_url': reverse('catalog:catalog'),
     }
-    return render(request, 'products/recently_viewed.html', context)
+
+    return render(
+        request,
+        'products/recently_viewed.html',
+        context,
+    )
 
 # @cache_page(60 * 5)  # 5 минут
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug, is_active=True)
     context = {"product": product, "page": product}
-    context.update(ProductService.context(product))
+    context["similar_products"] = (
+        ProductService.get_similar_products(product)
+    )
     
     # Сохраняем товар в список недавно просмотренных
-    recently_viewed = request.session.get('recently_viewed', [])
-    if product.id in recently_viewed:
-        recently_viewed.remove(product.id)  # перемещаем в начало
-    recently_viewed.insert(0, product.id)
-    # Ограничиваем количество
-    if len(recently_viewed) > MAX_RECENTLY_VIEWED:
-        recently_viewed = recently_viewed[:MAX_RECENTLY_VIEWED]
-    request.session['recently_viewed'] = recently_viewed
+    SessionService.save_recently_viewed(
+        request,
+        product.id,
+        MAX_RECENTLY_VIEWED,
+    )
+
 
     # Получаем товары для блока «Недавно просмотренные» (без текущего)
-    recent_ids = [pid for pid in recently_viewed if pid != product.id]
-    recent_products = Product.objects.filter(id__in=recent_ids, is_active=True)
-    # Сохраняем порядок из сессии
-    order = {pid: i for i, pid in enumerate(recently_viewed)}
-    recent_products = sorted(recent_products, key=lambda p: order.get(p.id, 999))
-    context['recently_viewed_products'] = recent_products
-
+    context["recently_viewed_products"] = (
+        ProductService.get_recently_viewed_products(
+            request,
+            product,
+        )
+    )
 
     # Отзывы – фильтрация и сортировка
-    reviews_qs = product.reviews.filter(is_published=True)
+    
+    reviews_qs = ReviewService.get_reviews(
+        product,
+        request,
+    )
 
-    # Фильтры
-    rating_filter = request.GET.get('rating')
-    if rating_filter and rating_filter.isdigit():
-        reviews_qs = reviews_qs.filter(rating=int(rating_filter))
+    sort_by = request.GET.get(
+        "sort",
+        "-helpful_count",
+    )
 
-    with_photos = request.GET.get('with_photos')
-    if with_photos == '1':
-        reviews_qs = reviews_qs.filter(images__isnull=False).distinct()
 
-    verified = request.GET.get('verified')
-    if verified == '1':
-        reviews_qs = reviews_qs.filter(is_verified=True)
+    rating_filter = request.GET.get("rating")
+    with_photos = request.GET.get("with_photos")
+    verified = request.GET.get("verified")   
 
-    # Сортировка
-    sort_by = request.GET.get('sort', '-helpful_count')
-    if sort_by == 'created_at':
-        reviews_qs = reviews_qs.order_by('-created_at')
-    elif sort_by == 'rating':
-        reviews_qs = reviews_qs.order_by('-rating')
-    elif sort_by == 'helpful_count':
-        reviews_qs = reviews_qs.order_by('-helpful_count')
-    else:
-        reviews_qs = reviews_qs.order_by('-helpful_count', '-created_at')
 
     context["reviews"] = reviews_qs
     context["selected_sort"] = sort_by
@@ -185,69 +191,100 @@ def clear_recently_viewed_ajax(request):
     return JsonResponse({'success': True, 'count': 0})
 
 def add_to_comparison(request, product_id):
-    product = get_object_or_404(Product, id=product_id, is_active=True)
-    comparison = request.session.get('comparison', [])
-    
-    # Проверка лимита (добавляем)
-    if len(comparison) >= MAX_COMPARISON_ITEMS:
-        messages.warning(request, f"Можно добавить не более {MAX_COMPARISON_ITEMS} товаров для сравнения.")
-        return redirect(request.META.get('HTTP_REFERER', 'catalog:catalog'))
-    
-    if product_id not in comparison:
-        comparison.append(product_id)
-        request.session['comparison'] = comparison
-        messages.success(request, f"Товар «{product.title}» добавлен к сравнению.")
-    else:
-        messages.info(request, f"Товар «{product.title}» уже в списке сравнения.")
-    
-    return redirect(request.META.get('HTTP_REFERER', 'catalog:catalog'))
+    """
+    Добавляет товар в список сравнения.
+    """
+    product = get_object_or_404(
+        Product,
+        id=product_id,
+        is_active=True,
+    )
+
+    comparison = SessionService.get_comparison(request)
+
+    # Товар уже находится в сравнении
+    if product_id in comparison:
+        messages.info(
+            request,
+            f"Товар «{product.title}» уже в списке сравнения.",
+        )
+
+        return redirect(
+            request.META.get(
+                "HTTP_REFERER",
+                "catalog:catalog",
+            )
+        )
+
+    # Проверяем лимит ДО добавления товара
+    if not SessionService.can_add_to_comparison(
+        request,
+        MAX_COMPARISON_ITEMS,
+    ):
+        messages.warning(
+            request,
+            f"Можно добавить не более "
+            f"{MAX_COMPARISON_ITEMS} товаров для сравнения.",
+        )
+
+        return redirect(
+            request.META.get(
+                "HTTP_REFERER",
+                "catalog:catalog",
+            )
+        )
+
+    # Добавляем товар
+    SessionService.add_to_comparison(
+        request,
+        product_id,
+    )
+
+    messages.success(
+        request,
+        f"Товар «{product.title}» добавлен к сравнению.",
+    )
+
+    return redirect(
+        request.META.get(
+            "HTTP_REFERER",
+            "catalog:catalog",
+        )
+    )
 
 
 def remove_from_comparison(request, product_id):
-    comparison = request.session.get('comparison', [])
+    comparison = SessionService.get_comparison(request)
     if product_id in comparison:
-        comparison.remove(product_id)
-        request.session['comparison'] = comparison
+        comparison = SessionService.remove_from_comparison(
+            request,
+            product_id,
+        )
         messages.success(request, "Товар удалён из сравнения.")
     return redirect(request.META.get('HTTP_REFERER', 'catalog:catalog'))
 
 
 def comparison_list(request):
-    ids = request.session.get('comparison', [])
-    products = Product.objects.filter(id__in=ids, is_active=True)
-    # Сохраняем порядок, заданный пользователем
-    order = {id: i for i, id in enumerate(ids)}
-    products = sorted(products, key=lambda p: order.get(p.id, 999))
+    products = ComparisonService.get_products(request)
 
-    # Собираем все характеристики для выбранных товаров
-    attributes_data = {}
-    for product in products:
-        for attr in product.attributes.select_related('attribute_type').all():
-            key = attr.attribute_type.name
-            if key not in attributes_data:
-                attributes_data[key] = {}
-            attributes_data[key][product.id] = attr.attribute_value.value if attr.attribute_value else '—'
-
-    # Формируем список строк для шаблона (упорядочиваем по типу)
-    attributes_rows = []
-    for attr_name, values in attributes_data.items():
-        row = {'name': attr_name}
-        for product in products:
-            row[product.id] = values.get(product.id, '—')
-        attributes_rows.append(row)
+    attributes_rows = ComparisonService.get_attributes_rows(
+        products,
+    )
 
     context = {
         'products': products,
         'attributes_rows': attributes_rows,
     }
-    return render(request, 'products/comparison.html', context)
 
-@login_required
+    return render(
+        request,
+        'products/comparison.html',
+        context,
+    )
+
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
 def product_list_manage(request):
     """Список товаров для управления (менеджер)."""
-    if request.user.profile.role not in ['manager', 'admin']:
-        messages.error(request, 'У вас нет доступа к этой странице.')
-        return redirect('users:dashboard')
     
     products = Product.objects.all().order_by('-id')  # ИСПРАВЛЕНО
     
@@ -270,19 +307,23 @@ def product_list_manage(request):
     }
     return render(request, 'products/manage_list.html', context)
 
-@role_required("manager", "admin")
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
 def product_create(request):
     """Создание нового товара."""
-    
+
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
+
         if form.is_valid():
             product = form.save()
+
+            CatalogCache.clear_catalog()
+
             messages.success(request, f'Товар "{product.title}" успешно создан!')
             return redirect('catalog:product_edit', product_id=product.id)
     else:
         form = ProductForm()
-    
+
     context = {
         'form': form,
         'title': 'Создание товара',
@@ -290,19 +331,20 @@ def product_create(request):
     return render(request, 'products/product_form.html', context)
 
 
-@login_required
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
 def product_edit(request, product_id):
     """Редактирование товара."""
-    if request.user.profile.role not in ['manager', 'admin']:
-        messages.error(request, 'У вас нет доступа к этой странице.')
-        return redirect('users:dashboard')
     
     product = get_object_or_404(Product, id=product_id)
     
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES, instance=product)
+
         if form.is_valid():
             form.save()
+
+            CatalogCache.clear_catalog()
+
             messages.success(request, f'Товар "{product.title}" успешно обновлён!')
             return redirect('catalog:product_edit', product_id=product.id)
     else:
@@ -316,34 +358,37 @@ def product_edit(request, product_id):
     return render(request, 'products/product_form.html', context)
 
 
-@login_required
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
 def product_delete(request, product_id):
     """Удаление товара."""
-    if request.user.profile.role not in ['manager', 'admin']:
-        messages.error(request, 'У вас нет доступа к этой странице.')
-        return redirect('users:dashboard')
-    
+
     product = get_object_or_404(Product, id=product_id)
-    
+
     if request.method == 'POST':
         product_title = product.title
+
         product.delete()
+
+        CatalogCache.clear_catalog()
+
         messages.success(request, f'Товар "{product_title}" удалён.')
         return redirect('catalog:product_list_manage')
-    
+
     context = {
         'product': product,
     }
-    return render(request, 'products/product_confirm_delete.html', context)
+
+    return render(
+        request,
+        'products/product_confirm_delete.html',
+        context,
+    )
 
 
-@login_required
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
 def gallery_add(request, product_id):
     """Добавление изображения в галерею."""
-    if request.user.profile.role not in ['manager', 'admin']:
-        messages.error(request, 'У вас нет доступа к этой странице.')
-        return redirect('users:dashboard')
-    
+  
     product = get_object_or_404(Product, id=product_id)
     
     if request.method == 'POST':
@@ -359,12 +404,9 @@ def gallery_add(request, product_id):
     return redirect('catalog:product_edit', product_id=product.id)
 
 
-@login_required
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
 def gallery_delete(request, image_id):
     """Удаление изображения из галереи."""
-    if request.user.profile.role not in ['manager', 'admin']:
-        messages.error(request, 'У вас нет доступа к этой странице.')
-        return redirect('users:dashboard')
     
     image = get_object_or_404(ProductGalleryImage, id=image_id)
     product_id = image.product.id
@@ -374,12 +416,9 @@ def gallery_delete(request, image_id):
     return redirect('catalog:product_edit', product_id=product_id)
 
 
-@login_required
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
 def product_attributes(request, product_id):
     """Управление характеристиками товара."""
-    if request.user.profile.role not in ['manager', 'admin']:
-        messages.error(request, 'У вас нет доступа к этой странице.')
-        return redirect('users:dashboard')
     
     product = get_object_or_404(Product, id=product_id)
     attribute_types = AttributeType.objects.all()
@@ -420,12 +459,9 @@ def product_attributes(request, product_id):
     }
     return render(request, 'products/product_attributes.html', context)
 
-@login_required
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
 def attribute_delete(request, attribute_id):
     """Удаление характеристики товара."""
-    if request.user.profile.role not in ['manager', 'admin']:
-        messages.error(request, 'У вас нет доступа к этой странице.')
-        return redirect('users:dashboard')
     
     attribute = get_object_or_404(ProductAttribute, id=attribute_id)
     product_id = attribute.product.id

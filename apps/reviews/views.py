@@ -12,66 +12,31 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse
 from apps.products.models import Product
 
+from apps.reviews.services import ReviewService
+
 def filter_reviews(request, product_id):
     """
     Возвращает HTML-фрагмент со списком отфильтрованных и отсортированных отзывов.
     """
-    product = get_object_or_404(Product, id=product_id, is_active=True)
-    reviews_qs = product.reviews.filter(is_published=True)
 
-    # Фильтры
-    rating_filter = request.GET.get('rating')
-    if rating_filter and rating_filter.isdigit():
-        rating_value = int(rating_filter)
-        if rating_value == 5:
-            reviews_qs = reviews_qs.filter(rating=5)
-        elif rating_value == 4:
-            reviews_qs = reviews_qs.filter(rating__gte=4)
-        elif rating_value == 3:
-            reviews_qs = reviews_qs.filter(rating__gte=3)
-        else:
-            reviews_qs = reviews_qs.filter(rating=rating_value)
+    product = get_object_or_404(
+        Product,
+        id=product_id,
+        is_active=True,
+    )
 
+    reviews_qs = ReviewService.get_reviews(
+        product,
+        request,
+    )
 
-    with_photos = request.GET.get('with_photos')
-    if with_photos == '1':
-        reviews_qs = reviews_qs.filter(images__isnull=False).distinct()
-
-    verified = request.GET.get('verified')
-    if verified == '1':
-        reviews_qs = reviews_qs.filter(is_verified=True)
-
-
-
-    # Сортировка
-    sort_by = request.GET.get('sort', '-helpful_count,-created_at')
-
-    # Разбираем значение на отдельные поля сортировки (для комбинированного варианта)
-    sort_fields = sort_by.split(',') if ',' in sort_by else [sort_by]
-
-    # Применяем сортировку
-    ordered = False
-    for field in sort_fields:
-        if field == '-created_at':
-            reviews_qs = reviews_qs.order_by('-created_at')
-            ordered = True
-        elif field == '-rating':
-            reviews_qs = reviews_qs.order_by('-rating')
-            ordered = True
-        elif field == 'rating':
-            reviews_qs = reviews_qs.order_by('rating')
-            ordered = True
-        elif field == '-helpful_count':
-            reviews_qs = reviews_qs.order_by('-helpful_count')
-            ordered = True
-
-    # Если ни одно условие не сработало или сортировка по умолчанию
-    if not ordered or sort_by == '-helpful_count,-created_at':
-        reviews_qs = reviews_qs.order_by('-helpful_count', '-created_at')
-
-
-    # Рендерим список отзывов
-    html = render_to_string('reviews/_review_list.html', {'reviews': reviews_qs, 'product': product})
+    html = render_to_string(
+        'reviews/_review_list.html',
+        {
+            'reviews': reviews_qs,
+            'product': product,
+        }
+    )
 
     return JsonResponse({'html': html})
 
