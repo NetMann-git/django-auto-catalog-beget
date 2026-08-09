@@ -1,0 +1,37 @@
+/* apps/products/static/products/css/catalog/_wishlist.css */
+/* Стили для страницы избранного */
+.wishlist-note {
+    margin-top: 20px;
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #666;
+    border: 1px solid #e9ecef;
+}
+.wishlist-note a {
+    color: #c0392b;
+    text-decoration: none;
+    font-weight: 500;
+}
+.wishlist-note a:hover {
+    text-decoration: underline;
+}
+
+#empty-wishlist {
+    text-align: center;
+    padding: 60px 20px;
+}
+#empty-wishlist p {
+    font-size: 18px;
+    color: #888;
+    margin-bottom: 20px;
+}
+
+/* Сетка товаров в избранном */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    margin: 20px 0;
+}

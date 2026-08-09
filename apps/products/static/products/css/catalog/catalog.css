@@ -1,0 +1,16 @@
+/* apps/products/static/products/css/catalog/catalog.css */
+/* ========================= catalog.css
+   Стили для каталога и карточек товаров
+   Подключает модули для удобства поддержки
+========================= */
+
+/* Подключаем модули */
+@import url('_layout.css');
+@import url('_filters.css');
+@import url('_product-card.css');
+@import url('_sort.css');
+@import url('_pagination.css');
+@import url('_wishlist.css');
+@import url('_recently-viewed.css');
+@import url('_comparison.css');
+@import url('_responsive.css');

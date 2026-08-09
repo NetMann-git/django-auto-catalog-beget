@@ -1,0 +1,43 @@
+/* apps/products/static/products/css/catalog/_layout.css */
+/* Макет каталога */
+.catalog-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 40px;
+    margin-top: 30px;
+}
+
+.catalog-sidebar {
+    position: sticky;
+    top: 20px;
+    align-self: start;
+}
+
+.catalog-content {
+    min-width: 0;
+}
+
+.catalog-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.catalog-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.catalog-count {
+    margin: 0;
+    font-weight: 600;
+}
+
+.catalog-section-title {
+    margin-bottom: 15px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #222;
+}

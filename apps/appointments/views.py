@@ -27,32 +27,46 @@ def get_available_slots(request, date):
         return JsonResponse({'error': 'Неверный формат даты'}, status=400)
 
     day_of_week = date_obj.weekday()
-    try:
-        working_hours = WorkingHours.objects.get(day_of_week=day_of_week, is_active=True)
-    except WorkingHours.DoesNotExist:
-        return JsonResponse({'error': 'В этот день салон не работает'}, status=404)
 
-    booked_appointments = Appointment.objects.filter(
-        date=date_obj,
-        status__in=['pending', 'confirmed']
-    ).values_list('time', flat=True)
+    try:
+        working_hours = WorkingHours.objects.get(
+            day_of_week=day_of_week,
+            is_active=True,
+        )
+    except WorkingHours.DoesNotExist:
+        return JsonResponse(
+            {'error': 'В этот день салон не работает'},
+            status=404,
+        )
+
+    booked_appointments = set(
+        Appointment.objects.filter(
+            date=date_obj,
+            status__in=['pending', 'confirmed'],
+        ).values_list('time', flat=True)
+    )
 
     start = datetime.combine(date_obj, working_hours.start_time)
     end = datetime.combine(date_obj, working_hours.end_time)
 
     slots = []
     current = start
+
     while current < end:
+        slot_time = current.time()
         time_str = current.strftime('%H:%M')
-        is_booked = time_str in booked_appointments
+
         slots.append({
             'time': time_str,
-            'available': not is_booked,
+            'available': slot_time not in booked_appointments,
         })
+
         current += timedelta(minutes=30)
 
-    return JsonResponse({'date': date, 'slots': slots})
-
+    return JsonResponse({
+        'date': date,
+        'slots': slots,
+    })
 
 def appointment_form(request, product_id=None):
     """
