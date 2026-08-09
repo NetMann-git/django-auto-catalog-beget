@@ -1,21 +1,17 @@
-
 /* static/products/css/catalog.css */
-
-/* =========================
-    catalog.css
-    Стили только для каталога и карточек товаров
+/* ========================= catalog.css
+   Стили только для каталога и карточек товаров
 ========================= */
 
-.container {
+/* Обновляем стили для контейнера, чтобы не затрагивать шапку */
+.main .container,
+.catalog-content .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 30px;
 }
 
-/* =========================
-    Каталог
-========================= */
-
+/* ========================= Каталог ========================= */
 .catalog-layout {
     display: grid;
     grid-template-columns: 280px 1fr;
@@ -58,10 +54,7 @@
     color: #222;
 }
 
-/* =========================
-    Фильтры
-========================= */
-
+/* ========================= Фильтры ========================= */
 .catalog-filters {
     display: flex;
     flex-direction: column;
@@ -126,10 +119,7 @@
     background: #000;
 }
 
-/* =========================
-    Активные фильтры
-========================= */
-
+/* ========================= Активные фильтры ========================= */
 .active-filters {
     display: flex;
     flex-wrap: wrap;
@@ -149,7 +139,6 @@
     text-decoration: none;
     transition: 0.2s;
 }
-
 .filter-chip:hover {
     background: #333;
     transform: translateY(-1px);
@@ -161,15 +150,11 @@
     color: #666;
     transition: 0.2s;
 }
-
 .clear-filters:hover {
     color: #000;
 }
 
-/* =========================
-    Сетка карточек товаров
-========================= */
-
+/* ========================= Сетка карточек товаров ========================= */
 .dress-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -177,10 +162,7 @@
     margin-top: 40px;
 }
 
-/* =========================
-    Карточка товара
-========================= */
-
+/* ========================= Карточка товара ========================= */
 .dress-card {
     display: flex;
     flex-direction: column;
@@ -193,12 +175,10 @@
     transition: transform .3s ease, box-shadow .3s ease;
     isolation: isolate;
 }
-
 .dress-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 30px 70px rgba(0, 0, 0, .14);
 }
-
 .dress-card:hover .dress-card-image {
     transform: scale(1.08);
 }
@@ -210,10 +190,7 @@
     padding: 28px;
 }
 
-/* =========================
-    Изображение карточки
-========================= */
-
+/* ========================= Изображение карточки ========================= */
 .dress-image-link {
     display: block;
     position: relative;
@@ -221,7 +198,6 @@
     aspect-ratio: 2 / 3;
     background: #f7f7f7;
 }
-
 .dress-image-link::after {
     content: "";
     position: absolute;
@@ -230,11 +206,9 @@
     opacity: 0;
     transition: opacity .35s ease;
 }
-
 .dress-card:hover .dress-image-link::after {
     opacity: 1;
 }
-
 .dress-card-image {
     position: absolute;
     inset: 0;
@@ -243,32 +217,25 @@
     object-fit: cover;
     transition: opacity .45s ease, transform .7s ease;
 }
-
 .primary-image {
     opacity: 1;
     z-index: 1;
 }
-
 .hover-image {
     opacity: 0;
     z-index: 2;
     transform: scale(1.05);
 }
-
 .dress-image-link.has-hover:hover .primary-image {
     opacity: 0;
     transform: scale(1.05);
 }
-
 .dress-image-link.has-hover:hover .hover-image {
     opacity: 1;
     transform: scale(1);
 }
 
-/* =========================
-    Кнопка "Смотреть" поверх фото
-========================= */
-
+/* ========================= Кнопка "Смотреть" поверх фото ========================= */
 .image-button {
     position: absolute;
     left: 50%;
@@ -286,20 +253,15 @@
     transition: .35s;
     z-index: 5;
 }
-
 .dress-card:hover .image-button {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
 }
-
 .image-button:hover {
     background: white;
 }
 
-/* =========================
-    Контент карточки
-========================= */
-
+/* ========================= Контент карточки ========================= */
 .dress-title {
     margin: 0 0 16px;
     font-size: 24px;
@@ -308,16 +270,13 @@
     min-height: 64px;
     transition: transform .35s ease, color .35s ease;
 }
-
 .dress-card:hover .dress-title {
     transform: translateY(-4px);
 }
-
 .dress-title a {
     color: inherit;
     text-decoration: none;
 }
-
 .dress-title a:hover {
     text-decoration: underline;
 }
@@ -331,11 +290,9 @@
     color: #111;
     transition: transform .35s ease, color .35s ease;
 }
-
 .dress-card:hover .dress-price {
     transform: translateY(-3px);
 }
-
 .currency {
     font-size: 20px;
     font-weight: 600;
@@ -347,7 +304,6 @@
     gap: 8px;
     margin: 10px 0 15px;
 }
-
 .dress-meta span {
     background: #f7f7f7;
     border-radius: 20px;
@@ -356,10 +312,7 @@
     font-weight: 500;
 }
 
-/* =========================
-    Бейджи
-========================= */
-
+/* ========================= Бейджи ========================= */
 .badges {
     position: absolute;
     top: 18px;
@@ -369,7 +322,6 @@
     gap: 10px;
     z-index: 20;
 }
-
 .badge {
     display: inline-block;
     padding: 8px 14px;
@@ -382,41 +334,32 @@
     white-space: nowrap;
     transition: transform .35s ease, box-shadow .35s ease;
 }
-
 .dress-card:hover .badge {
     transform: translateX(6px);
     box-shadow: 0 10px 24px rgba(0, 0, 0, .18);
 }
-
 .badge-novinka {
     background: #27ae60;
     color: white;
 }
-
 .badge-hit-prodazh {
     background: #e74c3c;
     color: white;
 }
-
 .badge-akciya {
     background: #f39c12;
     color: white;
 }
-
 .badge-premium {
     background: #8e44ad;
     color: white;
 }
-
 .badge-eksklyuziv {
     background: #2c3e50;
     color: white;
 }
 
-/* =========================
-    Кнопки (избранное, сравнение)
-========================= */
-
+/* ========================= Кнопки (избранное, сравнение) ========================= */
 .favorite-btn {
     position: absolute;
     top: 18px;
@@ -434,13 +377,11 @@
     z-index: 30;
     transition: transform .25s, background .25s, box-shadow .25s;
 }
-
 .favorite-btn:hover {
     transform: scale(1.12);
     background: white;
     box-shadow: 0 8px 20px rgba(0,0,0,.18);
 }
-
 .favorite-btn.active {
     color: #e63946;
     transform: scale(1.15);
@@ -458,13 +399,11 @@
     text-decoration: none;
     transition: 0.2s;
 }
-
 .compare-btn.active {
     background: #e0f0e0;
     border-color: #4CAF50;
     color: #2e7d32;
 }
-
 .compare-btn.remove-btn {
     border: none;
     background: transparent;
@@ -472,19 +411,14 @@
     font-size: 18px;
     padding: 0 5px;
 }
-
 .compare-btn.remove-btn:hover {
     color: #c0392b;
 }
-
 .compare-btn:hover {
     background: #e0e0e0;
 }
 
-/* =========================
-    Пагинация
-========================= */
-
+/* ========================= Пагинация ========================= */
 .pagination {
     display: flex;
     justify-content: center;
@@ -494,7 +428,6 @@
     flex-wrap: wrap;
     user-select: none;
 }
-
 .page-link {
     display: flex;
     justify-content: center;
@@ -509,14 +442,12 @@
     font-weight: 600;
     transition: .25s;
 }
-
 .page-link:hover {
     background: #111;
     color: white;
     border-color: #111;
     transform: translateY(-2px);
 }
-
 .page-link.active {
     background: #111;
     color: white;
@@ -524,53 +455,40 @@
     box-shadow: 0 8px 20px rgba(0, 0, 0, .15);
 }
 
-/* =========================
-    Адаптивность
-========================= */
-
+/* ========================= Адаптивность ========================= */
 @media (max-width: 768px) {
     .catalog-layout {
         grid-template-columns: 1fr;
     }
-
     .catalog-sidebar {
         position: static;
     }
-
     .catalog-toolbar {
         flex-direction: column;
         gap: 15px;
         align-items: stretch;
     }
-
     .catalog-toolbar-left {
         flex-wrap: wrap;
     }
-
     .dress-grid {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 20px;
     }
-
     .dress-title {
         font-size: 20px;
         min-height: 50px;
     }
-
     .dress-price {
         font-size: 28px;
     }
-
     .badge {
         font-size: 11px;
         padding: 4px 10px;
     }
 }
 
-/* ========================================
-   ИЗБРАННОЕ
-======================================== */
-
+/* ======================================== ИЗБРАННОЕ ======================================== */
 .wishlist-note {
     margin-top: 20px;
     padding: 15px 20px;
@@ -580,43 +498,34 @@
     color: #666;
     border: 1px solid #e9ecef;
 }
-
 .wishlist-note a {
     color: #c0392b;
     text-decoration: none;
     font-weight: 500;
 }
-
 .wishlist-note a:hover {
     text-decoration: underline;
 }
-
 #empty-wishlist {
     text-align: center;
     padding: 60px 20px;
 }
-
 #empty-wishlist p {
     font-size: 18px;
     color: #888;
     margin-bottom: 20px;
 }
 
-/* ========================================
-   ИСТОРИЯ ПРОСМОТРОВ
-======================================== */
-
+/* ======================================== ИСТОРИЯ ПРОСМОТРОВ ======================================== */
 .recently-viewed-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 25px;
 }
-
 .recently-viewed-header h1 {
     margin: 0;
 }
-
 .btn-clear-history {
     padding: 8px 20px;
     background: #f8f9fa;
@@ -627,28 +536,22 @@
     cursor: pointer;
     transition: all 0.2s;
 }
-
 .btn-clear-history:hover {
     background: #fde8e8;
     border-color: #e74c3c;
     color: #e74c3c;
 }
-
 #empty-history-message {
     text-align: center;
     padding: 60px 20px;
 }
-
 #empty-history-message p {
     font-size: 18px;
     color: #888;
     margin-bottom: 20px;
 }
 
-/* ========================================
-   СРАВНЕНИЕ
-======================================== */
-
+/* ======================================== СРАВНЕНИЕ ======================================== */
 .comparison-table {
     width: 100%;
     border-collapse: collapse;
@@ -658,7 +561,6 @@
     overflow: hidden;
     box-shadow: 0 2px 20px rgba(0,0,0,0.06);
 }
-
 .comparison-table th,
 .comparison-table td {
     padding: 16px 20px;
@@ -666,25 +568,21 @@
     text-align: center;
     vertical-align: middle;
 }
-
 .comparison-table th {
     background: #f8f9fa;
     font-weight: 600;
     font-size: 16px;
     min-width: 150px;
 }
-
 .comparison-table th a {
     color: #333;
     text-decoration: none;
     display: block;
     margin-bottom: 8px;
 }
-
 .comparison-table th a:hover {
     color: #c0392b;
 }
-
 .comparison-table td:first-child {
     font-weight: 600;
     color: #555;
@@ -692,14 +590,12 @@
     background: #fafafa;
     min-width: 120px;
 }
-
 .comparison-table td img {
     max-width: 80px;
     max-height: 120px;
     border-radius: 6px;
     object-fit: cover;
 }
-
 .comparison-table .remove-btn {
     background: none;
     border: none;
@@ -710,58 +606,46 @@
     border-radius: 4px;
     transition: 0.2s;
 }
-
 .comparison-table .remove-btn:hover {
     background: #fde8e8;
     transform: scale(1.1);
 }
-
 #comparison-table-wrapper {
     overflow-x: auto;
 }
-
 #empty-message {
     text-align: center;
     padding: 60px 20px;
 }
-
 #empty-message p {
     font-size: 18px;
     color: #888;
     margin-bottom: 20px;
 }
 
-/* ========================================
-   АДАПТИВНОСТЬ
-======================================== */
-
+/* ======================================== АДАПТИВНОСТЬ ======================================== */
 @media (max-width: 768px) {
     .comparison-table th,
     .comparison-table td {
         padding: 10px 12px;
         font-size: 14px;
     }
-
     .comparison-table th {
         min-width: 100px;
     }
-
     .comparison-table td:first-child {
         min-width: 80px;
         font-size: 13px;
     }
-
     .comparison-table td img {
         max-width: 50px;
         max-height: 80px;
     }
-
     .recently-viewed-header {
         flex-direction: column;
         gap: 12px;
         align-items: flex-start;
     }
-
     #empty-wishlist p,
     #empty-history-message p,
     #empty-message p {
@@ -769,30 +653,24 @@
     }
 }
 
-/* ========================================
-   ИЗБРАННОЕ И ИСТОРИЯ ПРОСМОТРОВ
-======================================== */
-
+/* ======================================== ИЗБРАННОЕ И ИСТОРИЯ ПРОСМОТРОВ ======================================== */
 .product-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 30px;
     margin: 20px 0;
 }
-
 #empty-wishlist,
 #empty-history-message {
     text-align: center;
     padding: 60px 20px;
 }
-
 #empty-wishlist p,
 #empty-history-message p {
     font-size: 18px;
     color: #888;
     margin-bottom: 20px;
 }
-
 .wishlist-note {
     margin-top: 20px;
     padding: 15px 20px;
@@ -802,7 +680,6 @@
     color: #666;
     border: 1px solid #e9ecef;
 }
-
 .wishlist-note a {
     color: #c0392b;
     text-decoration: none;
