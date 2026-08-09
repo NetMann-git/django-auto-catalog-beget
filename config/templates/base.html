@@ -6,12 +6,29 @@
 <head>
     <meta charset="utf-8" />
 
+    <!-- Текущая логика для description (сохраняем!) -->
+    {% if page and page.search_description %}
+        <meta name="description" content="{{ page.search_description }}" />
+    {% else %}
+        <!-- Дефолтное описание для главной и других страниц без page.search_description -->
+        <meta name="description" content="Свадебный салон MoreUG: широкий ассортимент свадебных платьев, индивидуальный подход, запись на примерку.">
+    {% endif %}
+
+    <!-- Добавляем Open Graph (для соцсетей) -->
+    <meta property="og:title" content="{% if page and page.seo_title %}{{ page.seo_title }}{% else %}Свадебный салон MoreUG – Элегантные свадебные платья{% endif %}">
+    <meta property="og:description" content="{% if page and page.search_description %}{{ page.search_description }}{% else %}Широкий ассортимент свадебных платьев. Запишитесь на примерку!{% endif %}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://moreug.beget.tech">
+    <meta property="og:image" content="https://moreug.beget.tech/static/images/og-image.jpg"> <!-- Нужно будет добавить это изображение -->
+    <meta property="og:locale" content="ru_RU">
+
+    <!-- Обновлённый title (сохраняем текущую логику, но делаем дефолт на русском) -->
     <title>
         {% block title %}
             {% if page %}
                 {% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}
             {% else %}
-                Wedding Salon
+                Свадебный салон "MoreUG" – Элегантные свадебные платья
             {% endif %}
         {% endblock %}
 
