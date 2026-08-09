@@ -1,0 +1,66 @@
+/* apps/products/static/products/css/catalog/_responsive.css */
+/* Адаптивность для всех модулей */
+@media (max-width: 768px) {
+    /* Каталог */
+    .catalog-layout {
+        grid-template-columns: 1fr;
+    }
+    .catalog-sidebar {
+        position: static;
+    }
+    .catalog-toolbar {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    .catalog-toolbar-left {
+        flex-wrap: wrap;
+    }
+
+    /* Карточки товаров */
+    .dress-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+    }
+    .dress-title {
+        font-size: 20px;
+        min-height: 50px;
+    }
+    .dress-price {
+        font-size: 28px;
+    }
+    .badge {
+        font-size: 11px;
+        padding: 4px 10px;
+    }
+
+    /* Сравнение */
+    .comparison-table th,
+    .comparison-table td {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+    .comparison-table th {
+        min-width: 100px;
+    }
+    .comparison-table td:first-child {
+        min-width: 80px;
+        font-size: 13px;
+    }
+    .comparison-table td img {
+        max-width: 50px;
+        max-height: 80px;
+    }
+
+    /* История просмотров и избранное */
+    .recently-viewed-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    #empty-wishlist p,
+    #empty-history-message p,
+    #empty-message p {
+        font-size: 16px;
+    }
+}

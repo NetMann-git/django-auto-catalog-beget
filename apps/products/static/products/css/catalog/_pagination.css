@@ -1,0 +1,37 @@
+/* apps/products/static/products/css/catalog/_pagination.css */
+/* Пагинация */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 60px 0 30px;
+    flex-wrap: wrap;
+    user-select: none;
+}
+.page-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    text-decoration: none;
+    background: white;
+    color: #222;
+    border: 1px solid #e5e5e5;
+    font-weight: 600;
+    transition: .25s;
+}
+.page-link:hover {
+    background: #111;
+    color: white;
+    border-color: #111;
+    transform: translateY(-2px);
+}
+.page-link.active {
+    background: #111;
+    color: white;
+    border-color: #111;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .15);
+}
