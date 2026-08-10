@@ -76,7 +76,7 @@
                     {% for product in products %}
                         <td data-product-id="{{ product.id }}">
                             {% if product.image %}
-                                <img src="{{ product.image.url }}" alt="{{ product.title }}" width="80">
+                                <img src="{{ product.image.small.url }}" alt="{{ product.title }}" width="80" height="120" loading="lazy">
                             {% else %}
                                 —
                             {% endif %}

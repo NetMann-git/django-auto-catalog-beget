@@ -266,3 +266,10 @@ CURRENT_THEME = 'wedding'
 # -----------------------------------------------------------------------------
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Настройки easy-thumbnails
+THUMBNAIL_ALIASES = {
+    '': {
+        'small': {'size': (100, 150), 'crop': True},
+    },
+}
