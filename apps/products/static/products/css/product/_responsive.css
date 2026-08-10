@@ -1,0 +1,119 @@
+/* apps\products\static\products\css\product\_responsive.css */
+
+/* ======================================== АДАПТИВНОСТЬ ======================================== */
+@media (max-width: 900px) {
+    .dress-detail {
+        flex-direction: column;
+    }
+    .dress-photo,
+    .dress-info {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .price {
+        font-size: 28px;
+    }
+
+    .dress-actions {
+        flex-direction: column;
+    }
+
+    .dress-actions .btn,
+    .dress-actions .btn-outline {
+        width: 100%;
+        text-align: center;
+    }
+
+    .spec-row {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .spec-row strong {
+        text-align: left;
+    }
+
+    .recently-viewed-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    /* Галерея */
+    .gallery-wrapper {
+        flex-direction: column-reverse;
+        gap: 12px;
+    }
+
+    .gallery-thumbs-vertical {
+        flex-direction: row;
+        max-height: none;
+        overflow-x: auto;
+        overflow-y: visible;
+        padding-bottom: 5px;
+        gap: 8px;
+    }
+
+    .gallery-thumb-vertical {
+        width: 70px;
+        height: 95px;
+        flex-shrink: 0;
+    }
+
+    .main-image {
+        max-height: 400px;
+    }
+
+    .image-arrow {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    .prev-image {
+        left: 8px;
+    }
+
+    .next-image {
+        right: 8px;
+    }
+
+    /* Лайтбокс */
+    .lightbox-image {
+        max-width: 95vw;
+        max-height: 60vh;
+    }
+
+    .lightbox-prev,
+    .lightbox-next {
+        font-size: 30px;
+    }
+
+    .lightbox-thumb {
+        width: 50px;
+        height: 65px;
+    }
+
+    .similar-title {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .gallery-thumb-vertical {
+        width: 55px;
+        height: 75px;
+    }
+
+    .main-image {
+        max-height: 320px;
+    }
+
+    .image-arrow {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+}

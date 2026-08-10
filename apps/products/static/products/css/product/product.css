@@ -1,0 +1,6 @@
+/* apps/products/static/products/css/product/product.css */
+@import url('_gallery.css');
+@import url('_card.css');
+@import url('_similar.css');
+@import url('_detail.css');
+@import url('_responsive.css');

@@ -4,7 +4,7 @@
 {% load thumbnail %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
-<link rel="stylesheet" href="{% static 'products/css/product.css' %}">
+<link rel="stylesheet" href="{% static 'products/css/product/product.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/catalog/catalog.css' %}">
 <link rel="stylesheet" href="{% static 'reviews/css/reviews.css' %}">
 {% endblock extra_css %}
@@ -197,26 +197,25 @@
         <h2 class="similar-title">Похожие платья</h2>
         <div class="dress-grid">
 
+            <!-- Новое: используем тот же стиль, что и в _product_card.html -->
             {% for similar in similar_products %}
-            <article class="dress-card">
-
-                {% if similar.image %}
-                <a href="{{ similar.get_absolute_url }}">
-                    <img src="{% thumbnail similar.image 400x533 crop %}" alt="{{ similar.title }}" class="dress-card-image" loading="lazy">
+            <article class="card product-card">
+                <a href="{{ similar.get_absolute_url }}" class="card-image-link">
+                    <div class="card-image">
+                        {% thumbnail similar.image 400x533 crop as similar_thumb %}
+                        <img src="{{ similar_thumb.url }}" alt="{{ similar.title }}" itemprop="image" loading="lazy" decoding="async">
+                    </div>
                 </a>
-                {% endif %}
-
-                <div class="dress-card-content">
-                    <h3 class="dress-title">
-                        <a href="{{ similar.get_absolute_url }}">{{ similar.title }}</a>
+                <div class="card-content">
+                    <h3 class="card-title" itemprop="name">
+                        <a href="{{ similar.get_absolute_url }}" itemprop="url">{{ similar.title }}</a>
                     </h3>
-                    <div class="dress-price">{{ similar.price|floatformat:0 }} ₽</div>
-                    {% if similar.collection %}
-                    <div class="dress-meta"><span>{{ similar.collection }}</span></div>
-                    {% endif %}
+                    <div class="card-price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                        <span class="current-price" itemprop="price" content="{{ similar.price }}">{{ similar.price|floatformat:0 }} ₽</span>
+                        <meta itemprop="priceCurrency" content="RUB">
+                    </div>
                     <a href="{{ similar.get_absolute_url }}" class="btn">Смотреть</a>
                 </div>
-
             </article>
             {% endfor %}
 
