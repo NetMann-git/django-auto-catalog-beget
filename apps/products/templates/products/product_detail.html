@@ -1,7 +1,7 @@
 <!-- product_detail.html -->
 {% extends "base.html" %}
 {% load static %}
-
+{% load thumbnail %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/product.css' %}">
@@ -34,14 +34,14 @@
                 {% if product.gallery.all %}
                     <div class="gallery-thumbs-vertical">
                         {% if product.image %}
-                            <img src="{{ product.image.url }}"
-                                data-full="{{ product.image.url }}"
+                            <img src="{% thumbnail product.image 100x150 crop %}"
+                                data-full="{% thumbnail product.image 800x1200 crop %}"
                                 class="gallery-thumb-vertical active"
                                 alt="{{ product.title }}">
                         {% endif %}
                         {% for photo in product.gallery.all %}
-                            <img src="{{ photo.image.url }}"
-                                data-full="{{ photo.image.url }}"
+                            <img src="{% thumbnail photo.image 100x150 crop %}"
+                                data-full="{% thumbnail photo.image 800x1200 crop %}"
                                 class="gallery-thumb-vertical"
                                 alt="{{ photo.alt|default:product.title }}">
                         {% endfor %}
@@ -52,7 +52,7 @@
                 <div class="main-image-wrapper">
                     {% if product.image %}
                         <img id="main-image"
-                            src="{{ product.image.url }}"
+                            src="{% thumbnail product.image 800x1200 crop %}"
                             alt="{{ product.title }}"
                             class="main-image"
                             style="cursor:pointer;">
@@ -202,7 +202,7 @@
 
                 {% if similar.image %}
                 <a href="{{ similar.get_absolute_url }}">
-                    <img src="{{ similar.image.url }}" alt="{{ similar.title }}" class="dress-card-image">
+                    <img src="{% thumbnail similar.image 400x533 crop %}" alt="{{ similar.title }}" class="dress-card-image" loading="lazy">
                 </a>
                 {% endif %}
 
