@@ -12,6 +12,7 @@ from apps.products.constants import (
     AVAILABILITY_IN_STOCK,
 )
 
+from easy_thumbnails.fields import ThumbnailerImageField
 
 class Product(models.Model):
     """
@@ -22,7 +23,7 @@ class Product(models.Model):
     title = models.CharField(max_length=255, verbose_name="Название")
     slug = models.SlugField(unique=True, verbose_name="URL")
 
-    image = models.ImageField(
+    image = ThumbnailerImageField(
         upload_to="products/",
         blank=True,
         null=True,
