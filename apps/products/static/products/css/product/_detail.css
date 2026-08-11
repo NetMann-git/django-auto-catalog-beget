@@ -171,17 +171,65 @@
     margin-top: 60px;
     padding-top: 40px;
     border-top: 1px solid #eee;
+    text-align: center;
 }
 
 .recently-viewed-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    position: relative; /* Добавляем для абсолютного позиционирования кнопки */
     margin-bottom: 20px;
 }
 
 .recently-viewed-header h2 {
     font-size: 24px;
+    margin: 0 auto; /* Выравнивание заголовка по центру */
+    width: fit-content;
+}
+
+/* Переопределяем стили из catalog/_recently-viewed.css */
+section.recently-viewed .recently-viewed-header {
+    display: flex;
+    justify-content: center !important; /* Принудительно по центру */
+    position: relative;
+    margin-bottom: 20px;
+}
+
+section.recently-viewed .recently-viewed-header h2 {
+    margin: 0 auto;
+    width: fit-content;
+}
+
+section.recently-viewed .btn-clear-history {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.btn-clear-history {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 14px;
+    text-decoration: none;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.btn-clear-history:hover {
+    color: #e74c3c;
+}
+
+/* Сетка для недавно просмотренных (уже выровнена по центру) */
+.recently-viewed .dress-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    justify-content: center;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .btn-clear-history {
