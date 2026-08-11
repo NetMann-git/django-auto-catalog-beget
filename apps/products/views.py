@@ -33,6 +33,8 @@ from apps.reviews.services import ReviewService
 
 from .comparison_service import ComparisonService
 
+from .context import ProductContextBuilder
+
 
 def brand_detail(request, slug):
     brand = get_object_or_404(Brand, slug=slug)
@@ -115,6 +117,14 @@ def recently_viewed_list(request):
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug, is_active=True)
     context = {"product": product, "page": product}
+
+    if request.user.is_authenticated:
+            wishlist_ids = list(request.user.favorites.values_list("product_id", flat=True))
+    else:
+            wishlist_ids = request.session.get('wishlist', [])
+    context["wishlist_ids"] = wishlist_ids
+
+    
     context["similar_products"] = (
         ProductService.get_similar_products(product)
     )
