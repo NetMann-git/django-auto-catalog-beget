@@ -1,0 +1,14 @@
+{% load static %}
+
+{% if recommended_products %}
+<section class="section recommended-section">
+    <div class="container">
+        <h2 class="section-title">Рекомендуем</h2>
+        <div class="products-grid">
+            {% for product in recommended_products %}
+                {% include "products/_product_card.html" with product=product %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}

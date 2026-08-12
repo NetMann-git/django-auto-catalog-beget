@@ -35,6 +35,8 @@ from .comparison_service import ComparisonService
 
 from .context import ProductContextBuilder
 
+from apps.recommendations.services import RecommendationService
+
 
 def brand_detail(request, slug):
     brand = get_object_or_404(Brand, slug=slug)
@@ -95,23 +97,24 @@ def catalog(request):
 
 def recently_viewed_list(request):
     """
-    Страница со списком всех просмотренных товаров.
+    Страница со списком всех просмотренных товаров + блок рекомендаций.
     """
+    recently_ids = request.session.get('recently_viewed', [])
+    products = Product.objects.filter(
+        id__in=recently_ids, is_active=True
+    ) if recently_ids else Product.objects.none()
 
-    products = ProductService.get_recently_viewed_products(
-        request,
+    # Получаем рекомендации на основе просмотренных товаров
+    recommended_products = RecommendationService.get_similar_products(
+        products, limit=4
     )
 
     context = {
         'products': products,
-        'catalog_url': reverse('catalog:catalog'),
+        'recently_viewed_ids': recently_ids,
+        'recommended_products': recommended_products,
     }
-
-    return render(
-        request,
-        'products/recently_viewed.html',
-        context,
-    )
+    return render(request, 'products/recently_viewed.html', context)
 
 # @cache_page(60 * 5)  # 5 минут
 def product_detail(request, slug):
