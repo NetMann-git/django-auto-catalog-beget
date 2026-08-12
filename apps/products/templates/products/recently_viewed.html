@@ -37,5 +37,7 @@
             <a href="{{ catalog_url }}" class="btn">Перейти в каталог</a>
         </div>
     </div>
+
+    {% include "recommendations/_recommended_block.html" with recommended_products=recommended_products %}
 </div>
 {% endblock %}

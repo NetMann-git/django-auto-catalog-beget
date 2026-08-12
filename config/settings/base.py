@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'apps.size_helper',
     'apps.users',
     'apps.search',
+    'apps.recommendations',
 ]
 
 MIDDLEWARE = [
