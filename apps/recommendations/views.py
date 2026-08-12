@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from .models import PromotedProduct
 from .forms import PromotedProductForm
+from django.core.paginator import Paginator
 
 
 def is_manager(user):
@@ -14,7 +15,10 @@ def is_manager(user):
 
 @user_passes_test(is_manager)
 def manage_recommendations(request):
-    promotions = PromotedProduct.objects.select_related('product').order_by('-priority', '-id')
+    promotions_list = PromotedProduct.objects.select_related('product').order_by('-priority', '-id')
+    paginator = Paginator(promotions_list, 10)  # по 10 на страницу, как в manage_list
+    page_number = request.GET.get('page')
+    promotions = paginator.get_page(page_number)
     return render(request, 'recommendations/manage.html', {
         'promotions': promotions,
     })
