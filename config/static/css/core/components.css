@@ -416,3 +416,12 @@
 .badge-akciya { background: #f39c12; }
 .badge-eksklyuziv { background: #9b59b6; }
 .badge-premium { background: #e67e22; }
+
+/* Бейдж "Выбор салона" */
+.badge-salon-choice {
+  background: linear-gradient(135deg, #b8860b 0%, #ffd700 50%, #b8860b 100%);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(255, 215, 0, 0.8);
+}

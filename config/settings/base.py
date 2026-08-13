@@ -100,6 +100,8 @@ TEMPLATES = [
                 "apps.products.context_processors.comparison_ids",
                 "apps.products.context_processors.recently_viewed_ids",
                 'config.context_processors.theme_context',
+                'apps.recommendations.context_processors.promoted_products',
+
             ],
         },
     },
