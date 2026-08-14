@@ -1,3 +1,5 @@
+# apps\recommendations\models.py
+
 from django.db import models
 from apps.products.models import Product
 
@@ -6,8 +8,9 @@ class PromotedProduct(models.Model):
 
     PAGE_CHOICES = [
         ('recently_viewed', 'История просмотров'),
+        ('wishlist', 'Избранное'),
         ('home', 'Главная страница'),
-        # Позже можно добавить 'wishlist', 'comparison' и т.д.
+        # Позже можно добавить 'comparison' и т.д.
     ]
 
     product = models.ForeignKey(

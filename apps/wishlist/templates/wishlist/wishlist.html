@@ -34,5 +34,7 @@
         <p>У вас пока нет избранных товаров.</p>
         <a href="{% url 'catalog:catalog' %}" class="btn">Перейти в каталог</a>
     </div>
+
+    {% include "recommendations/_recommended_block.html" with recommended_products=recommended_products %}
 </div>
 {% endblock %}
