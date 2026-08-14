@@ -284,9 +284,17 @@ def comparison_list(request):
         products,
     )
 
+    # Получаем рекомендации для страницы сравнения
+    recommended_products = RecommendationService.get_similar_products(
+        viewed_products=products,
+        page='comparison',
+        limit=4
+    )
+
     context = {
         'products': products,
         'attributes_rows': attributes_rows,
+        'recommended_products': recommended_products,
     }
 
     return render(

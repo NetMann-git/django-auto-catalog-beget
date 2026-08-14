@@ -10,7 +10,7 @@ class PromotedProduct(models.Model):
         ('recently_viewed', 'История просмотров'),
         ('wishlist', 'Избранное'),
         ('home', 'Главная страница'),
-        # Позже можно добавить 'comparison' и т.д.
+        ('comparison', 'Сравнение'),
     ]
 
     product = models.ForeignKey(
