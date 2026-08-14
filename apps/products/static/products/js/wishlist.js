@@ -49,4 +49,41 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => console.error('Ошибка:', error));
         });
     });
+
+    // Обработчик кнопки «✕ Очистить избранное»
+    const clearBtn = document.getElementById('clear-wishlist');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const url = this.dataset.url;
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Скрываем блок с товарами
+                    const productsBlock = document.getElementById('wishlist-products');
+                    const emptyBlock = document.getElementById('empty-wishlist');
+                    if (productsBlock) productsBlock.style.display = 'none';
+                    if (emptyBlock) emptyBlock.style.display = 'block';
+
+                    // Очищаем контейнер с карточками (на случай, если они ещё в DOM)
+                    const grid = document.getElementById('wishlist-grid');
+                    if (grid) grid.innerHTML = '';
+
+                    // Обновляем счётчик в шапке
+                    const counter = document.getElementById('wishlist-count');
+                    if (counter) counter.textContent = '0';
+                }
+            })
+            .catch(error => console.error('Ошибка очистки избранного:', error));
+        });
+    }
 });
