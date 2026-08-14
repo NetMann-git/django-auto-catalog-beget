@@ -13,9 +13,21 @@ class RecommendationService:
         Сначала берутся активные ручные рекомендации для указанной страницы,
         затем добираются автоматические (по категориям просмотренных товаров).
         Исключаются уже просмотренные товары.
+        Поддерживает как QuerySet, так и список товаров.
         """
-        # 1. Ручные рекомендации для заданной страницы
         now = timezone.now()
+
+        # Приводим просмотренные товары к множеству ID (поддержка QuerySet и list)
+        if viewed_products is None:
+            viewed_ids = set()
+        elif hasattr(viewed_products, 'values_list'):
+            # QuerySet → множество id
+            viewed_ids = set(viewed_products.values_list('id', flat=True))
+        else:
+            # list → множество id из объектов
+            viewed_ids = {p.id for p in viewed_products}
+
+        # 1. Ручные рекомендации для заданной страницы
         promoted_qs = PromotedProduct.objects.filter(
             page=page,
             is_active=True
@@ -28,10 +40,7 @@ class RecommendationService:
         promoted_products = []
         promoted_ids = set()
         for pp in promoted_qs:
-            if pp.product.is_active and pp.product.id not in promoted_ids:
-                # Исключаем уже просмотренные
-                if viewed_products and pp.product.id in viewed_products.values_list('id', flat=True):
-                    continue
+            if pp.product.is_active and pp.product.id not in viewed_ids and pp.product.id not in promoted_ids:
                 promoted_products.append(pp.product)
                 promoted_ids.add(pp.product.id)
 
@@ -39,15 +48,19 @@ class RecommendationService:
         remaining = limit - len(promoted_products)
         auto_products = []
         if remaining > 0:
-            # Исключаем просмотренные и уже добавленные ручные
-            exclude_ids = set()
-            if viewed_products:
-                exclude_ids.update(viewed_products.values_list('id', flat=True))
+            exclude_ids = set(viewed_ids)
             exclude_ids.update(promoted_ids)
 
-            # По категориям просмотренных
-            if viewed_products and viewed_products.exists():
-                category_ids = viewed_products.values_list('category_id', flat=True).distinct()
+            # По категориям просмотренных товаров
+            if viewed_ids:
+                # Получаем категории просмотренных товаров (работает и для QuerySet, и для list)
+                if hasattr(viewed_products, 'values_list'):
+                    category_ids = Product.objects.filter(
+                        id__in=viewed_ids
+                    ).values_list('category_id', flat=True).distinct()
+                else:
+                    category_ids = {p.category_id for p in viewed_products if p.category_id}
+
                 auto_qs = Product.objects.filter(
                     is_active=True,
                     category_id__in=category_ids
