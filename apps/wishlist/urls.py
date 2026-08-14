@@ -8,4 +8,5 @@ app_name = "wishlist"
 urlpatterns = [
     path("", views.WishlistView.as_view(), name="list"),
     path("toggle/<int:product_id>/", views.toggle_wishlist, name="toggle"),
+    path("clear/", views.clear_wishlist_ajax, name="clear"),
 ]

@@ -21,6 +21,14 @@
                 {% include "products/_product_card.html" with product=product %}
             {% endfor %}
         </div>
+
+        <button type="button" 
+                id="clear-wishlist"
+                class="btn btn-outline"
+                data-url="{% url 'wishlist:clear' %}">
+            ✕ Очистить избранное
+        </button>
+
         {% if is_guest %}
             <p class="wishlist-note">
                 💡 Ваше избранное сохраняется временно. 

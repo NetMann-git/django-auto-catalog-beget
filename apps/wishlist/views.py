@@ -1,5 +1,3 @@
-# apps/wishlist/views.py
-
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404
@@ -75,4 +73,21 @@ def toggle_wishlist(request, product_id):
     return JsonResponse({
         "is_favorite": is_favorite,
         "count": count,
+    })
+
+
+@require_POST
+def clear_wishlist_ajax(request):
+    """
+    AJAX-очистка избранного.
+    """
+    if request.user.is_authenticated:
+        Favorite.objects.filter(user=request.user).delete()
+    else:
+        request.session['wishlist'] = []
+        request.session.modified = True
+
+    return JsonResponse({
+        "success": True,
+        "count": 0,
     })
