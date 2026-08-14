@@ -1,3 +1,5 @@
+<!-- apps\recommendations\templates\recommendations\_recommended_block.html -->
+
 {% load static %}
 
 {% if recommended_products %}
@@ -6,7 +8,7 @@
         <h2 class="section-title">Рекомендуем</h2>
         <div class="products-grid">
             {% for product in recommended_products %}
-                {% include "products/_product_card.html" with product=product %}
+                {% include "products/_product_card.html" with product=product wishlist_ids=wishlist_ids %}
             {% endfor %}
         </div>
     </div>

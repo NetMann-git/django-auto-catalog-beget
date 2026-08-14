@@ -43,6 +43,6 @@
         <a href="{% url 'catalog:catalog' %}" class="btn">Перейти в каталог</a>
     </div>
 
-    {% include "recommendations/_recommended_block.html" with recommended_products=recommended_products %}
+    {% include "recommendations/_recommended_block.html" with recommended_products=recommended_products wishlist_ids=wishlist_ids %}
 </div>
 {% endblock %}
