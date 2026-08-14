@@ -1,5 +1,10 @@
 // apps/products/static/products/js/wishlist.js
 document.addEventListener('DOMContentLoaded', function() {
+    const wishlistGrid = document.getElementById('wishlist-grid');
+    const recommendedGrid = document.querySelector('.recommended-section .products-grid');
+    const wishlistProducts = document.getElementById('wishlist-products');
+    const emptyWishlist = document.getElementById('empty-wishlist');
+
     const buttons = document.querySelectorAll('.wishlist-btn');
 
     buttons.forEach(btn => {
@@ -8,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
 
             const url = this.dataset.url;
+            const card = this.closest('.dress-card, .product-card');
 
             fetch(url, {
                 method: 'POST',
@@ -19,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
+                // Обновляем состояние кнопки
                 if (data.is_favorite) {
                     this.classList.add('active');
                     this.querySelector('.heart').textContent = '❤️';
@@ -27,22 +34,41 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.classList.remove('active');
                     this.querySelector('.heart').textContent = '🤍';
                     this.querySelector('.label').textContent = 'В избранное';
+                }
 
-                    if (window.location.pathname.includes('/wishlist/')) {
-                        const card = this.closest('.dress-card, .product-card');
-                        if (card) {
-                            card.remove();
-                            const grid = document.getElementById('wishlist-grid');
-                            const remainingCards = grid ? grid.querySelectorAll('.dress-card, .product-card').length : 0;
-                            if (remainingCards === 0) {
-                                const productsBlock = document.getElementById('wishlist-products');
-                                const emptyBlock = document.getElementById('empty-wishlist');
-                                if (productsBlock) productsBlock.style.display = 'none';
-                                if (emptyBlock) emptyBlock.style.display = 'block';
+                // Логика перемещения карточки только на странице избранного
+                if (window.location.pathname.includes('/wishlist/')) {
+                    if (!card) return;
+
+                    if (data.is_favorite) {
+                        // Добавление в избранное: перемещаем карточку из рекомендаций в список
+                        if (recommendedGrid && recommendedGrid.contains(card)) {
+                            if (wishlistGrid) {
+                                wishlistGrid.prepend(card);
+                            }
+                            // Показываем блок с товарами, если он был скрыт
+                            if (wishlistProducts) wishlistProducts.style.display = 'block';
+                            if (emptyWishlist) emptyWishlist.style.display = 'none';
+                        }
+                    } else {
+                        // Удаление из избранного: перемещаем карточку из списка в рекомендации
+                        if (wishlistGrid && wishlistGrid.contains(card)) {
+                            if (recommendedGrid) {
+                                recommendedGrid.appendChild(card);
+                            } else {
+                                card.remove();
+                            }
+                            // Проверяем, остались ли карточки в списке
+                            const remainingCards = wishlistGrid.querySelectorAll('.product-card, .dress-card').length;
+                            if (remainingCards === 0 && wishlistProducts && emptyWishlist) {
+                                wishlistProducts.style.display = 'none';
+                                emptyWishlist.style.display = 'block';
                             }
                         }
                     }
                 }
+
+                // Обновляем счётчик
                 const counter = document.getElementById('wishlist-count');
                 if (counter) counter.textContent = data.count;
             })
