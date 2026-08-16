@@ -5,7 +5,7 @@
 {% load comparison_filters %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'products/css/catalog.css' %}">
+    <link rel="stylesheet" href="{% static 'products/css/catalog/catalog.css' %}">
     <link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
 {% endblock %}
 
@@ -13,6 +13,16 @@
 
 {% block content %}
 <div class="container">
+
+    <!-- Хлебные крошки -->
+    <nav class="breadcrumbs">
+        <a href="/">Главная</a>
+        <span>/</span>
+        <a href="/catalog/">Каталог</a>
+        <span>/</span>
+        <span>Сравнение товаров</span>
+    </nav>
+
     <h1>Сравнение товаров</h1>
 
     <!-- Сообщение о пустом списке -->
@@ -76,7 +86,7 @@
                     {% for product in products %}
                         <td data-product-id="{{ product.id }}">
                             {% if product.image %}
-                                <img src="{{ product.image.url }}" alt="{{ product.title }}" width="80">
+                                <img src="{{ product.image.small.url }}" alt="{{ product.title }}" width="80" height="120" loading="lazy">
                             {% else %}
                                 —
                             {% endif %}
@@ -96,5 +106,7 @@
         </table>
         <a href="{% url 'catalog:catalog' %}" class="btn comparison-back-link">Вернуться в каталог</a>
     </div>
+
+    {% include "recommendations/_recommended_block.html" with recommended_products=recommended_products %}
 </div>
 {% endblock %}

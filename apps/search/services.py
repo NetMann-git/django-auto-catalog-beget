@@ -2,12 +2,27 @@
 
 from django.core.cache import cache
 from django.db.models import Q
+from easy_thumbnails.files import get_thumbnailer
 from apps.products.models import Product, Category, Badge, ProductAttribute
 from .models import SearchQuery
 
 
 class SearchService:
     LIMIT = 8
+
+    @staticmethod
+    def _thumbnail_url(image, size=(80, 120)):
+        """Возвращает URL миниатюры для изображения."""
+        if not image:
+            return None
+        try:
+            thumbnail = get_thumbnailer(image).get_thumbnail({
+                'size': size,
+                'crop': True,
+            })
+            return thumbnail.url
+        except Exception:
+            return image.url
 
     @staticmethod
     def search(query):
@@ -56,7 +71,7 @@ class SearchService:
                 'price': str(product.price),
                 'currency': product.currency,
                 'url': product.get_absolute_url(),
-                'image': product.image.url if product.image else None,
+                'image': SearchService._thumbnail_url(product.image),
                 'badges': [{'title': b.title, 'slug': b.slug} for b in product.badges.all()],
                 'category': product.category.title if product.category else None,
                 'brand': product.brand.name if product.brand else None,
@@ -109,7 +124,7 @@ class SearchService:
                 'title': f"{attr.attribute_type.name}: {attr.attribute_value.value}",
                 'product_title': product.title,
                 'url': product.get_absolute_url(),
-                'image': product.image.url if product.image else None,
+                'image': SearchService._thumbnail_url(product.image),
                 'price': str(product.price),
                 'currency': product.currency,
             })

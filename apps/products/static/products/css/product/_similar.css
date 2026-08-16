@@ -1,0 +1,40 @@
+/* apps\products\static\products\css\product\_similar.css */
+
+/* ======================================== ПОХОЖИЕ ТОВАРЫ ======================================== */
+.similar_products {
+    margin-top: 60px;
+    padding: 40px 0;
+    text-align: center; /* Выравнивание заголовка по центру */
+}
+
+.similar-title {
+    font-family: var(--font-display, 'Playfair Display', serif);
+    font-size: 28px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 30px;
+    display: inline-block;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.similar-title::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(to right, #FFD700, #FFC0CB);
+}
+
+/* Сетка для похожих товаров (выравнивание по центру) */
+.similar_products .dress-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    justify-content: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}

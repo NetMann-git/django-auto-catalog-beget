@@ -5,53 +5,52 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-
     <title>
         {% block title %}
             {% if page %}
                 {% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}
             {% else %}
-                Wedding Salon
+                Свадебный салон MoreUG
             {% endif %}
         {% endblock %}
-
         {% block title_suffix %}
-            
-            {% if site and site.site_name %}
-                - {{ site.site_name }}
-            {% endif %}
+            {% if site and site.site_name %} – {{ site.site_name }}{% endif %}
         {% endblock %}
     </title>
-
     {% if page and page.search_description %}
         <meta name="description" content="{{ page.search_description }}" />
+    {% else %}
+        <meta name="description" content="Свадебный салон MoreUG: широкий ассортимент свадебных платьев, индивидуальный подход, запись на примерку.">
     {% endif %}
-
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="index, follow">
-
+    <meta property="og:title" content="{% if page and page.seo_title %}{{ page.seo_title }}{% else %}Свадебный салон MoreUG – Элегантные свадебные платья{% endif %}">
+    <meta property="og:description" content="{% if page and page.search_description %}{{ page.search_description }}{% else %}Широкий ассортимент свадебных платьев. Запишитесь на примерку!{% endif %}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://moreug.beget.tech">
+    <meta property="og:image" content="https://moreug.beget.tech/static/images/og-image.jpg">
+    <meta property="og:locale" content="ru_RU">
     {% if request.in_preview_panel %}
         <base target="_blank">
     {% endif %}
 
+    <!-- Подключение шрифтов -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
     {% block global_css %}
-
         <link rel="stylesheet" href="{% static 'css/core/variables.css' %}">
-        <link rel="stylesheet" href="{% static 'css/core/components.css' %}"> 
-
+        <link rel="stylesheet" href="{% static 'css/core/components.css' %}">
         {% if current_theme %}
             <link rel="stylesheet" href="{% static 'css/themes/'|add:current_theme|add:'.css' %}">
         {% else %}
             <link rel="stylesheet" href="{% static 'css/themes/default.css' %}">
         {% endif %}
- 
         <link rel="stylesheet" type="text/css" href="{% static 'css/config.css' %}">
         <link rel="stylesheet" type="text/css" href="{% static 'search/css/search.css' %}">
         <link rel="stylesheet" type="text/css" href="{% static 'css/modal.css' %}">
-
-
     {% endblock %}
-
     {% block extra_css %}{% endblock %}
 </head>
 

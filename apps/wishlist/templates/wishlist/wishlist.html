@@ -4,7 +4,7 @@
 {% load static %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'products/css/catalog.css' %}">
+    <link rel="stylesheet" href="{% static 'products/css/catalog/catalog.css' %}">
     <link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
 {% endblock %}
 
@@ -12,6 +12,12 @@
 
 {% block content %}
 <div class="container">
+    <!-- Хлебные крошки -->
+    <nav class="breadcrumbs">
+        <a href="/">Главная</a>
+        <span>/</span>
+        <span>Избранное</span>
+    </nav>
     <h1>Избранное</h1>
 
     <!-- Блок с карточками товаров (виден, если есть товары) -->
@@ -21,6 +27,14 @@
                 {% include "products/_product_card.html" with product=product %}
             {% endfor %}
         </div>
+
+        <button type="button" 
+                id="clear-wishlist"
+                class="btn btn-outline"
+                data-url="{% url 'wishlist:clear' %}">
+            ✕ Очистить избранное
+        </button>
+
         {% if is_guest %}
             <p class="wishlist-note">
                 💡 Ваше избранное сохраняется временно. 
@@ -34,5 +48,7 @@
         <p>У вас пока нет избранных товаров.</p>
         <a href="{% url 'catalog:catalog' %}" class="btn">Перейти в каталог</a>
     </div>
+
+    {% include "recommendations/_recommended_block.html" with recommended_products=recommended_products wishlist_ids=wishlist_ids %}
 </div>
 {% endblock %}

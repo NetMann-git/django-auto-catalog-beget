@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'apps.size_helper',
     'apps.users',
     'apps.search',
+    'apps.recommendations',
 ]
 
 MIDDLEWARE = [
@@ -99,6 +100,8 @@ TEMPLATES = [
                 "apps.products.context_processors.comparison_ids",
                 "apps.products.context_processors.recently_viewed_ids",
                 'config.context_processors.theme_context',
+                'apps.recommendations.context_processors.promoted_products',
+
             ],
         },
     },
@@ -266,3 +269,10 @@ CURRENT_THEME = 'wedding'
 # -----------------------------------------------------------------------------
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Настройки easy-thumbnails
+THUMBNAIL_ALIASES = {
+    '': {
+        'small': {'size': (100, 150), 'crop': True},
+    },
+}

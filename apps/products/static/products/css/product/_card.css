@@ -1,0 +1,183 @@
+/* apps\products\static\products\css\product\_card.css */
+
+/* ======================================== КАРТОЧКИ ТОВАРОВ ======================================== */
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+    background: white;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Блок изображения */
+.card-image-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.card-image {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 3 / 4;
+    background: #f8f8f8;
+    border-radius: 16px 16px 0 0;
+}
+
+.card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.card:hover .card-image img {
+    transform: scale(1.05);
+}
+
+/* Кнопка "Подробнее" по центру изображения */
+.card-image-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    padding: 12px 26px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #1a1a1a;
+    text-decoration: none;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: 0.35s;
+    z-index: 5;
+}
+
+.card:hover .card-image-btn {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0);
+}
+
+/* Панель действий внизу изображения */
+.card-actions-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    z-index: 4;
+}
+
+.card:hover .card-actions-bar {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Кнопки действий */
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid var(--color-white);
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(4px);
+    color: var(--color-white);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: var(--color-primary-light);
+    transform: translateY(-1px);
+}
+
+.action-btn.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--text-on-primary);
+}
+
+/* Бейджи поверх изображения */
+.card-badges {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 4;
+}
+
+/* Контент карточки */
+.card-content {
+    padding: 20px;
+    text-align: center;
+}
+
+.card-title {
+    margin: 0 0 10px;
+    font-family: var(--font-display, 'Playfair Display', serif);
+    font-size: 18px;
+    font-weight: 500;
+    color: #1a1a1a;
+    letter-spacing: 0.5px;
+}
+
+.card-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.card-title a:hover {
+    color: var(--color-primary);
+}
+
+.card-price {
+    font-size: 22px;
+    font-weight: 700;
+    color: #FFD700;
+    margin-bottom: 15px;
+}
+
+.card-availability {
+    margin-top: 10px;
+}
+
+/* Сетка для карточек */
+.dress-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+/* Кнопка "Избранное" в карточке товара (переопределяем стили из components.css) */
+.product-detail .wishlist-btn,
+.dress-info .wishlist-btn {
+    color: var(--text-primary) !important; /* Цвет текста: тёмный (видно на светлом фоне) */
+    background: transparent !important; /* Убираем прозрачный фон */
+    border: 1px solid var(--color-gray-300) !important; /* Серый border */
+}

@@ -32,6 +32,13 @@ from .session_service import SessionService
 from apps.reviews.services import ReviewService
 
 from .comparison_service import ComparisonService
+<<<<<<< HEAD
+=======
+
+from .context import ProductContextBuilder
+
+from apps.recommendations.services import RecommendationService
+>>>>>>> dev
 
 
 def brand_detail(request, slug):
@@ -89,20 +96,48 @@ def toggle_comparison_ajax(request, product_id):
 
 def catalog(request):
     context = CatalogContextBuilder.build(request)
+
+    # AJAX-подгрузка товаров при прокрутке
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        html = render(
+            request,
+            'products/_catalog_cards.html',
+            context,
+        ).content.decode('utf-8')
+
+        page_obj = context['page_obj']
+        return JsonResponse({
+            'html': html,
+            'has_next': page_obj.has_next(),
+            'next_page': page_obj.next_page_number() if page_obj.has_next() else None,
+        })
+
     return render(request, "products/catalog.html", context)
 
 def recently_viewed_list(request):
     """
-    Страница со списком всех просмотренных товаров.
+    Страница со списком всех просмотренных товаров + блок рекомендаций.
     """
+<<<<<<< HEAD
 
     products = ProductService.get_recently_viewed_products(
         request,
+=======
+    recently_ids = request.session.get('recently_viewed', [])
+    products = Product.objects.filter(
+        id__in=recently_ids, is_active=True
+    ) if recently_ids else Product.objects.none()
+
+    # Получаем рекомендации на основе просмотренных товаров
+    recommended_products = RecommendationService.get_similar_products(
+        products, limit=4
+>>>>>>> dev
     )
 
     context = {
         'products': products,
-        'catalog_url': reverse('catalog:catalog'),
+        'recently_viewed_ids': recently_ids,
+        'recommended_products': recommended_products,
     }
 
     return render(
@@ -115,6 +150,17 @@ def recently_viewed_list(request):
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug, is_active=True)
     context = {"product": product, "page": product}
+<<<<<<< HEAD
+=======
+
+    if request.user.is_authenticated:
+            wishlist_ids = list(request.user.favorites.values_list("product_id", flat=True))
+    else:
+            wishlist_ids = request.session.get('wishlist', [])
+    context["wishlist_ids"] = wishlist_ids
+
+    
+>>>>>>> dev
     context["similar_products"] = (
         ProductService.get_similar_products(product)
     )
@@ -270,10 +316,21 @@ def comparison_list(request):
     attributes_rows = ComparisonService.get_attributes_rows(
         products,
     )
+<<<<<<< HEAD
+=======
+
+    # Получаем рекомендации для страницы сравнения
+    recommended_products = RecommendationService.get_similar_products(
+        viewed_products=products,
+        page='comparison',
+        limit=4
+    )
+>>>>>>> dev
 
     context = {
         'products': products,
         'attributes_rows': attributes_rows,
+        'recommended_products': recommended_products,
     }
 
     return render(

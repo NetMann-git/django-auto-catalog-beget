@@ -1,0 +1,246 @@
+/* apps\products\static\products\css\product\_detail.css */
+
+/* ======================================== СТРАНИЦА ТОВАРА (общие стили) ======================================== */
+.dress-detail {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    margin-top: 30px;
+}
+
+.dress-photo {
+    flex: 0 0 60%;
+}
+
+.dress-info {
+    flex: 1;
+}
+
+.dress-specs {
+    margin: 25px 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+.spec-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f3f3;
+}
+
+.spec-row:last-child {
+    border-bottom: none;
+}
+
+.spec-row span {
+    color: #666;
+}
+
+.spec-row strong {
+    text-align: right;
+}
+
+.price-block {
+    margin: 20px 0;
+}
+
+.price-label {
+    display: block;
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 4px;
+}
+
+.price {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.dress-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.dress-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 30px;
+    background: #111;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.25s, transform 0.25s, box-shadow 0.25s;
+}
+
+.dress-actions .btn:hover {
+    background: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+.dress-actions .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 30px;
+    background: transparent;
+    color: #111;
+    border: 2px solid #111;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s;
+}
+
+.dress-actions .btn-outline:hover {
+    background: #111;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+.product-brand {
+    margin: 10px 0;
+}
+
+.product-brand a {
+    color: #c0392b;
+    text-decoration: none;
+}
+
+.product-brand a:hover {
+    text-decoration: underline;
+}
+
+.product-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0 15px;
+}
+
+/* ======================================== ОПИСАНИЕ ======================================== */
+.description-block {
+    margin-top: 30px;
+}
+
+.description-block h2 {
+    font-size: 20px;
+    margin-bottom: 12px;
+}
+
+.description {
+    line-height: 1.7;
+    color: #333;
+}
+
+/* ======================================== ХЛЕБНЫЕ КРОШКИ ======================================== */
+.breadcrumbs {
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #888;
+}
+
+.breadcrumbs a {
+    color: #888;
+    text-decoration: none;
+}
+
+.breadcrumbs a:hover {
+    color: #111;
+    text-decoration: underline;
+}
+
+.breadcrumbs span {
+    margin: 0 8px;
+}
+
+/* ======================================== НЕДАВНО ПРОСМОТРЕННЫЕ ======================================== */
+.recently-viewed {
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 1px solid #eee;
+    text-align: center;
+}
+
+.recently-viewed-header {
+    position: relative; /* Добавляем для абсолютного позиционирования кнопки */
+    margin-bottom: 20px;
+}
+
+.recently-viewed-header h2 {
+    font-size: 24px;
+    margin: 0 auto; /* Выравнивание заголовка по центру */
+    width: fit-content;
+}
+
+/* Переопределяем стили из catalog/_recently-viewed.css */
+section.recently-viewed .recently-viewed-header {
+    display: flex;
+    justify-content: center !important; /* Принудительно по центру */
+    position: relative;
+    margin-bottom: 20px;
+}
+
+section.recently-viewed .recently-viewed-header h2 {
+    margin: 0 auto;
+    width: fit-content;
+}
+
+section.recently-viewed .btn-clear-history {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.btn-clear-history {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 14px;
+    text-decoration: none;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.btn-clear-history:hover {
+    color: #e74c3c;
+}
+
+/* Сетка для недавно просмотренных (уже выровнена по центру) */
+.recently-viewed .dress-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    justify-content: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.btn-clear-history {
+    color: #999;
+    font-size: 14px;
+    text-decoration: none;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.btn-clear-history:hover {
+    color: #e74c3c;
+}

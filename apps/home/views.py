@@ -21,4 +21,11 @@ def home(request):
         'categories': categories,
         'reviews': reviews,
     }
+
+    if request.user.is_authenticated:
+        wishlist_ids = list(request.user.favorites.values_list("product_id", flat=True))
+    else:
+        wishlist_ids = request.session.get('wishlist', [])
+    context["wishlist_ids"] = wishlist_ids
+
     return render(request, 'home/home.html', context)

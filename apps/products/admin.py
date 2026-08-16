@@ -2,6 +2,7 @@
 
 from django.contrib import admin
 from django.utils.html import format_html
+from easy_thumbnails.files import get_thumbnailer
 
 from .models import (
     Product,
@@ -69,7 +70,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    save_on_top = True  # <-- добавьте эту строку
+    save_on_top = True
     list_display = (
         "title",
         "article",
@@ -158,6 +159,13 @@ class ProductAdmin(admin.ModelAdmin):
 
     def image_tag(self, obj):
         if obj.image:
-            return format_html('<img src="{}" width="50" height="50" />', obj.image.url)
-        return "-"
+            thumbnail = get_thumbnailer(obj.image).get_thumbnail({
+                'size': (50, 75),
+                'crop': True,
+            })
+            return format_html(
+                '<img src="{}" style="width:50px; height:75px; object-fit: cover;" />',
+                thumbnail.url
+            )
+        return format_html('<span style="color: #aaa;">Нет фото</span>')
     image_tag.short_description = "Фото"

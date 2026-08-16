@@ -57,6 +57,11 @@ class CatalogFilter:
         if self.price_max:
             queryset = queryset.filter(price__lte=self.price_max)
 
+        if self.category:
+            queryset = queryset.filter(
+                category_id=self.category
+            )
+
         # Поиск выполняется в Python (регистронезависимо для кириллицы)
         if self.query:
             query = self.query.casefold()
@@ -107,6 +112,11 @@ class CatalogFilter:
             "selected_sort": self.sort,
             "selected_availability": self.availability,
             "selected_availability_label": dict(AVAILABILITY_CHOICES).get(self.availability, self.availability),
+<<<<<<< HEAD
             "selected_price_min": self.price_min,
             "selected_price_max": self.price_max,
+=======
+            "selected_price_min": self.price_min or "",
+            "selected_price_max": self.price_max or "",
+>>>>>>> dev
         }

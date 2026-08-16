@@ -4,8 +4,9 @@
    Все переменные уже определены в core/variables.css */
 
 :root {
-  --color-primary: #2563EB;
-  --color-primary-light: #3B82F6;
-  --color-primary-dark: #1D4ED8;
+    --color-primary: #2563EB;
+    --color-primary-light: #3B82F6;
+    --color-primary-dark: #1D4ED8;
+    --font-display: 'Playfair Display', serif; /* Добавляем шрифт для заголовков */
   /* остальные значения по умолчанию */
 }

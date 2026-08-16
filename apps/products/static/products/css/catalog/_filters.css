@@ -1,0 +1,100 @@
+/* apps/products/static/products/css/catalog/_filters.css */
+/* Фильтры */
+.catalog-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #eee;
+}
+
+.filters-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.filter-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.catalog-filters select,
+.catalog-filters input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    transition: border-color .2s, box-shadow .2s;
+    box-sizing: border-box;
+}
+
+.catalog-filters select:focus,
+.catalog-filters input:focus {
+    outline: none;
+    border-color: #111;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, .08);
+}
+
+.catalog-filters .search-field {
+    display: flex;
+    gap: 10px;
+}
+
+.catalog-filters .search-field input {
+    flex: 1;
+}
+
+.catalog-filters .btn {
+    width: 100%;
+    padding: 12px;
+    background: #111;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.catalog-filters .btn:hover {
+    background: #000;
+}
+
+/* Активные фильтры */
+.active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 15px 0 25px;
+}
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: #111;
+    color: #fff;
+    border-radius: 999px;
+    font-size: 13px;
+    text-decoration: none;
+    transition: 0.2s;
+}
+.filter-chip:hover {
+    background: #333;
+    transform: translateY(-1px);
+}
+
+.clear-filters {
+    text-decoration: none;
+    font-size: 14px;
+    color: #666;
+    transition: 0.2s;
+}
+.clear-filters:hover {
+    color: #000;
+}

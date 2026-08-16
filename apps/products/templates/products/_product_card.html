@@ -42,6 +42,9 @@
 
             <!-- Бейджи -->
             <div class="card-badges">
+                {% if product.id in promoted_product_ids %}
+                    <span class="badge badge-salon-choice">Выбор салона</span>
+                {% endif %}
                 {% for badge in product.badges.all %}
                     <span class="badge badge-{{ badge.slug }}">{{ badge.title }}</span>
                 {% endfor %}

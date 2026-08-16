@@ -1,0 +1,7 @@
+<!-- apps/products/templates/products/_catalog_cards.html -->
+
+{% for product in products %}
+    {% include "products/_product_card.html" with product=product %}
+{% empty %}
+    <p>Платья не найдены.</p>
+{% endfor %}

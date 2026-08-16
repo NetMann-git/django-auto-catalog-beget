@@ -1,4 +1,4 @@
-# apps/wishlist/views.py
+# apps\wishlist\views.py
 
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
@@ -7,6 +7,7 @@ from django.views.generic import ListView
 from django.contrib.auth import login
 
 from apps.products.models import Product
+from apps.recommendations.services import RecommendationService
 from .models import Favorite
 
 
@@ -33,9 +34,17 @@ class WishlistView(ListView):
             wishlist_ids = self.request.session.get('wishlist', [])
             products = Product.objects.filter(id__in=wishlist_ids, is_active=True)
 
+        # Получаем рекомендации для страницы «Избранное»
+        recommended_products = RecommendationService.get_similar_products(
+            viewed_products=products,
+            page='wishlist',
+            limit=4
+        )
+
         context["products"] = products
         context["wishlist_ids"] = wishlist_ids
         context["is_guest"] = not self.request.user.is_authenticated
+        context["recommended_products"] = recommended_products
 
         return context
 
@@ -66,4 +75,21 @@ def toggle_wishlist(request, product_id):
     return JsonResponse({
         "is_favorite": is_favorite,
         "count": count,
+    })
+
+
+@require_POST
+def clear_wishlist_ajax(request):
+    """
+    AJAX-очистка избранного.
+    """
+    if request.user.is_authenticated:
+        Favorite.objects.filter(user=request.user).delete()
+    else:
+        request.session['wishlist'] = []
+        request.session.modified = True
+
+    return JsonResponse({
+        "success": True,
+        "count": 0,
     })

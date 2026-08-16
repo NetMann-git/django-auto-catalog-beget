@@ -1,0 +1,37 @@
+/* apps/products/static/products/css/catalog/_recently-viewed.css */
+/* Стили для истории просмотров */
+.recently-viewed-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+.recently-viewed-header h1 {
+    margin: 0;
+}
+
+.btn-clear-history {
+    padding: 8px 20px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    color: #666;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-clear-history:hover {
+    background: #fde8e8;
+    border-color: #e74c3c;
+    color: #e74c3c;
+}
+
+#empty-history-message {
+    text-align: center;
+    padding: 60px 20px;
+}
+#empty-history-message p {
+    font-size: 18px;
+    color: #888;
+    margin-bottom: 20px;
+}

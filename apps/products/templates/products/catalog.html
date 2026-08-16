@@ -4,13 +4,20 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'products/css/catalog.css' %}">
-<link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
-{% endblock extra_css %}
+    <link rel="stylesheet" href="{% static 'products/css/catalog/catalog.css' %}">
+    <link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
+{% endblock %}
 
 {% block content %}
 
 <div class="container">
+
+    <!-- Хлебные крошки -->
+    <nav class="breadcrumbs">
+        <a href="/">Главная</a>
+        <span>/</span>
+        <span>Каталог</span>
+    </nav>    
 
     <h1>{{ page.title }}</h1>
 
@@ -328,93 +335,78 @@
                     </a>
                 {% endif %}
 
-
             </div>
 
             {% endif %}
 
-            <div class="dress-grid">
+            <!-- Оборачиваем список товаров в контейнер для Infinite Scroll -->
+            <div id="catalog-products-container"
+                 data-next-page="2"
+                 data-has-next="{% if page_obj.has_next %}true{% else %}false{% endif %}">
 
-                {% for product in products %}
+                <div class="dress-grid">
 
-                    {% include "products/_product_card.html" with product=product %}
+                    {% include "products/_catalog_cards.html" with products=products %}
 
-                {% empty %}
+                </div> <!-- dress-grid -->
 
-                    <p>Платья не найдены.</p>
+                <!-- Сентинел и индикатор загрузки -->
+                <div id="catalog-load-sentinel" style="height: 1px;"></div>
+                <div id="catalog-loader" style="display: none; text-align: center; padding: 20px;">
+                    <p>Загрузка...</p>
+                </div>
 
-                {% endfor %}
+                <!-- Кнопка fallback для старых браузеров -->
+                <button type="button" id="load-more-btn" class="btn btn-outline" style="display: none; margin: 20px auto;">
+                    Показать ещё
+                </button>
 
-            </div> <!-- dress-grid -->
-  
-        <!-- сюда вставим пагинацию -->
+            <!-- Пагинация остаётся в DOM для SEO, но скрывается через JS -->
+            {% if page_obj.has_other_pages %}
 
-        {% if page_obj.has_other_pages %}
+            <nav class="pagination">
 
-        <nav class="pagination">
-
-            {% if page_obj.has_previous %}
-                <!-- Первая страница -->
-                <a
-                    class="page-link"
-                    href="?page=1{% if query_params %}&{{ query_params }}{% endif %}"
-                >
-                    «
-                </a>
-                <!-- Предыдущая -->
-                <a
-                    class="page-link"
-                    href="?page={{ page_obj.previous_page_number }}{% if query_params %}&{{ query_params }}{% endif %}"
-                >
-                    ←
-                </a>
-
-            {% endif %}
-
-
-            {% for num in page_obj.paginator.page_range %}
-
-                {% if num == page_obj.number %}
-
-                    <span class="page-link active">
-                        {{ num }}
-                    </span>
-
-                {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
-                    <!-- Номер страницы -->
-                    <a
-                        class="page-link"
-                        href="?page={{ num }}{% if query_params %}&{{ query_params }}{% endif %}"
+                {% if page_obj.has_previous %}
+                    <a class="page-link"
+                        href="?page=1{% if query_params %}&{{ query_params }}{% endif %}"
                     >
-                        {{ num }}
+                        «
                     </a>
-
+                    <a class="page-link"
+                        href="?page={{ page_obj.previous_page_number }}{% if query_params %}&{{ query_params }}{% endif %}"
+                    >
+                        ←
+                    </a>
                 {% endif %}
 
-            {% endfor %}
+                {% for num in page_obj.paginator.page_range %}
+                    {% if num == page_obj.number %}
+                        <span class="page-link active">{{ num }}</span>
+                    {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+                        <a class="page-link"
+                            href="?page={{ num }}{% if query_params %}&{{ query_params }}{% endif %}"
+                        >
+                            {{ num }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
 
+                {% if page_obj.has_next %}
+                    <a class="page-link"
+                        href="?page={{ page_obj.next_page_number }}{% if query_params %}&{{ query_params }}{% endif %}"
+                    >
+                        →
+                    </a>
+                    <a class="page-link"
+                        href="?page={{ page_obj.paginator.num_pages }}{% if query_params %}&{{ query_params }}{% endif %}"
+                    >
+                        »
+                    </a>
+                {% endif %}
 
-            {% if page_obj.has_next %}
-                <!-- Следующая -->
-                <a
-                    class="page-link"
-                    href="?page={{ page_obj.next_page_number }}{% if query_params %}&{{ query_params }}{% endif %}"
-                >
-                    →
-                </a>
-                <!-- Последняя -->
-                <a
-                    class="page-link"
-                    href="?page={{ page_obj.paginator.num_pages }}{% if query_params %}&{{ query_params }}{% endif %}"
-                >
-                    »
-                </a>
+            </nav>
 
             {% endif %}
-
-        </nav>
-
-        {% endif %}
 
         </main>
 
@@ -422,4 +414,9 @@
  
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'products/js/catalog.js' %}"></script>
 {% endblock %}

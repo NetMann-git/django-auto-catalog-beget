@@ -1,7 +1,7 @@
 <!-- apps/products/templates/products/manage_list.html -->
 {% extends 'base.html' %}
 {% load static %}
-
+{% load thumbnail %}
 {% block extra_css %}
     <link rel="stylesheet" type="text/css" href="{% static 'products/css/manage.css' %}">
 {% endblock %}
@@ -41,7 +41,7 @@
                 <tr>
                     <td>
                         {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.title }}" class="product-thumb">
+                            <img src="{% thumbnail product.image 100x150 crop %}" alt="{{ product.title }}" class="product-thumb" loading="lazy">
                         {% else %}
                             <span style="color: #ccc;">Нет фото</span>
                         {% endif %}
