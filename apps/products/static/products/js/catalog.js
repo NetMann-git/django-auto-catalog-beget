@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const sentinel = document.getElementById('catalog-load-sentinel');
     const loader = document.getElementById('catalog-loader');
     const paginationNav = document.querySelector('.pagination');
+    const loadMoreBtn = document.getElementById('load-more-btn');
 
     // Скрываем пагинацию (она остаётся в DOM для SEO)
     if (paginationNav) {
@@ -62,6 +63,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 nextPage = data.next_page || nextPage + 1;
                 container.dataset.hasNext = hasNext ? 'true' : 'false';
                 container.dataset.nextPage = nextPage;
+
+                // Если товары закончились, скрываем кнопку (если она есть)
+                if (!hasNext && loadMoreBtn) {
+                    loadMoreBtn.style.display = 'none';
+                }
             }
         })
         .catch(error => console.error('Ошибка подгрузки товаров:', error))
@@ -72,6 +78,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if ('IntersectionObserver' in window) {
+        // Современные браузеры: бесконечная прокрутка, кнопка не нужна
+        if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+
         const observer = new IntersectionObserver(function(entries) {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -82,12 +91,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (sentinel) observer.observe(sentinel);
     } else {
-        // Fallback для старых браузеров
-        window.addEventListener('scroll', function() {
-            const rect = container.getBoundingClientRect();
-            if (rect.bottom <= window.innerHeight + 200) {
-                loadMore();
-            }
-        });
+        // Fallback для старых браузеров: показываем кнопку «Показать ещё»
+        if (loadMoreBtn) {
+            loadMoreBtn.style.display = 'inline-block';
+            loadMoreBtn.addEventListener('click', loadMore);
+        }
+        // Сентинел не нужен
+        if (sentinel) sentinel.style.display = 'none';
     }
 });

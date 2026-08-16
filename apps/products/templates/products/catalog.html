@@ -356,7 +356,10 @@
                     <p>Загрузка...</p>
                 </div>
 
-            </div>
+                <!-- Кнопка fallback для старых браузеров -->
+                <button type="button" id="load-more-btn" class="btn btn-outline" style="display: none; margin: 20px auto;">
+                    Показать ещё
+                </button>
 
             <!-- Пагинация остаётся в DOM для SEO, но скрывается через JS -->
             {% if page_obj.has_other_pages %}
