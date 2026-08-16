@@ -93,6 +93,22 @@ def toggle_comparison_ajax(request, product_id):
 
 def catalog(request):
     context = CatalogContextBuilder.build(request)
+
+    # AJAX-подгрузка товаров при прокрутке
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        html = render(
+            request,
+            'products/_catalog_cards.html',
+            context,
+        ).content.decode('utf-8')
+
+        page_obj = context['page_obj']
+        return JsonResponse({
+            'html': html,
+            'has_next': page_obj.has_next(),
+            'next_page': page_obj.next_page_number() if page_obj.has_next() else None,
+        })
+
     return render(request, "products/catalog.html", context)
 
 def recently_viewed_list(request):
