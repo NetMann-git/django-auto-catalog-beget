@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let hasNext = container.dataset.hasNext === 'true';
     let isLoading = false;
 
+    let previousCardCount = 0;
     const params = new URLSearchParams(window.location.search);
 
     function loadMore() {
@@ -35,17 +36,27 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.html) {
-                // Вставляем карточки внутрь существующей сетки
                 const grid = container.querySelector('.dress-grid');
                 if (grid) {
+                    // Запоминаем, сколько карточек уже было
+                    previousCardCount = grid.children.length;
                     grid.insertAdjacentHTML('beforeend', data.html);
                 } else {
-                    // если сетки нет, создаём её
+                    // Если сетки нет, создаём её и анимируем все карточки
                     const newGrid = document.createElement('div');
                     newGrid.className = 'dress-grid';
                     newGrid.innerHTML = data.html;
                     container.appendChild(newGrid);
+                    previousCardCount = 0;
+                    grid = newGrid;
                 }
+
+                // Анимируем только новые карточки
+                const newCards = Array.from(grid.children).slice(previousCardCount);
+                newCards.forEach((card, index) => {
+                    card.classList.add('catalog-card-animate');
+                    card.style.animationDelay = `${index * 0.1}s`;
+                });
 
                 hasNext = data.has_next;
                 nextPage = data.next_page || nextPage + 1;

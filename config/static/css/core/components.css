@@ -425,3 +425,19 @@
   letter-spacing: 0.5px;
   border: 1px solid rgba(255, 215, 0, 0.8);
 }
+
+/* Анимация появления карточек при подгрузке */
+.catalog-card-animate {
+    animation: catalogCardFadeIn 0.5s ease forwards;
+}
+
+@keyframes catalogCardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
