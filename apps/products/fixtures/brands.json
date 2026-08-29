@@ -1,0 +1,101 @@
+[
+  {
+    "model": "products.brand",
+    "pk": 1,
+    "fields": {
+      "name": "Hyundai",
+      "slug": "hyundai",
+      "country": "Южная Корея"
+    }
+  },
+  {
+    "model": "products.brand",
+    "pk": 2,
+    "fields": {
+      "name": "Kia",
+      "slug": "kia",
+      "country": "Южная Корея"
+    }
+  },
+  {
+    "model": "products.brand",
+    "pk": 3,
+    "fields": {
+      "name": "Genesis",
+      "slug": "genesis",
+      "country": "Южная Корея"
+    }
+  },
+  {
+    "model": "products.brand",
+    "pk": 4,
+    "fields": {
+      "name": "SsangYong",
+      "slug": "ssangyong",
+      "country": "Южная Корея"
+    }
+  },
+  {
+    "model": "products.brand",
+    "pk": 5,
+    "fields": {
+      "name": "Geely",
+      "slug": "geely",
+      "country": "Китай"
+    }
+  },
+  {
+    "model": "products.brand",
+    "pk": 6,
+    "fields": {
+      "name": "Chery",
+      "slug": "chery",
+      "country": "Китай"
+    }
+  },
+  {
+    "model": "products.brand",
+    "pk": 7,
+    "fields": {
+      "name": "BYD",
+      "slug": "byd",
+      "country": "Китай"
+    }
+  },
+  {
+    "model": "products.brand",
+    "pk": 8,
+    "fields": {
+      "name": "Great Wall",
+      "slug": "greatwall",
+      "country": "Китай"
+    }
+  },
+  {
+    "model": "products.brand",
+    "pk": 9,
+    "fields": {
+      "name": "Haval",
+      "slug": "haval",
+      "country": "Китай"
+    }
+  },
+  {
+    "model": "products.brand",
+    "pk": 10,
+    "fields": {
+      "name": "Omoda",
+      "slug": "omoda",
+      "country": "Китай"
+    }
+  },
+  {
+    "model": "products.brand",
+    "pk": 11,
+    "fields": {
+      "name": "Exeed",
+      "slug": "exeed",
+      "country": "Китай"
+    }
+  }
+]

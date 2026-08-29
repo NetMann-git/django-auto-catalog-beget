@@ -1,0 +1,158 @@
+/*config\static\css\themes\auto.css*/
+
+/* ============================================================
+   ТЕМА: АВТОМОБИЛЬНЫЙ КАТАЛОГ (индустриальная, динамичная)
+   Цвета: сталь, графит, глубокий синий, оранжевый акцент
+   ============================================================ */
+
+:root {
+  /* Основные цвета бренда — глубокий синий + стальной оттенок */
+  --color-primary: #1E3A5F;                /* Тёмно-синий (корпоративный) */
+  --color-primary-light: #4A6A8B;
+  --color-primary-dark: #0F2640;
+  --color-primary-bg: rgba(30, 58, 95, 0.08);
+
+  --color-secondary: #6C7A89;             /* Стальной серый */
+  --color-secondary-light: #A0B0C0;
+  --color-secondary-dark: #4A5663;
+
+  /* Акценты — яркий оранжевый / красный для кнопок, скидок, избранного */
+  --color-accent: #E6672A;                /* Оранжевый (CTR) */
+  --color-accent-hover: #D35400;           /* Более тёмный оранжевый при ховере */
+  --color-success: #27AE60;               /* Зелёный для статуса "в наличии" */
+  --color-warning: #F1C40F;               /* Жёлтый для бейджей "Топ" */
+  --color-danger: #E74C3C;                /* Красный для распродаж */
+
+  /* Нейтральная палитра — холодные оттенки серого */
+  --color-white: #FFFFFF;
+  --color-black: #1C1E20;
+  --color-gray-50: #F8F9FA;
+  --color-gray-100: #ECEEF0;
+  --color-gray-200: #DDE0E3;
+  --color-gray-300: #C2C7CC;
+  --color-gray-400: #A0A8B0;
+  --color-gray-500: #7A8490;
+  --color-gray-600: #5A6572;
+  --color-gray-700: #3E4754;
+  --color-gray-800: #2A323D;
+  --color-gray-900: #1C1E20;
+
+  /* Фоны */
+  --bg-body: #F4F6F8;                    /* Светлый холодный серый */
+  --bg-card: #FFFFFF;
+  --bg-header: rgba(255, 255, 255, 0.95);
+  --bg-footer: #1E2A36;                  /* Тёмный сине-серый */
+
+  /* Текст */
+  --text-primary: #1C1E20;
+  --text-secondary: #5A6572;
+  --text-light: #A0A8B0;
+  --text-on-primary: #FFFFFF;
+  --text-on-accent: #FFFFFF;
+
+  /* Градиенты */
+  --gradient-primary: linear-gradient(135deg, #1E3A5F 0%, #4A6A8B 100%);
+  --gradient-accent: linear-gradient(135deg, #E6672A 0%, #D35400 100%);
+
+  /* Тени — более чёткие, без тёплого отлива */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.10);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 12px 36px rgba(0, 0, 0, 0.15);
+
+  /* Типографика — строгие, современные шрифты без засечек */
+  --font-sans: 'Inter', 'Segoe UI', 'Roboto', Arial, sans-serif;
+  --font-display: var(--font-sans);
+  /* Декоративный шрифт не нужен, оставляем без скриптовых */
+
+  /* Дополнительные переменные для авто-специфики */
+  --border-radius-card: 8px;              /* Чёткие углы, не скруглённые */
+  --transition-speed: 0.25s;
+  --line-height-body: 1.6;
+}
+
+/* Глобальные стили для авто-тематики */
+body {
+  background-color: var(--bg-body);
+  font-family: var(--font-sans);
+  background-image: none; /* Убираем свадебные радиальные градиенты */
+}
+
+/* Акцентные элементы (кнопки, ссылки, бейджи) */
+.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.btn-primary:hover {
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+.btn-accent {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+.btn-accent:hover {
+  background-color: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+/* Карточки товаров */
+.product-card {
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--border-radius-card);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-speed), transform var(--transition-speed);
+}
+.product-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+}
+
+/* Бейджи (скидки, новинки, хиты) */
+.badge-accent {
+  background-color: var(--color-accent);
+  color: var(--text-on-accent);
+}
+.badge-success {
+  background-color: var(--color-success);
+  color: var(--text-on-primary);
+}
+.badge-danger {
+  background-color: var(--color-danger);
+  color: var(--text-on-primary);
+}
+
+/* Заголовки */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Ссылки */
+a {
+  color: var(--color-primary);
+  transition: color var(--transition-speed);
+}
+a:hover {
+  color: var(--color-primary-dark);
+}
+
+/* Шапка (если нужно дополнительно кастомизировать) */
+.site-header {
+  background: var(--bg-header);
+  border-bottom: 2px solid var(--color-primary);
+}
+
+/* Подвал */
+.site-footer {
+  background: var(--bg-footer);
+  color: var(--color-gray-300);
+}
+.site-footer a {
+  color: var(--color-gray-400);
+}
+.site-footer a:hover {
+  color: var(--color-accent);
+}
