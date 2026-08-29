@@ -180,20 +180,34 @@
 .card-image {
     position: relative;
     overflow: hidden;
-    aspect-ratio: 3 / 4;
-    max-height: 500px;
+    aspect-ratio: 4/3;
+    max-height: 400px;
     background: var(--color-gray-100);
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 .card-image img {
     width: 100%;
     height: 100%;
-    max-height: 500px;
     object-fit: cover;
     transition: transform 0.4s ease;
 }
 .card:hover .card-image img {
     transform: scale(1.05);
+}
+
+.card-specs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+    margin: 0.25rem 0 0.5rem 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+.card-specs .spec {
+    background: var(--color-gray-100);
+    padding: 0.1rem 0.5rem;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
 }
 
 /* Кнопка "Подробнее" по центру изображения */
