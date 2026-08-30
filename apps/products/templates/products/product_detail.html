@@ -1,7 +1,8 @@
-<!-- apps\products\templates\products\product_detail.html -->
+<!-- apps/products/templates/products/product_detail.html -->
 {% extends "base.html" %}
 {% load static %}
 {% load thumbnail %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/product/product.css' %}">
@@ -26,7 +27,7 @@
     <div class="dress-detail">
 
         <!-- =======================================
-            ГАЛЕРЕЯ ФОТО (вертикальная)
+            ГАЛЕРЕЯ ФОТО (горизонтальная)
         ======================================= -->
         <div class="dress-photo">
             <div class="gallery-wrapper">
@@ -34,16 +35,16 @@
                 {% if product.gallery.all %}
                     <div class="gallery-thumbs-vertical">
                         {% if product.image %}
-                            <img src="{% thumbnail product.image 100x150 crop %}"
-                                data-full="{% thumbnail product.image 800x1200 crop %}"
-                                class="gallery-thumb-vertical active"
-                                alt="{{ product.title }}">
+                            <img src="{% thumbnail product.image 100x75 crop %}"
+                                 data-full="{% thumbnail product.image 800x600 crop %}"
+                                 class="gallery-thumb-vertical active"
+                                 alt="{{ product.title }}">
                         {% endif %}
                         {% for photo in product.gallery.all %}
-                            <img src="{% thumbnail photo.image 100x150 crop %}"
-                                data-full="{% thumbnail photo.image 800x1200 crop %}"
-                                class="gallery-thumb-vertical"
-                                alt="{{ photo.alt|default:product.title }}">
+                            <img src="{% thumbnail photo.image 100x75 crop %}"
+                                 data-full="{% thumbnail photo.image 800x600 crop %}"
+                                 class="gallery-thumb-vertical"
+                                 alt="{{ photo.alt|default:product.title }}">
                         {% endfor %}
                     </div>
                 {% endif %}
@@ -52,10 +53,10 @@
                 <div class="main-image-wrapper">
                     {% if product.image %}
                         <img id="main-image"
-                            src="{% thumbnail product.image 800x1200 crop %}"
-                            alt="{{ product.title }}"
-                            class="main-image"
-                            style="cursor:pointer;">
+                             src="{% thumbnail product.image 800x600 crop %}"
+                             alt="{{ product.title }}"
+                             class="main-image"
+                             style="cursor:pointer;">
                         <!-- Стрелки навигации — только если есть несколько фото -->
                         {% if product.gallery.all %}
                             <button class="image-arrow prev-image" id="prev-image-btn">‹</button>
@@ -127,24 +128,23 @@
                 </span>
             </div>
 
-            <!-- Кнопки -->
+            <!-- Кнопки действий -->
             <div class="dress-actions">
                 <button type="button" class="btn" id="open-appointment-modal" data-product-id="{{ product.id }}">
-                    Записаться на примерку
+                    📅 Записаться на тест-драйв
                 </button>
-                <a href="/catalog/" class="btn-outline">Вернуться в каталог</a>
-                <button type="button" class="btn btn-outline" id="open-size-helper-modal">
-                    📐 Подобрать размер
-                </button>
-                <button type="button" class="btn btn-outline" id="open-size-table-modal">
-                    📊 Таблица размеров
-                </button>
+                <a href="/catalog/" class="btn-outline">← Вернуться в каталог</a>
+                <!-- Можно добавить другие кнопки, например "Рассчитать кредит" -->
+                <!-- <button type="button" class="btn btn-outline">💰 Рассчитать кредит</button> -->
             </div>
 
-            <!-- Характеристики -->
+            <!-- =======================================
+                ТАБЛИЦА ХАРАКТЕРИСТИК
+            ======================================= -->
             <div class="dress-specs">
                 <h2>Характеристики</h2>
 
+                <!-- Если есть артикул, выводим его -->
                 {% if product.article %}
                 <div class="spec-row">
                     <span>Артикул</span>
@@ -152,18 +152,21 @@
                 </div>
                 {% endif %}
 
+                <!-- Перебираем все атрибуты и выводим в таблицу -->
                 {% for attr in product.attributes.all %}
                     <div class="spec-row">
                         <span>{{ attr.attribute_type.name }}</span>
                         <strong>{{ attr.attribute_value.value }}</strong>
                     </div>
+                {% empty %}
+                    <p class="text-muted">Характеристики не указаны.</p>
                 {% endfor %}
             </div>
 
             <!-- Описание -->
             {% if product.description %}
             <section class="description-block">
-                <h2>Описание модели</h2>
+                <h2>Описание</h2>
                 <div class="description">{{ product.description|linebreaks }}</div>
             </section>
             {% endif %}
@@ -171,7 +174,9 @@
         </div>
     </div>
 
-    <!-- Недавно просмотренные -->
+    <!-- =======================================
+        НЕДАВНО ПРОСМОТРЕННЫЕ
+    ======================================= -->
     {% if recently_viewed_products %}
     <section class="recently-viewed">
         <div class="recently-viewed-header">
@@ -183,42 +188,24 @@
                 ✕ Очистить историю
             </button>
         </div>
-        <div id="recently-viewed-grid" class="dress-grid">
-            {% for product in recently_viewed_products %}
-                {% include "products/_product_card.html" with product=product %}
+        <div id="recently-viewed-grid" class="products-grid">
+            {% for p in recently_viewed_products %}
+                {% include "products/_product_card.html" with product=p %}
             {% endfor %}
         </div>
     </section>
     {% endif %}
 
-    <!-- Похожие товары -->
+    <!-- =======================================
+        ПОХОЖИЕ АВТОМОБИЛИ
+    ======================================= -->
     {% if similar_products %}
     <section class="similar_products">
-        <h2 class="similar-title">Похожие платья</h2>
-        <div class="dress-grid">
-
-            <!-- Новое: используем тот же стиль, что и в _product_card.html -->
+        <h2 class="similar-title">Похожие автомобили</h2>
+        <div class="products-grid">
             {% for similar in similar_products %}
-            <article class="card product-card">
-                <a href="{{ similar.get_absolute_url }}" class="card-image-link">
-                    <div class="card-image">
-                        {% thumbnail similar.image 400x533 crop as similar_thumb %}
-                        <img src="{{ similar_thumb.url }}" alt="{{ similar.title }}" itemprop="image" loading="lazy" decoding="async">
-                    </div>
-                </a>
-                <div class="card-content">
-                    <h3 class="card-title" itemprop="name">
-                        <a href="{{ similar.get_absolute_url }}" itemprop="url">{{ similar.title }}</a>
-                    </h3>
-                    <div class="card-price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-                        <span class="current-price" itemprop="price" content="{{ similar.price }}">{{ similar.price|floatformat:0 }} ₽</span>
-                        <meta itemprop="priceCurrency" content="RUB">
-                    </div>
-                    <a href="{{ similar.get_absolute_url }}" class="btn">Смотреть</a>
-                </div>
-            </article>
+                {% include "products/_product_card.html" with product=similar %}
             {% endfor %}
-
         </div>
     </section>
     {% endif %}
@@ -331,29 +318,7 @@
     <div id="review-lightbox-thumbs" class="lightbox-thumbs"></div>
 </div>
 
-<!-- =======================================
-    МОДАЛЬНОЕ ОКНО – ТАБЛИЦА РАЗМЕРОВ
-======================================= -->
-<div id="size-table-modal" class="modal" style="display:none;">
-    <div class="modal-content">
-        <span class="modal-close" data-modal="size-table-modal">&times;</span>
-        <div id="size-table-modal-body">
-            <div class="modal-loader">Загрузка...</div>
-        </div>
-    </div>
-</div>
-
-<!-- =======================================
-    МОДАЛЬНОЕ ОКНО – РАЗМЕРНЫЙ ПОМОЩНИК
-======================================= -->
-<div id="size-helper-modal" class="modal" style="display:none;">
-    <div class="modal-content">
-        <span class="modal-close" data-modal="size-helper-modal">&times;</span>
-        <div id="size-helper-modal-body">
-            <div class="modal-loader">Загрузка...</div>
-        </div>
-    </div>
-</div>
+<!-- Удалены модалки с размерами – они не нужны для авто -->
 
 <!-- Подключаем скрипты галереи и лайтбоксов -->
 <script src="{% static 'products/js/product_gallery.js' %}"></script>
