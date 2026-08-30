@@ -31,7 +31,6 @@
         ======================================= -->
         <div class="dress-photo">
             <div class="gallery-wrapper">
-                <!-- Миниатюры слева — только если есть галерея -->
                 {% if product.gallery.all %}
                     <div class="gallery-thumbs-vertical">
                         {% if product.image %}
@@ -49,7 +48,6 @@
                     </div>
                 {% endif %}
 
-                <!-- Главное изображение -->
                 <div class="main-image-wrapper">
                     {% if product.image %}
                         <img id="main-image"
@@ -57,7 +55,6 @@
                              alt="{{ product.title }}"
                              class="main-image"
                              style="cursor:pointer;">
-                        <!-- Стрелки навигации — только если есть несколько фото -->
                         {% if product.gallery.all %}
                             <button class="image-arrow prev-image" id="prev-image-btn">‹</button>
                             <button class="image-arrow next-image" id="next-image-btn">›</button>
@@ -68,7 +65,6 @@
                 </div>
             </div>
 
-            <!-- Счётчик — только если есть несколько фото -->
             {% if product.gallery.all %}
             <div class="gallery-counter">
                 Фото <span id="current-photo">1</span> из <span id="total-photos">
@@ -85,12 +81,10 @@
 
             <h1>{{ product.title }}</h1>
 
-            <!-- Бренд -->
             {% if product.brand %}
                 <div class="product-brand">Бренд: <a href="{{ product.brand.get_absolute_url }}">{{ product.brand.name }}</a></div>
             {% endif %}
 
-            <!-- Бейджи -->
             {% if product.badges.all %}
             <div class="product-badges">
                 {% for badge in product.badges.all %}
@@ -101,7 +95,6 @@
             </div>
             {% endif %}
 
-            <!-- Кнопка сравнения -->
             <button class="compare-btn {% if product.id in comparison_ids %}active{% endif %}"
                     data-product-id="{{ product.id }}"
                     data-url="{% url 'catalog:toggle_comparison_ajax' product.id %}"
@@ -113,10 +106,8 @@
                 {% endif %}
             </button>
 
-            <!-- Кнопка "Избранное" -->
             {% include "wishlist/_button.html" with product=product %}
 
-            <!-- Цена -->
             <div class="price-block">
                 <span class="price-label">Цена</span>
                 <div class="price">{{ product.price|floatformat:0 }} ₽</div>
@@ -128,14 +119,20 @@
                 </span>
             </div>
 
-            <!-- Кнопки действий -->
+            <!-- =======================================
+                КНОПКИ ДЕЙСТВИЙ (размерный помощник и таблица размеров восстановлены)
+            ======================================= -->
             <div class="dress-actions">
                 <button type="button" class="btn" id="open-appointment-modal" data-product-id="{{ product.id }}">
                     📅 Записаться на тест-драйв
                 </button>
+                <button type="button" class="btn btn-outline" id="open-size-helper-modal">
+                    📐 Подобрать размер
+                </button>
+                <button type="button" class="btn btn-outline" id="open-size-table-modal">
+                    📊 Таблица размеров
+                </button>
                 <a href="/catalog/" class="btn-outline">← Вернуться в каталог</a>
-                <!-- Можно добавить другие кнопки, например "Рассчитать кредит" -->
-                <!-- <button type="button" class="btn btn-outline">💰 Рассчитать кредит</button> -->
             </div>
 
             <!-- =======================================
@@ -144,7 +141,6 @@
             <div class="dress-specs">
                 <h2>Характеристики</h2>
 
-                <!-- Если есть артикул, выводим его -->
                 {% if product.article %}
                 <div class="spec-row">
                     <span>Артикул</span>
@@ -152,7 +148,6 @@
                 </div>
                 {% endif %}
 
-                <!-- Перебираем все атрибуты и выводим в таблицу -->
                 {% for attr in product.attributes.all %}
                     <div class="spec-row">
                         <span>{{ attr.attribute_type.name }}</span>
@@ -230,7 +225,6 @@
             </div>
         {% endif %}
 
-        <!-- Управление отзывами: фильтры и сортировка -->
         <div class="reviews-controls">
             <div class="reviews-filters">
                 <label for="rating-filter">Оценка:</label>
@@ -265,12 +259,10 @@
             </div>
         </div>
 
-        <!-- Контейнер для списка отзывов -->
         <div id="reviews-container" data-product-id="{{ product.id }}">
             {% include "reviews/_review_list.html" with reviews=reviews %}
         </div>
 
-        <!-- Форма добавления отзыва -->
         <div class="review-form-wrapper">
             <h3>Оставить отзыв</h3>
             <form method="post" action="{% url 'reviews:add_review' product.id %}" enctype="multipart/form-data">
@@ -288,7 +280,6 @@
 ======================================= -->
 <div id="lightbox" class="lightbox">
     <span class="lightbox-close">&times;</span>
-
     <div class="lightbox-top">
         <span class="lightbox-prev">&#10094;</span>
         <div class="lightbox-counter">
@@ -296,9 +287,7 @@
         </div>
         <span class="lightbox-next">&#10095;</span>
     </div>
-
     <img id="lightbox-image" class="lightbox-image" src="" alt="">
-
     <div id="lightbox-thumbs" class="lightbox-thumbs"></div>
 </div>
 
@@ -318,7 +307,26 @@
     <div id="review-lightbox-thumbs" class="lightbox-thumbs"></div>
 </div>
 
-<!-- Удалены модалки с размерами – они не нужны для авто -->
+<!-- =======================================
+    МОДАЛЬНЫЕ ОКНА – РАЗМЕРЫ
+======================================= -->
+<div id="size-table-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="modal-close" data-modal="size-table-modal">&times;</span>
+        <div id="size-table-modal-body">
+            <div class="modal-loader">Загрузка...</div>
+        </div>
+    </div>
+</div>
+
+<div id="size-helper-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="modal-close" data-modal="size-helper-modal">&times;</span>
+        <div id="size-helper-modal-body">
+            <div class="modal-loader">Загрузка...</div>
+        </div>
+    </div>
+</div>
 
 <!-- Подключаем скрипты галереи и лайтбоксов -->
 <script src="{% static 'products/js/product_gallery.js' %}"></script>
