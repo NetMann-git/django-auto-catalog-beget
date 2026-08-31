@@ -1,0 +1,83 @@
+[
+  {
+    "model": "products.attributetype",
+    "pk": 1,
+    "fields": {
+      "name": "Год выпуска",
+      "slug": "year",
+      "data_type": "integer"
+    }
+  },
+  {
+    "model": "products.attributetype",
+    "pk": 2,
+    "fields": {
+      "name": "Пробег (км)",
+      "slug": "mileage",
+      "data_type": "integer"
+    }
+  },
+  {
+    "model": "products.attributetype",
+    "pk": 3,
+    "fields": {
+      "name": "Объём двигателя (л)",
+      "slug": "engine_volume",
+      "data_type": "float"
+    }
+  },
+  {
+    "model": "products.attributetype",
+    "pk": 4,
+    "fields": {
+      "name": "Мощность (л.с.)",
+      "slug": "power",
+      "data_type": "integer"
+    }
+  },
+  {
+    "model": "products.attributetype",
+    "pk": 5,
+    "fields": {
+      "name": "Коробка передач",
+      "slug": "transmission",
+      "data_type": "choice"
+    }
+  },
+  {
+    "model": "products.attributetype",
+    "pk": 6,
+    "fields": {
+      "name": "Привод",
+      "slug": "drive",
+      "data_type": "choice"
+    }
+  },
+  {
+    "model": "products.attributetype",
+    "pk": 7,
+    "fields": {
+      "name": "Цвет",
+      "slug": "color",
+      "data_type": "string"
+    }
+  },
+  {
+    "model": "products.attributetype",
+    "pk": 8,
+    "fields": {
+      "name": "Состояние",
+      "slug": "condition",
+      "data_type": "choice"
+    }
+  },
+  {
+    "model": "products.attributetype",
+    "pk": 9,
+    "fields": {
+      "name": "Расход топлива (л/100 км)",
+      "slug": "fuel_consumption",
+      "data_type": "float"
+    }
+  }
+]
