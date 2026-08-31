@@ -4,7 +4,7 @@
 {% load static %}
 {% load thumbnail %}
 
-{% block title %}Свадебный салон MoreUG — Эксклюзивные свадебные платья{% endblock %}
+{% block title %}Подберем АВТО - автомобили под заказ из Южной Кореи и Китая полный цикл услуг{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'home/css/home.css' %}">
@@ -16,9 +16,9 @@
 <section class="hero">
     <div class="hero-overlay"></div>
     <div class="hero-content">
-        <h1 class="hero-title">Найдите платье своей мечты</h1>
-        <p class="hero-subtitle">Эксклюзивные свадебные платья от ведущих дизайнеров</p>
-        <button class="btn btn-primary btn-lg appointment-trigger">Записаться на примерку</button>
+        <h1 class="hero-title">Доступ на закрытые автомобильные площадки</h1>
+        <p class="hero-subtitle">Нам предоставлен доступ к закрытым площадкам Южной Кореи с автомобилями премиальных марок</p>
+        <button class="btn btn-primary btn-lg appointment-trigger">Заказать звонок</button>
     </div>
 </section>
 
@@ -45,7 +45,7 @@
 {% if featured_products %}
 <section class="section featured-section">
     <div class="container">
-        <h2 class="section-title">Популярные платья</h2>
+        <h2 class="section-title">Популярные авто</h2>
         <div class="products-grid">
             {% for product in featured_products %}
                 {% include "products/_product_card.html" with product=product %}

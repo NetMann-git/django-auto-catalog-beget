@@ -1,7 +1,8 @@
-<!-- apps\products\templates\products\product_detail.html -->
+<!-- apps/products/templates/products/product_detail.html -->
 {% extends "base.html" %}
 {% load static %}
 {% load thumbnail %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/product/product.css' %}">
@@ -26,37 +27,34 @@
     <div class="dress-detail">
 
         <!-- =======================================
-            ГАЛЕРЕЯ ФОТО (вертикальная)
+            ГАЛЕРЕЯ ФОТО (горизонтальная)
         ======================================= -->
         <div class="dress-photo">
             <div class="gallery-wrapper">
-                <!-- Миниатюры слева — только если есть галерея -->
                 {% if product.gallery.all %}
                     <div class="gallery-thumbs-vertical">
                         {% if product.image %}
-                            <img src="{% thumbnail product.image 100x150 crop %}"
-                                data-full="{% thumbnail product.image 800x1200 crop %}"
-                                class="gallery-thumb-vertical active"
-                                alt="{{ product.title }}">
+                            <img src="{% thumbnail product.image 100x75 crop %}"
+                                 data-full="{% thumbnail product.image 800x600 crop %}"
+                                 class="gallery-thumb-vertical active"
+                                 alt="{{ product.title }}">
                         {% endif %}
                         {% for photo in product.gallery.all %}
-                            <img src="{% thumbnail photo.image 100x150 crop %}"
-                                data-full="{% thumbnail photo.image 800x1200 crop %}"
-                                class="gallery-thumb-vertical"
-                                alt="{{ photo.alt|default:product.title }}">
+                            <img src="{% thumbnail photo.image 100x75 crop %}"
+                                 data-full="{% thumbnail photo.image 800x600 crop %}"
+                                 class="gallery-thumb-vertical"
+                                 alt="{{ photo.alt|default:product.title }}">
                         {% endfor %}
                     </div>
                 {% endif %}
 
-                <!-- Главное изображение -->
                 <div class="main-image-wrapper">
                     {% if product.image %}
                         <img id="main-image"
-                            src="{% thumbnail product.image 800x1200 crop %}"
-                            alt="{{ product.title }}"
-                            class="main-image"
-                            style="cursor:pointer;">
-                        <!-- Стрелки навигации — только если есть несколько фото -->
+                             src="{% thumbnail product.image 800x600 crop %}"
+                             alt="{{ product.title }}"
+                             class="main-image"
+                             style="cursor:pointer;">
                         {% if product.gallery.all %}
                             <button class="image-arrow prev-image" id="prev-image-btn">‹</button>
                             <button class="image-arrow next-image" id="next-image-btn">›</button>
@@ -67,7 +65,6 @@
                 </div>
             </div>
 
-            <!-- Счётчик — только если есть несколько фото -->
             {% if product.gallery.all %}
             <div class="gallery-counter">
                 Фото <span id="current-photo">1</span> из <span id="total-photos">
@@ -84,12 +81,10 @@
 
             <h1>{{ product.title }}</h1>
 
-            <!-- Бренд -->
             {% if product.brand %}
                 <div class="product-brand">Бренд: <a href="{{ product.brand.get_absolute_url }}">{{ product.brand.name }}</a></div>
             {% endif %}
 
-            <!-- Бейджи -->
             {% if product.badges.all %}
             <div class="product-badges">
                 {% for badge in product.badges.all %}
@@ -100,7 +95,6 @@
             </div>
             {% endif %}
 
-            <!-- Кнопка сравнения -->
             <button class="compare-btn {% if product.id in comparison_ids %}active{% endif %}"
                     data-product-id="{{ product.id }}"
                     data-url="{% url 'catalog:toggle_comparison_ajax' product.id %}"
@@ -112,10 +106,8 @@
                 {% endif %}
             </button>
 
-            <!-- Кнопка "Избранное" -->
             {% include "wishlist/_button.html" with product=product %}
 
-            <!-- Цена -->
             <div class="price-block">
                 <span class="price-label">Цена</span>
                 <div class="price">{{ product.price|floatformat:0 }} ₽</div>
@@ -127,21 +119,25 @@
                 </span>
             </div>
 
-            <!-- Кнопки -->
+            <!-- =======================================
+                КНОПКИ ДЕЙСТВИЙ (размерный помощник и таблица размеров восстановлены)
+            ======================================= -->
             <div class="dress-actions">
                 <button type="button" class="btn" id="open-appointment-modal" data-product-id="{{ product.id }}">
-                    Записаться на примерку
+                    📅 Записаться на тест-драйв
                 </button>
-                <a href="/catalog/" class="btn-outline">Вернуться в каталог</a>
                 <button type="button" class="btn btn-outline" id="open-size-helper-modal">
                     📐 Подобрать размер
                 </button>
                 <button type="button" class="btn btn-outline" id="open-size-table-modal">
                     📊 Таблица размеров
                 </button>
+                <a href="/catalog/" class="btn-outline">← Вернуться в каталог</a>
             </div>
 
-            <!-- Характеристики -->
+            <!-- =======================================
+                ТАБЛИЦА ХАРАКТЕРИСТИК
+            ======================================= -->
             <div class="dress-specs">
                 <h2>Характеристики</h2>
 
@@ -157,13 +153,15 @@
                         <span>{{ attr.attribute_type.name }}</span>
                         <strong>{{ attr.attribute_value.value }}</strong>
                     </div>
+                {% empty %}
+                    <p class="text-muted">Характеристики не указаны.</p>
                 {% endfor %}
             </div>
 
             <!-- Описание -->
             {% if product.description %}
             <section class="description-block">
-                <h2>Описание модели</h2>
+                <h2>Описание</h2>
                 <div class="description">{{ product.description|linebreaks }}</div>
             </section>
             {% endif %}
@@ -171,7 +169,9 @@
         </div>
     </div>
 
-    <!-- Недавно просмотренные -->
+    <!-- =======================================
+        НЕДАВНО ПРОСМОТРЕННЫЕ
+    ======================================= -->
     {% if recently_viewed_products %}
     <section class="recently-viewed">
         <div class="recently-viewed-header">
@@ -183,42 +183,24 @@
                 ✕ Очистить историю
             </button>
         </div>
-        <div id="recently-viewed-grid" class="dress-grid">
-            {% for product in recently_viewed_products %}
-                {% include "products/_product_card.html" with product=product %}
+        <div id="recently-viewed-grid" class="products-grid">
+            {% for p in recently_viewed_products %}
+                {% include "products/_product_card.html" with product=p %}
             {% endfor %}
         </div>
     </section>
     {% endif %}
 
-    <!-- Похожие товары -->
+    <!-- =======================================
+        ПОХОЖИЕ АВТОМОБИЛИ
+    ======================================= -->
     {% if similar_products %}
     <section class="similar_products">
-        <h2 class="similar-title">Похожие платья</h2>
-        <div class="dress-grid">
-
-            <!-- Новое: используем тот же стиль, что и в _product_card.html -->
+        <h2 class="similar-title">Похожие автомобили</h2>
+        <div class="products-grid">
             {% for similar in similar_products %}
-            <article class="card product-card">
-                <a href="{{ similar.get_absolute_url }}" class="card-image-link">
-                    <div class="card-image">
-                        {% thumbnail similar.image 400x533 crop as similar_thumb %}
-                        <img src="{{ similar_thumb.url }}" alt="{{ similar.title }}" itemprop="image" loading="lazy" decoding="async">
-                    </div>
-                </a>
-                <div class="card-content">
-                    <h3 class="card-title" itemprop="name">
-                        <a href="{{ similar.get_absolute_url }}" itemprop="url">{{ similar.title }}</a>
-                    </h3>
-                    <div class="card-price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-                        <span class="current-price" itemprop="price" content="{{ similar.price }}">{{ similar.price|floatformat:0 }} ₽</span>
-                        <meta itemprop="priceCurrency" content="RUB">
-                    </div>
-                    <a href="{{ similar.get_absolute_url }}" class="btn">Смотреть</a>
-                </div>
-            </article>
+                {% include "products/_product_card.html" with product=similar %}
             {% endfor %}
-
         </div>
     </section>
     {% endif %}
@@ -243,7 +225,6 @@
             </div>
         {% endif %}
 
-        <!-- Управление отзывами: фильтры и сортировка -->
         <div class="reviews-controls">
             <div class="reviews-filters">
                 <label for="rating-filter">Оценка:</label>
@@ -278,12 +259,10 @@
             </div>
         </div>
 
-        <!-- Контейнер для списка отзывов -->
         <div id="reviews-container" data-product-id="{{ product.id }}">
             {% include "reviews/_review_list.html" with reviews=reviews %}
         </div>
 
-        <!-- Форма добавления отзыва -->
         <div class="review-form-wrapper">
             <h3>Оставить отзыв</h3>
             <form method="post" action="{% url 'reviews:add_review' product.id %}" enctype="multipart/form-data">
@@ -301,7 +280,6 @@
 ======================================= -->
 <div id="lightbox" class="lightbox">
     <span class="lightbox-close">&times;</span>
-
     <div class="lightbox-top">
         <span class="lightbox-prev">&#10094;</span>
         <div class="lightbox-counter">
@@ -309,9 +287,7 @@
         </div>
         <span class="lightbox-next">&#10095;</span>
     </div>
-
     <img id="lightbox-image" class="lightbox-image" src="" alt="">
-
     <div id="lightbox-thumbs" class="lightbox-thumbs"></div>
 </div>
 
@@ -332,7 +308,7 @@
 </div>
 
 <!-- =======================================
-    МОДАЛЬНОЕ ОКНО – ТАБЛИЦА РАЗМЕРОВ
+    МОДАЛЬНЫЕ ОКНА – РАЗМЕРЫ
 ======================================= -->
 <div id="size-table-modal" class="modal" style="display:none;">
     <div class="modal-content">
@@ -343,9 +319,6 @@
     </div>
 </div>
 
-<!-- =======================================
-    МОДАЛЬНОЕ ОКНО – РАЗМЕРНЫЙ ПОМОЩНИК
-======================================= -->
 <div id="size-helper-modal" class="modal" style="display:none;">
     <div class="modal-content">
         <span class="modal-close" data-modal="size-helper-modal">&times;</span>
