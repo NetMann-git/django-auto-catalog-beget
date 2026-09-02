@@ -1,0 +1,131 @@
+
+
+
+@font-face {
+  font-family: 'Font Awesome 6 Free';
+  src: url('../../fonts/fa-solid-900.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Font Awesome 6 Free';
+  src: url('../../fonts/fa-regular-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Font Awesome 6 Brands';
+  src: url('../../fonts/fa-brands-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+.fa,
+.fas,
+.fa-solid,
+.far,
+.fa-regular,
+.fab,
+.fa-brands {
+  display: inline-block;
+  font-style: normal;
+  font-variant: normal;
+  line-height: 1;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+}
+.fa,
+.fas,
+.fa-solid {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+}
+.far,
+.fa-regular {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+.fab,
+.fa-brands {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+
+.fa-mobile:before {
+  content: "\f3cd"; 
+}
+.fa-bars:before {
+  content: "\f0c9";
+}
+.fa-angle-left:before {
+  content: "\f104";
+}
+.fa-angle-right:before {
+  content: "\f105";
+}
+.fa-chevron-right:before {
+  content: "\f054";
+}
+
+
+.fa-circle-dollar-to-slot:before {
+  content: "\f4b9";
+}
+.fa-gears:before {
+  content: "\f085";
+}
+.fa-briefcase:before {
+  content: "\f0b1";
+}
+.fa-magnifying-glass:before {
+  content: "\f002";
+}
+.fa-car:before {
+  content: "\f1b9";
+}
+.fa-building-columns:before {
+  content: "\f19c";
+}
+.fa-building-circle-check:before {
+  content: "\e4d2";
+}
+.fa-money-bill-transfer:before {
+  content: "\e528";
+}
+.fa-file-video:before {
+  content: "\f1c8";
+}
+.fa-oil-can:before {
+  content: "\f613";
+}
+.fa-shield-virus:before {
+  content: "\e06c";
+}
+.fa-address-book:before {
+  content: "\f2b9";
+}
+.fa-square-phone-flip:before {
+  content: "\f87b";
+}
+.fa-location-dot:before {
+  content: "\f3c5";
+}
+.fa-calendar-check:before {
+  content: "\f274";
+}
+
+
+.fa-telegram:before {
+  content: "\f2c6";
+}
+.fa-vk:before {
+  content: "\f189";
+}
+.fa-discourse:before {
+  content: "\f393";
+}
+.fa-remove:before {
+  content: "\f00d";
+}

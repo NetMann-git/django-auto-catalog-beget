@@ -9,15 +9,13 @@ from .base import *
 # Отключаем ManifestStaticFilesStorage для разработки (удобнее работать со статикой)
 STORAGES["staticfiles"]["BACKEND"] = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
-# Настройки кэширования (файловый кэш)
+# Кэширование для локальной разработки.
+# LocMemCache не использует файловую систему, поэтому на Windows
+# не возникает PermissionError при удалении просроченных cache-файлов.
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
-        "LOCATION": BASE_DIR / "cache",
-        "TIMEOUT": 60 * 10,   # 10 минут
-        "OPTIONS": {
-            "MAX_ENTRIES": 1000,
-        },
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "auto-catalog-dev",
     }
 }
 

@@ -1,8 +1,7 @@
 <!-- config/templates/base.html -->
 {% load static %}
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="utf-8" />
     <title>
@@ -10,36 +9,34 @@
             {% if page %}
                 {% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}
             {% else %}
-                Свадебный салон MoreUG
+                Подберем АВТО — автомобили из Южной Кореи и Китая
             {% endif %}
         {% endblock %}
         {% block title_suffix %}
             {% if site and site.site_name %} – {{ site.site_name }}{% endif %}
         {% endblock %}
     </title>
+
     {% if page and page.search_description %}
         <meta name="description" content="{{ page.search_description }}" />
     {% else %}
-        <meta name="description" content="Подбор, выкуп и доставка автомобилей из Южной Кореи и Китая до города заказчика. Полное сопровождение, минимальная комиссия, услуги под ключ.">
+        <meta name="description" content="Подбор, выкуп и доставка автомобилей из Южной Кореи и Китая. Полное сопровождение сделки под ключ." />
     {% endif %}
+
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="{% if page and page.seo_title %}{{ page.seo_title }}{% else %}Подбор и доставка авто из Кореи и Китая под ключ в любой регион. Полный цикл, минимальная комиссия, юридическое сопровождение{% endif %}">
-    <meta property="og:description" content="{% if page and page.search_description %}{{ page.search_description }}{% else %}Подбор и доставка авто из Кореи и Китая под ключ в любой регион. Полный цикл, минимальная комиссия, юридическое сопровождение{% endif %}">
+    <meta property="og:title" content="{% if page and page.seo_title %}{{ page.seo_title }}{% else %}Подберем АВТО — автомобили из Кореи и Китая{% endif %}">
+    <meta property="og:description" content="{% if page and page.search_description %}{{ page.search_description }}{% else %}Подбор, выкуп и доставка автомобилей из Южной Кореи и Китая под ключ.{% endif %}">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="http://link23yu.beget.tech/">
-    <meta property="og:image" content="http://link23yu.beget.tech/static/images/og-image.jpg">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
     <meta property="og:locale" content="ru_RU">
+
     {% if request.in_preview_panel %}
         <base target="_blank">
     {% endif %}
 
-    <!-- Подключение шрифтов -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-
     {% block global_css %}
+        <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
         <link rel="stylesheet" href="{% static 'css/core/variables.css' %}">
         <link rel="stylesheet" href="{% static 'css/core/components.css' %}">
         {% if current_theme %}
@@ -47,15 +44,15 @@
         {% else %}
             <link rel="stylesheet" href="{% static 'css/themes/default.css' %}">
         {% endif %}
-        <link rel="stylesheet" type="text/css" href="{% static 'css/config.css' %}">
-        <link rel="stylesheet" type="text/css" href="{% static 'search/css/search.css' %}">
-        <link rel="stylesheet" type="text/css" href="{% static 'css/modal.css' %}">
+        <link rel="stylesheet" href="{% static 'css/config.css' %}">
+        <link rel="stylesheet" href="{% static 'search/css/search.css' %}">
+        <link rel="stylesheet" href="{% static 'css/modal.css' %}">
+        <link rel="stylesheet" href="{% static 'css/header.css' %}">
     {% endblock %}
     {% block extra_css %}{% endblock %}
 </head>
 
-<body class="{% block body_class %}{% endblock %} {{ current_theme }}-theme">
-
+<body class="sticky-header {% block body_class %}{% endblock %} {{ current_theme }}-theme">
     <script>
     function getCookie(name) {
         let value = null;
@@ -73,25 +70,26 @@
     }
     </script>
 
-    {% include 'includes/header.html' %}
+    {% block site_shell %}
+        {% block site_header %}
+            {% include 'includes/header.html' %}
+        {% endblock %}
 
-    {% if messages %}
-        <div class="messages">
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
-    {% block content %}{% endblock %}
+        {% block content %}{% endblock %}
 
-    {% include 'includes/footer.html' %}
+        {% block site_footer %}
+            {% include 'includes/footer.html' %}
+        {% endblock %}
+    {% endblock %}
 
-    <!-- =======================================
-        МОДАЛЬНОЕ ОКНО ЗАПИСИ НА ПРИМЕРКУ (глобальное)
-    ======================================= -->
     <div id="appointment-modal" class="modal" style="display:none;">
         <div class="modal-content">
             <span class="modal-close">&times;</span>
@@ -103,6 +101,7 @@
 
     {% block global_js %}
         <script src="{% static 'js/config.js' %}"></script>
+        <script src="{% static 'js/site-header.js' %}"></script>
     {% endblock %}
 
     {% block extra_js %}
@@ -113,6 +112,5 @@
         <script src="{% static 'search/js/search.js' %}"></script>
         <script src="{% static 'appointments/js/modal_window.js' %}"></script>
     {% endblock %}
-
 </body>
 </html>
