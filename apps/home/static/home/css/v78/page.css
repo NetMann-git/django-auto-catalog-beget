@@ -1035,7 +1035,7 @@
 
 
 .sp-page-builder .page-content #section-id-b4b44281-fa43-460d-8404-2682a048cbe5 {
-    background: url("../images/2025/08/07/proverka_lkp.jpg") no-repeat cover fixed 50% 50%;
+    background: url("/static/home/images/2025/08/07/proverka_lkp.jpg") no-repeat fixed 50% 50% / cover;
     padding: 99px 0;
     margin: 0;
 }
@@ -1488,7 +1488,7 @@
 #sppb-addon-397448e4-d972-4c8a-89b0-fa7bbe2d52f6,
 #sppb-addon-33574abd-82f1-476a-8238-07ec601ad384,
 #sppb-addon-faaec121-9719-4573-b2ef-1a9b5e4d5ab0 {
-  background: url(../images/2019/06/11/line-6.svg) no-repeat 70px 50% / calc(100% - 70px);
+  background: url(/static/home/images/2019/06/11/line-6.svg) no-repeat 70px 50% / calc(100% - 70px);
   padding: 0;
 }
 #sppb-addon-e6b9010e-479c-48b4-9864-6335b4d27f9c .sppb-addon-header .sppb-addon-title,
@@ -2314,7 +2314,7 @@
 
 
 .sp-page-builder .page-content #section-id-86865e23-bbc9-4ac1-8b56-0e58f76ae97d {
-    background: url("../images/2025/09/01/exclisivecars.jpg") no-repeat 50% 100% / cover fixed;
+    background: url("/static/home/images/2025/09/01/exclisivecars.jpg") no-repeat 50% 100% / cover fixed;
     padding: 153px 0;
     margin: 0;
 }
