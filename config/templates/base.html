@@ -52,7 +52,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 
-<body class="sticky-header {% block body_class %}{% endblock %} {{ current_theme }}-theme">
+<body class="{% block body_class %}{% endblock %}">
     <script>
     function getCookie(name) {
         let value = null;
