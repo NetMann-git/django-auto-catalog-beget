@@ -27,9 +27,9 @@
      <div class="page-content builder-container">
       <div class="sppb-section" id="section-id-sA877hScVrXJKWEoIl0Rc">
        <div class="sppb-section-background-video">
-        <video autoplay="" class="section-bg-video" loop="" muted="" playsinline="">
-         <source src="{% static 'home/video/cars_video.webm' %}" type="video/webm"/>
-    <source src="{% static 'home/video/cars_video.mp4' %}" type="video/mp4"/>
+        <video autoplay="" class="section-bg-video" loop="" muted="" playsinline="" preload="none" poster="{% static 'home/video/cars_video_poster.webp' %}">
+         <source data-src="{% static 'home/video/cars_video.webm' %}" type="video/webm"/>
+         <source data-src="{% static 'home/video/cars_video.mp4' %}" type="video/mp4"/>
         </video>
        </div>
        <div class="sppb-container-inner">
@@ -4359,4 +4359,40 @@
     <script src="{% static 'home/js/v78/home.bundle.js' %}"></script>
 {% endblock %}
 
-{% block extra_js %}{% endblock %}
+{% block extra_js %}
+<script>
+(function () {
+    function loadHeroVideo() {
+        var video = document.querySelector('.sppb-section-background-video video.section-bg-video');
+        if (!video || video.dataset.sourcesLoaded === '1') {
+            return;
+        }
+
+        video.querySelectorAll('source[data-src]').forEach(function (source) {
+            source.src = source.dataset.src;
+            source.removeAttribute('data-src');
+        });
+
+        video.dataset.sourcesLoaded = '1';
+        video.load();
+
+        var playPromise = video.play();
+        if (playPromise && typeof playPromise.catch === 'function') {
+            playPromise.catch(function () {});
+        }
+    }
+
+    function scheduleHeroVideo() {
+        requestAnimationFrame(function () {
+            requestAnimationFrame(loadHeroVideo);
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', scheduleHeroVideo, { once: true });
+    } else {
+        scheduleHeroVideo();
+    }
+})();
+</script>
+{% endblock %}
