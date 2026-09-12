@@ -1,0 +1,63 @@
+      <section class="sppb-section primary-bg" id="section-id-gTOoFi5BcbswB4Hq4zqAE">
+       <div class="sppb-row-container">
+        <div class="sppb-row">
+         <div class="sppb-col-md-12" id="column-wrap-id-wH_PMU882Y79QHHqX_9ft">
+          <div class="sppb-column" id="column-id-wH_PMU882Y79QHHqX_9ft">
+           <div class="sppb-column-addons">
+            <div class="sppb-section primary-bg" id="section-id-RJ8qgEc5_cmNyroTj31yk">
+             <div class="sppb-container-inner">
+              <div class="sppb-row sppb-nested-row">
+               <div class="sppb-col-md-5" id="column-wrap-id-Khhq-xlbQS_gh-5eaLok6">
+                <div class="sppb-column" id="column-id-Khhq-xlbQS_gh-5eaLok6">
+                 <div class="sppb-column-addons">
+                  <div class="sppb-addon-wrapper addon-root-heading" id="sppb-addon-wrapper-KJHO120lUaztZlTo78cKS">
+                   <div class="clearfix" id="sppb-addon-KJHO120lUaztZlTo78cKS">
+                    <div class="sppb-addon sppb-addon-header">
+                     <h3 class="sppb-addon-title">
+                      Подберите авто прямо сейчас:
+                     </h3>
+                    </div>
+                   </div>
+                  </div>
+                 </div>
+                </div>
+               </div>
+               <div class="sppb-col-md-7" id="column-wrap-id-3E76w5e_rOi3x92nsSdy3">
+                <div class="sppb-column" id="column-id-3E76w5e_rOi3x92nsSdy3">
+                 <div class="sppb-column-addons">
+                  <div class="sppb-addon-wrapper addon-root-form-builder" id="sppb-addon-wrapper-w9JbceYzMrDwOAyUbL1Db">
+                   <div class="clearfix" id="sppb-addon-w9JbceYzMrDwOAyUbL1Db">
+                    <div class="sppb-addon sppb-addon-form-builder req-a-call">
+                     <div class="sppb-addon-content">
+                         <form class="sppb-addon-form-builder-form" method="post" action="{% url 'appointments:submit' %}" onsubmit="return false;">
+                          {% csrf_token %}
+                          <div class="sppb-form-group sppb-form-builder-field-0">
+                           <label class="sppb-form-label-visually-hidden" for="v78-form-name">Ваше имя</label>
+                           <input class="sppb-form-control" id="v78-form-name" name="name" placeholder="Ваше имя" type="text">
+                          </div>
+                          <div class="sppb-form-group sppb-form-builder-field-1">
+                           <label class="sppb-form-label-visually-hidden" for="v78-form-phone">Номер тел.</label>
+                           <input aria-required="true" class="sppb-form-control" id="v78-form-phone" name="phone" placeholder="Номер тел." required type="tel">
+                           <span class="sppb-form-builder-required">Пожалуйста заполните поле</span>
+                          </div>
+                          <div class="sppb-form-builder-btn sppb-text-sppb-text-left">
+                           <button aria-label="Заказать звонок" class="sppb-btn sppb-btn-custom sppb-btn-rounded" id="btn-v78-callback" type="submit">Заказать звонок</button>
+                          </div>
+                         </form>
+                         <div class="sppb-ajax-contact-status" style="display:none;margin-top:10px;"></div>
+                        </div>
+</div>
+                    </div>
+                   </div>
+                  </div>
+                 </div>
+                </div>
+               </div>
+              </div>
+             </div>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+      </section>
