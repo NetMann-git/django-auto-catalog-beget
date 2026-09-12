@@ -8,6 +8,7 @@
 
 {% block global_css %}
             <link href="{% static 'home/css/v78/home.bundle.css' %}" rel="stylesheet">
+            <link href="{% static 'home/css/home-catalog.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block site_shell %}
@@ -29,6 +30,7 @@
       {% include 'home/sections/lead_form.html' %}
       {% include 'home/sections/about.html' %}
       {% include 'home/sections/brands.html' %}
+      {% include 'home/sections/catalog.html' %}
       {% include 'home/sections/full_cycle.html' %}
       {% include 'home/sections/advantages.html' %}
       {% include 'home/sections/process.html' %}
