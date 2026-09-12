@@ -4,12 +4,23 @@ from .base import *
 
 DEBUG = False
 
-# Разрешённые хосты берём из .env, значения разделяются запятыми.
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in config('ALLOWED_HOSTS', default='localhost').split(',')
-    if host.strip()
-]
+
+def _env_list(name):
+    """Читает список значений из .env, разделённых запятыми."""
+    return [
+        value.strip()
+        for value in config(name).split(',')
+        if value.strip()
+    ]
+
+
+# -----------------------------------------------------------------------------
+# Домены и URL production
+# -----------------------------------------------------------------------------
+
+ALLOWED_HOSTS = _env_list('ALLOWED_HOSTS')
+SITE_URL = config('SITE_URL').rstrip('/')
+CSRF_TRUSTED_ORIGINS = _env_list('CSRF_TRUSTED_ORIGINS')
 
 # -----------------------------------------------------------------------------
 # База данных MySQL
