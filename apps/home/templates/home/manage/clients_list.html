@@ -43,11 +43,14 @@
  {% if clients %}
  <div class="client-grid{% if sortable %} client-grid--sortable{% endif %}"
       id="client-sortable"
-      {% if sortable %}data-reorder-url="{% url 'home:client_reorder' %}"{% endif %}>
+      {% if sortable %}
+      data-reorder-url="{% url 'home:client_reorder' %}"
+      data-csrf-token="{{ csrf_token }}"
+      {% endif %}>
   {% for client in clients %}
-  <article class="client-admin-card" data-client-id="{{ client.id }}" {% if sortable %}draggable="true"{% endif %}>
+  <article class="client-admin-card" data-client-id="{{ client.id }}">
    {% if sortable %}
-   <div class="client-admin-card__drag" title="Перетащить карточку" aria-label="Перетащить карточку">
+   <div class="client-admin-card__drag" draggable="true" title="Перетащить карточку" aria-label="Перетащить карточку">
     <span>⠿</span><small>Перетащить</small>
    </div>
    {% endif %}
@@ -68,6 +71,26 @@
     <p>{{ client.vehicle }}</p>
     <small>Порядок: <span class="client-order-value">{{ client.sort_order }}</span></small>
     <div class="client-admin-card__actions">
+     {% if sortable %}
+     <div class="client-admin-card__move-actions" aria-label="Изменить порядок карточки">
+      {% if not forloop.first %}
+      <form method="post" action="{% url 'home:client_move' client.id %}">
+       {% csrf_token %}
+       <input type="hidden" name="direction" value="up">
+       <input type="hidden" name="next" value="{{ request.get_full_path }}">
+       <button class="client-btn client-btn--move" type="submit" title="Поднять выше">↑ Выше</button>
+      </form>
+      {% endif %}
+      {% if not forloop.last %}
+      <form method="post" action="{% url 'home:client_move' client.id %}">
+       {% csrf_token %}
+       <input type="hidden" name="direction" value="down">
+       <input type="hidden" name="next" value="{{ request.get_full_path }}">
+       <button class="client-btn client-btn--move" type="submit" title="Опустить ниже">↓ Ниже</button>
+      </form>
+      {% endif %}
+     </div>
+     {% endif %}
      <a class="client-btn" href="{% url 'home:client_edit' client.id %}">Редактировать</a>
      <form method="post" action="{% url 'home:client_toggle_published' client.id %}">
       {% csrf_token %}

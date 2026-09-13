@@ -36,6 +36,19 @@
         </div>
     {% endif %}
 
+    <!-- Управление секцией «Наши клиенты» для менеджера, администратора и superuser -->
+    {% if user.is_superuser or user.profile.role == 'manager' or user.profile.role == 'admin' %}
+        <div style="margin: 20px 0; padding: 15px; background: #eef7ee; border-radius: 8px; border-left: 4px solid #2e7d32;">
+            <a href="{% url 'home:client_list_manage' %}"
+               style="color: #2e7d32; font-weight: bold; font-size: 18px; text-decoration: none;">
+                👥 Наши клиенты
+            </a>
+            <span style="color: #666; margin-left: 15px; font-size: 14px;">
+                (создание, редактирование и публикация карточек)
+            </span>
+        </div>
+    {% endif %}
+
     <div class="dashboard-stats">
         <div class="stat-card">
             <span class="stat-number">{{ appointments_count }}</span>

@@ -70,3 +70,31 @@ class ClientShowcaseTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertFalse(ClientShowcase.objects.filter(pk=client.id).exists())
+
+    def test_superuser_can_open_client_management_without_admin_profile_role(self):
+        user = get_user_model().objects.create_superuser(
+            username="root_clients",
+            email="root@example.com",
+            password="testpass123",
+        )
+        self.client.force_login(user)
+        response = self.client.get(reverse("home:client_list_manage"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_manager_can_move_client_down_without_javascript(self):
+        first = ClientShowcase.objects.create(name="Первый", vehicle="KIA", sort_order=10)
+        second = ClientShowcase.objects.create(name="Второй", vehicle="BMW", sort_order=20)
+        third = ClientShowcase.objects.create(name="Третий", vehicle="Audi", sort_order=30)
+
+        user = self.create_user("manager_move", ROLE_MANAGER)
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse("home:client_move", args=[first.id]),
+            {"direction": "down"},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            list(ClientShowcase.objects.values_list("id", flat=True)),
+            [second.id, first.id, third.id],
+        )

@@ -1,8 +1,7 @@
 (() => {
     "use strict";
 
-    const deleteForms = document.querySelectorAll(".client-delete-form");
-    deleteForms.forEach((form) => {
+    document.querySelectorAll(".client-delete-form").forEach((form) => {
         form.addEventListener("submit", (event) => {
             const name = form.dataset.clientName || "клиента";
             if (!window.confirm(`Удалить карточку «${name}»? Это действие нельзя отменить.`)) {
@@ -12,27 +11,14 @@
     });
 
     const grid = document.getElementById("client-sortable");
-    if (!grid || !grid.dataset.reorderUrl) {
-        return;
-    }
+    if (!grid || !grid.dataset.reorderUrl) return;
 
     const status = document.getElementById("client-sort-status");
-    let dragged = null;
+    const csrfToken = grid.dataset.csrfToken || "";
+    let draggedCard = null;
     let saveTimer = null;
 
-    const getCsrfToken = () => {
-        const input = document.querySelector("input[name='csrfmiddlewaretoken']");
-        return input ? input.value : "";
-    };
-
-    const updateOrderLabels = () => {
-        [...grid.querySelectorAll(".client-admin-card")].forEach((card, index) => {
-            const label = card.querySelector(".client-order-value");
-            if (label) {
-                label.textContent = String((index + 1) * 10);
-            }
-        });
-    };
+    const cards = () => [...grid.querySelectorAll(".client-admin-card")];
 
     const setStatus = (text, className = "") => {
         if (!status) return;
@@ -40,12 +26,15 @@
         status.className = `client-sort-status ${className}`.trim();
     };
 
-    const saveOrder = async () => {
-        const ids = [...grid.querySelectorAll(".client-admin-card")]
-            .map((card) => card.dataset.clientId)
-            .filter(Boolean);
+    const updateOrderLabels = () => {
+        cards().forEach((card, index) => {
+            const label = card.querySelector(".client-order-value");
+            if (label) label.textContent = String((index + 1) * 10);
+        });
+    };
 
-        const body = new URLSearchParams({ordered_ids: ids.join(",")});
+    const saveOrder = async () => {
+        const ids = cards().map((card) => card.dataset.clientId).filter(Boolean);
         setStatus("Сохраняю…", "is-saving");
 
         try {
@@ -53,16 +42,22 @@
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-                    "X-CSRFToken": getCsrfToken(),
+                    "X-CSRFToken": csrfToken,
                     "X-Requested-With": "XMLHttpRequest",
                 },
-                body: body.toString(),
+                body: new URLSearchParams({ordered_ids: ids.join(",")}).toString(),
                 credentials: "same-origin",
             });
 
-            const data = await response.json();
+            let data = null;
+            try {
+                data = await response.json();
+            } catch (_) {
+                throw new Error(`Сервер вернул HTTP ${response.status}. Обновите страницу.`);
+            }
+
             if (!response.ok || !data.ok) {
-                throw new Error(data.error || "Не удалось сохранить порядок.");
+                throw new Error(data.error || `Ошибка HTTP ${response.status}`);
             }
 
             updateOrderLabels();
@@ -75,56 +70,53 @@
 
     const queueSave = () => {
         window.clearTimeout(saveTimer);
-        saveTimer = window.setTimeout(saveOrder, 180);
+        saveTimer = window.setTimeout(saveOrder, 120);
     };
 
-    grid.querySelectorAll(".client-admin-card").forEach((card) => {
-        const handle = card.querySelector(".client-admin-card__drag");
-        if (handle) {
-            handle.addEventListener("mousedown", () => {
-                card.dataset.dragArmed = "1";
-            });
-        }
+    grid.querySelectorAll(".client-admin-card__drag").forEach((handle) => {
+        const card = handle.closest(".client-admin-card");
+        if (!card) return;
 
-        card.addEventListener("dragstart", (event) => {
-            if (card.dataset.dragArmed !== "1") {
-                event.preventDefault();
-                return;
-            }
-
-            delete card.dataset.dragArmed;
-            dragged = card;
+        handle.addEventListener("dragstart", (event) => {
+            draggedCard = card;
             card.classList.add("is-dragging");
             event.dataTransfer.effectAllowed = "move";
             event.dataTransfer.setData("text/plain", card.dataset.clientId || "");
         });
 
-        card.addEventListener("dragend", () => {
-            delete card.dataset.dragArmed;
+        handle.addEventListener("dragend", () => {
             card.classList.remove("is-dragging");
-            grid.querySelectorAll(".client-admin-card").forEach((item) => item.classList.remove("is-drag-over"));
-            dragged = null;
+            cards().forEach((item) => item.classList.remove("is-drag-over"));
+            draggedCard = null;
         });
+    });
 
+    cards().forEach((card) => {
         card.addEventListener("dragover", (event) => {
-            if (!dragged || dragged === card) return;
+            if (!draggedCard || draggedCard === card) return;
             event.preventDefault();
-            card.classList.add("is-drag-over");
             event.dataTransfer.dropEffect = "move";
+            card.classList.add("is-drag-over");
         });
 
-        card.addEventListener("dragleave", () => {
-            card.classList.remove("is-drag-over");
-        });
+        card.addEventListener("dragleave", () => card.classList.remove("is-drag-over"));
 
         card.addEventListener("drop", (event) => {
-            if (!dragged || dragged === card) return;
+            if (!draggedCard || draggedCard === card) return;
             event.preventDefault();
             card.classList.remove("is-drag-over");
 
-            const rect = card.getBoundingClientRect();
-            const insertAfter = event.clientY > rect.top + rect.height / 2;
-            grid.insertBefore(dragged, insertAfter ? card.nextSibling : card);
+            const currentCards = cards();
+            const draggedIndex = currentCards.indexOf(draggedCard);
+            const targetIndex = currentCards.indexOf(card);
+
+            if (draggedIndex < targetIndex) {
+                card.insertAdjacentElement("afterend", draggedCard);
+            } else {
+                card.insertAdjacentElement("beforebegin", draggedCard);
+            }
+
+            updateOrderLabels();
             queueSave();
         });
     });

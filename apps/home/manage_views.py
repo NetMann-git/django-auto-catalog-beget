@@ -101,6 +101,43 @@ def client_toggle_published(request, client_id):
 
 @require_POST
 @role_required(ROLE_MANAGER, ROLE_ADMIN)
+def client_move(request, client_id):
+    """Резервное серверное перемещение карточки вверх/вниз без JavaScript."""
+    direction = request.POST.get("direction")
+    if direction not in {"up", "down"}:
+        messages.error(request, "Некорректное направление перемещения.")
+        return redirect("home:client_list_manage")
+
+    ordered = list(ClientShowcase.objects.order_by("sort_order", "id"))
+    current_index = next((i for i, item in enumerate(ordered) if item.pk == client_id), None)
+
+    if current_index is None:
+        messages.error(request, "Карточка клиента не найдена.")
+        return redirect("home:client_list_manage")
+
+    target_index = current_index - 1 if direction == "up" else current_index + 1
+    if not 0 <= target_index < len(ordered):
+        return redirect(request.POST.get("next") or "home:client_list_manage")
+
+    ordered[current_index], ordered[target_index] = ordered[target_index], ordered[current_index]
+
+    changed = []
+    with transaction.atomic():
+        for position, client in enumerate(ordered, start=1):
+            new_order = position * 10
+            if client.sort_order != new_order:
+                client.sort_order = new_order
+                changed.append(client)
+
+        if changed:
+            ClientShowcase.objects.bulk_update(changed, ("sort_order",))
+
+    messages.success(request, "Порядок карточек изменён.")
+    return redirect(request.POST.get("next") or "home:client_list_manage")
+
+
+@require_POST
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
 def client_reorder(request):
     raw_ids = request.POST.get("ordered_ids", "")
 

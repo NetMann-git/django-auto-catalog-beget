@@ -7,6 +7,9 @@ from django.shortcuts import redirect
 def role_required(*allowed_roles):
     """
     Доступ только пользователям с указанными ролями.
+
+    Django superuser всегда имеет полный доступ к служебным страницам,
+    независимо от значения role в Profile.
     """
 
     def decorator(view_func):
@@ -16,6 +19,9 @@ def role_required(*allowed_roles):
 
             if not request.user.is_authenticated:
                 return redirect("users:login")
+
+            if request.user.is_superuser:
+                return view_func(request, *args, **kwargs)
 
             profile = getattr(request.user, "profile", None)
 
