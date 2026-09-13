@@ -39,10 +39,3 @@ class ClientShowcaseForm(forms.ModelForm):
 
         return f"https://rutube.ru/play/embed/{match.group(1).lower()}/"
 
-    def clean(self):
-        cleaned = super().clean()
-        if not self.instance.pk and not cleaned.get("image"):
-            self.add_error("image", "Для нового клиента загрузите фотографию.")
-        elif self.instance.pk and not cleaned.get("image") and not self.instance.legacy_image:
-            self.add_error("image", "У карточки должна быть фотография.")
-        return cleaned

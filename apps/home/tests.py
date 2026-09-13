@@ -1,5 +1,8 @@
+from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.contrib.auth.models import AnonymousUser
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
 from apps.users.constants import ROLE_CUSTOMER, ROLE_MANAGER
@@ -133,3 +136,47 @@ class ClientVideoReviewTests(TestCase):
     def test_rutube_embed_url_rejects_non_rutube_host(self):
         client = ClientShowcase(rutube_url="https://example.com/play/embed/b01059d843b5c69740fb2ae3d1cd682d/")
         self.assertEqual(client.rutube_embed_url, "")
+
+
+class ClientMediaRulesTests(TestCase):
+    def test_client_form_allows_video_without_photo(self):
+        from apps.home.forms import ClientShowcaseForm
+
+        form = ClientShowcaseForm(
+            data={
+                "name": "Оксана",
+                "vehicle": "Changan UNI-T",
+                "rutube_url": "https://rutube.ru/play/embed/f44e2211a5634fc5d83109157463b3c2/",
+                "sort_order": 100,
+                "is_published": True,
+            }
+        )
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_home_separates_photo_clients_and_video_clients(self):
+        from django.test import RequestFactory
+        from apps.home.context import HomeContextBuilder
+
+        photo_only = ClientShowcase.objects.create(
+            name="Фото",
+            vehicle="Авто 1",
+            legacy_image="home/images/test.webp",
+            is_published=True,
+        )
+        video_only = ClientShowcase.objects.create(
+            name="Видео",
+            vehicle="Авто 2",
+            rutube_url="https://rutube.ru/play/embed/f44e2211a5634fc5d83109157463b3c2/",
+            is_published=True,
+        )
+
+        request = RequestFactory().get("/")
+        request.user = AnonymousUser()
+        request.session = {}
+
+        with patch("apps.home.context.CatalogRepository.featured", return_value=[]):
+            context = HomeContextBuilder.build(request)
+
+        self.assertIn(photo_only, context["clients"])
+        self.assertNotIn(video_only, context["clients"])
+        self.assertIn(video_only, context["video_clients"])

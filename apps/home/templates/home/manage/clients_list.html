@@ -59,8 +59,17 @@
      <img src="{{ client.image.url }}" alt="{{ client.name }}">
     {% elif client.legacy_image %}
      <img src="{% static client.legacy_image %}" alt="{{ client.name }}">
+    {% elif client.rutube_embed_url %}
+     <iframe
+      class="client-admin-card__video-preview"
+      src="{{ client.rutube_embed_url }}"
+      title="Видеоотзыв {{ client.name }}"
+      loading="lazy"
+      allow="clipboard-write; autoplay"
+      allowfullscreen>
+     </iframe>
     {% else %}
-     <span>Нет фото</span>
+     <span class="client-admin-card__placeholder">Нет фото и видео</span>
     {% endif %}
    </div>
    <div class="client-admin-card__body">
@@ -69,9 +78,10 @@
     </div>
     <h2>{{ client.name }}</h2>
     <p>{{ client.vehicle }}</p>
-    {% if client.rutube_url %}
-    <div class="client-admin-card__video-status">▶ Есть видеоотзыв</div>
-    {% endif %}
+    <div class="client-admin-card__media-status">
+     <span>{% if client.has_image %}Фото: ✓{% else %}Фото: —{% endif %}</span>
+     <span>{% if client.rutube_url %}Видео: ✓{% else %}Видео: —{% endif %}</span>
+    </div>
     <small>Порядок: <span class="client-order-value">{{ client.sort_order }}</span></small>
     <div class="client-admin-card__actions">
      {% if sortable %}

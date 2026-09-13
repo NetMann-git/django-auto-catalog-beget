@@ -2,6 +2,8 @@
 
 from apps.products.models import Brand
 from apps.products.repository import CatalogRepository
+from django.db.models import Q
+
 from apps.reviews.models import Review
 
 from .models import ClientShowcase
@@ -22,8 +24,11 @@ class HomeContextBuilder:
             .order_by("name")[:12]
         )
 
-        clients = ClientShowcase.objects.filter(is_published=True).order_by("sort_order", "id")
-        video_clients = clients.exclude(rutube_url="")
+        published_clients = ClientShowcase.objects.filter(is_published=True)
+        clients = published_clients.filter(
+            Q(image__isnull=False, image__gt="") | Q(legacy_image__gt="")
+        ).order_by("sort_order", "id")
+        video_clients = published_clients.exclude(rutube_url="").order_by("sort_order", "id")
 
         reviews = (
             Review.objects
