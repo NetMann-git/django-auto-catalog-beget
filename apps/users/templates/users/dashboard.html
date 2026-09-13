@@ -57,6 +57,14 @@
         </div>
     {% endif %}
 
+    <!-- Контактные данные главной страницы -->
+    {% if user.is_superuser or user.profile.role == 'manager' or user.profile.role == 'admin' %}
+        <div style="margin: 20px 0; padding: 15px; background: #eef3f8; border-radius: 8px; border-left: 4px solid #315f8c;">
+            <a href="{% url 'home:contacts_manage' %}" style="color: #315f8c; font-weight: bold; font-size: 18px; text-decoration: none;">☎ Контакты</a>
+            <span style="color: #666; margin-left: 15px; font-size: 14px;">(телефоны, адрес, карта и соцсети)</span>
+        </div>
+    {% endif %}
+
     <div class="dashboard-stats">
         <div class="stat-card">
             <span class="stat-number">{{ appointments_count }}</span>

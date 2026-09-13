@@ -106,3 +106,24 @@ class TeamMember(models.Model):
     @property
     def has_image(self):
         return bool(self.image or self.legacy_image)
+
+
+class ContactSettings(models.Model):
+    """Контактные данные для секции «Контакты» на главной странице."""
+
+    phone_primary = models.CharField(max_length=40, verbose_name="Основной телефон")
+    phone_secondary = models.CharField(max_length=40, blank=True, verbose_name="Дополнительный телефон")
+    address = models.CharField(max_length=255, verbose_name="Адрес")
+    map_url = models.URLField(max_length=700, verbose_name="Ссылка на карту Яндекс")
+    telegram_url = models.URLField(max_length=500, blank=True, verbose_name="Telegram")
+    vk_url = models.URLField(max_length=500, blank=True, verbose_name="ВКонтакте")
+    max_url = models.URLField(max_length=500, blank=True, verbose_name="MAX")
+    is_published = models.BooleanField(default=True, verbose_name="Показывать секцию на главной")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Изменено")
+
+    class Meta:
+        verbose_name = "Контакты главной страницы"
+        verbose_name_plural = "Контакты главной страницы"
+
+    def __str__(self):
+        return "Контакты главной страницы"

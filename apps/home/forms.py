@@ -3,7 +3,7 @@ from urllib.parse import urlparse
 
 from django import forms
 
-from .models import ClientShowcase, TeamMember
+from .models import ClientShowcase, ContactSettings, TeamMember
 
 
 class ClientShowcaseForm(forms.ModelForm):
@@ -62,3 +62,37 @@ class TeamMemberForm(forms.ModelForm):
         elif not image and not has_existing:
             self.add_error("image", "Добавьте фотографию сотрудника.")
         return cleaned
+
+
+class ContactSettingsForm(forms.ModelForm):
+    class Meta:
+        model = ContactSettings
+        fields = (
+            "phone_primary",
+            "phone_secondary",
+            "address",
+            "map_url",
+            "telegram_url",
+            "vk_url",
+            "max_url",
+            "is_published",
+        )
+        widgets = {
+            "phone_primary": forms.TextInput(attrs={"class": "form-control", "placeholder": "+7 (988) 580-88-99"}),
+            "phone_secondary": forms.TextInput(attrs={"class": "form-control", "placeholder": "+7 (928) 959-54-59"}),
+            "address": forms.TextInput(attrs={"class": "form-control", "placeholder": "Ростов-на-Дону, Максима Горького 249"}),
+            "map_url": forms.URLInput(attrs={"class": "form-control", "placeholder": "https://yandex.ru/map-widget/v1/...?"}),
+            "telegram_url": forms.URLInput(attrs={"class": "form-control", "placeholder": "https://t.me/..."}),
+            "vk_url": forms.URLInput(attrs={"class": "form-control", "placeholder": "https://vk.com/..."}),
+            "max_url": forms.URLInput(attrs={"class": "form-control", "placeholder": "https://max.ru/..."}),
+            "is_published": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+
+    def clean_map_url(self):
+        value = (self.cleaned_data.get("map_url") or "").strip()
+        if not value:
+            raise forms.ValidationError("Укажите ссылку на карту.")
+        parsed = urlparse(value)
+        if parsed.scheme not in {"http", "https"}:
+            raise forms.ValidationError("Ссылка на карту должна начинаться с http:// или https://.")
+        return value

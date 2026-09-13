@@ -5,6 +5,7 @@ from . import manage_views
 app_name = "home"
 
 urlpatterns = [
+    path("contacts/", manage_views.contacts_manage, name="contacts_manage"),
     path("team/", manage_views.team_list_manage, name="team_list_manage"),
     path("team/create/", manage_views.team_create, name="team_create"),
     path("team/reorder/", manage_views.team_reorder, name="team_reorder"),

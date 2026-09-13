@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ClientShowcase, TeamMember
+from .models import ClientShowcase, ContactSettings, TeamMember
 
 
 @admin.register(ClientShowcase)
@@ -21,3 +21,14 @@ class TeamMemberAdmin(admin.ModelAdmin):
     list_filter = ("is_published",)
     search_fields = ("name", "position")
     list_editable = ("sort_order", "is_published")
+
+
+@admin.register(ContactSettings)
+class ContactSettingsAdmin(admin.ModelAdmin):
+    list_display = ("phone_primary", "address", "is_published", "updated_at")
+
+    def has_add_permission(self, request):
+        return not ContactSettings.objects.exists() and super().has_add_permission(request)
+
+    def has_delete_permission(self, request, obj=None):
+        return False

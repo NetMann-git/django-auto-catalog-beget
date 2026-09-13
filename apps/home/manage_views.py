@@ -9,8 +9,8 @@ from django.views.decorators.http import require_POST
 from apps.users.constants import ROLE_ADMIN, ROLE_MANAGER
 from apps.users.decorators import role_required
 
-from .forms import ClientShowcaseForm, TeamMemberForm
-from .models import ClientShowcase, TeamMember
+from .forms import ClientShowcaseForm, ContactSettingsForm, TeamMemberForm
+from .models import ClientShowcase, ContactSettings, TeamMember
 
 
 @role_required(ROLE_MANAGER, ROLE_ADMIN)
@@ -328,3 +328,35 @@ def team_delete(request, member_id):
     member.delete()
     messages.success(request, f'Сотрудник «{name}» удалён.')
     return redirect(request.POST.get("next") or "home:team_list_manage")
+
+
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
+def contacts_manage(request):
+    contacts, _ = ContactSettings.objects.get_or_create(
+        pk=1,
+        defaults={
+            "phone_primary": "+7(988)580-88-99",
+            "phone_secondary": "+7(928)959-54-59",
+            "address": "Ростов-на-Дону, Максима Горького 249",
+            "map_url": "https://yandex.ru/map-widget/v1/?z=12&ol=biz&oid=11795644110",
+            "telegram_url": "https://t.me/auto_korea_pod_zakaz",
+            "vk_url": "https://vk.com/podberemauto",
+            "max_url": "https://xn----8sbbggha0dnibq5a.xn--p1ai/max.ru/channel_podberem_auto",
+            "is_published": True,
+        },
+    )
+
+    if request.method == "POST":
+        form = ContactSettingsForm(request.POST, instance=contacts)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Контактные данные обновлены.")
+            return redirect("home:contacts_manage")
+    else:
+        form = ContactSettingsForm(instance=contacts)
+
+    return render(
+        request,
+        "home/manage/contacts_form.html",
+        {"form": form, "contacts": contacts},
+    )

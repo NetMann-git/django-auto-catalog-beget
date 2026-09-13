@@ -7,7 +7,7 @@ from django.db.models import Q
 
 from apps.reviews.models import Review
 
-from .models import ClientShowcase, TeamMember
+from .models import ClientShowcase, ContactSettings, TeamMember
 
 
 class HomeContextBuilder:
@@ -35,6 +35,8 @@ class HomeContextBuilder:
             Q(image__isnull=False, image__gt="") | Q(legacy_image__gt="")
         ).order_by("sort_order", "id")
 
+        contact_settings = ContactSettings.objects.filter(pk=1, is_published=True).first()
+
         reviews = (
             Review.objects
             .filter(is_published=True)
@@ -57,6 +59,7 @@ class HomeContextBuilder:
             "clients": clients,
             "video_clients": video_clients,
             "team_members": team_members,
+            "contact_settings": contact_settings,
             "wishlist_ids": wishlist_ids,
             "callback_form": CallbackRequestForm(),
         }

@@ -7,7 +7,7 @@ from django.urls import reverse
 
 from apps.users.constants import ROLE_CUSTOMER, ROLE_MANAGER
 
-from .models import ClientShowcase, TeamMember
+from .models import ClientShowcase, ContactSettings, TeamMember
 
 
 class ClientShowcaseTests(TestCase):
@@ -222,3 +222,50 @@ class TeamMemberTests(TestCase):
         self.client.force_login(user)
         response = self.client.get(reverse("home:team_list_manage"))
         self.assertEqual(response.status_code, 200)
+
+
+class ContactSettingsTests(TestCase):
+    def create_user(self, username, role):
+        user = get_user_model().objects.create_user(username=username, password="testpass123")
+        user.profile.role = role
+        user.profile.save(update_fields=("role",))
+        return user
+
+    def test_home_uses_contact_settings(self):
+        ContactSettings.objects.update_or_create(
+            pk=1,
+            defaults={
+                "phone_primary": "+7 900 111-22-33",
+                "address": "Тестовый адрес",
+                "map_url": "https://yandex.ru/map-widget/v1/?z=12",
+                "is_published": True,
+            },
+        )
+        response = self.client.get(reverse("home"))
+        self.assertContains(response, "+7 900 111-22-33")
+        self.assertContains(response, "Тестовый адрес")
+
+    def test_hidden_contacts_are_not_rendered(self):
+        ContactSettings.objects.update_or_create(
+            pk=1,
+            defaults={
+                "phone_primary": "+7 900 000-00-00",
+                "address": "Скрытый адрес",
+                "map_url": "https://yandex.ru/map-widget/v1/?z=12",
+                "is_published": False,
+            },
+        )
+        response = self.client.get(reverse("home"))
+        self.assertNotContains(response, "Скрытый адрес")
+
+    def test_manager_can_edit_contacts(self):
+        user = self.create_user("manager_contacts", ROLE_MANAGER)
+        self.client.force_login(user)
+        response = self.client.get(reverse("home:contacts_manage"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_customer_cannot_edit_contacts(self):
+        user = self.create_user("customer_contacts", ROLE_CUSTOMER)
+        self.client.force_login(user)
+        response = self.client.get(reverse("home:contacts_manage"))
+        self.assertEqual(response.status_code, 302)
