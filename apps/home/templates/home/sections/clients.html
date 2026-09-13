@@ -1,43 +1,17 @@
 {% if clients %}
-<section class="sppb-section" id="klienty">
+<section class="sppb-section clients-section" id="klienty">
  <div class="sppb-row-container">
-  <div class="sppb-row">
-   <div class="sppb-col-md-12" id="column-wrap-id-5d3da687-b202-41f0-b743-e30c1f3791ad">
-    <div class="sppb-column" id="column-id-5d3da687-b202-41f0-b743-e30c1f3791ad">
-     <div class="sppb-column-addons">
-      <div class="sppb-addon-wrapper addon-root-divider" id="sppb-addon-wrapper-fc1c2189-3059-4dff-bae9-785a84981ac8">
-       <div class="clearfix" id="sppb-addon-fc1c2189-3059-4dff-bae9-785a84981ac8">
-        <div class="sppb-addon-divider-wrap divider-position"><div class="sppb-divider sppb-divider-border" role="none"></div></div>
-       </div>
-      </div>
-      <div class="sppb-addon-wrapper addon-root-heading" id="sppb-addon-wrapper-c36ec84b-1f4c-4e81-ae1d-238222d5736e">
-       <div class="clearfix" id="sppb-addon-c36ec84b-1f4c-4e81-ae1d-238222d5736e">
-        <div class="sppb-addon sppb-addon-header"><h4 class="sppb-addon-title">Наши клиенты</h4></div>
-       </div>
-      </div>
-
-      <div class="sppb-addon-wrapper sppb-hidden-xs addon-root-team-carousel" id="sppb-addon-wrapper-672670ef-5e64-47e4-b7a5-e2b560e5f069">
-       <div class="clearfix" id="sppb-addon-672670ef-5e64-47e4-b7a5-e2b560e5f069">
-        <div class="sppb-addon sppb-carousel-extended sppb-team-carousel-layout1" data-arrow="1" data-autoplay="0" data-dots="1" data-interval="6" data-item-number-lg="4" data-item-number-md="4" data-item-number-sm="2" data-item-number-xl="6" data-item-number-xs="1" data-left-arrow="fa-angle-left" data-loop="true" data-margin="18" data-pause-on-hover="0" data-right-arrow="fa-angle-right" data-speed="41" data-team-layout="layout1">
-         {% for client in clients %}
-          {% include 'home/sections/_client_card.html' with client=client %}
-         {% endfor %}
-        </div>
-       </div>
-      </div>
-
-      <div class="sppb-addon-wrapper sppb-hidden-xl sppb-hidden-lg sppb-hidden-md sppb-hidden-sm addon-root-team-carousel" id="sppb-addon-wrapper-854d4a9a-da4c-4f93-999e-0559a6dca22d">
-       <div class="clearfix" id="sppb-addon-854d4a9a-da4c-4f93-999e-0559a6dca22d">
-        <div class="sppb-addon sppb-carousel-extended sppb-team-carousel-layout1" data-arrow="1" data-autoplay="0" data-dots="1" data-interval="6" data-item-number-lg="1" data-item-number-md="1" data-item-number-sm="1" data-item-number-xl="1" data-item-number-xs="1" data-left-arrow="fa-angle-left" data-loop="true" data-margin="0" data-pause-on-hover="0" data-right-arrow="fa-angle-right" data-speed="41" data-team-layout="layout1">
-         {% for client in clients %}
-          {% include 'home/sections/_client_card.html' with client=client %}
-         {% endfor %}
-        </div>
-       </div>
-      </div>
-     </div>
-    </div>
-   </div>
+  <div class="clients-section__divider" aria-hidden="true"></div>
+  <h4 class="clients-section__title">Наши клиенты</h4>
+  <div class="sppb-carousel-extended clients-carousel"
+       data-arrow="1" data-autoplay="0" data-dots="1" data-interval="6"
+       data-item-number-xl="6" data-item-number-lg="4" data-item-number-md="4"
+       data-item-number-sm="2" data-item-number-xs="1"
+       data-left-arrow="fa-angle-left" data-right-arrow="fa-angle-right"
+       data-loop="true" data-margin="18" data-pause-on-hover="0" data-speed="41">
+   {% for client in clients %}
+    {% include 'home/sections/_client_card.html' with client=client %}
+   {% endfor %}
   </div>
  </div>
 </section>

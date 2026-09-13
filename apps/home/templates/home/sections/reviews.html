@@ -1,50 +1,29 @@
 {% if video_clients %}
-<section class="sppb-section" id="section-id-63e7d0c4-3a32-4979-b358-2c7c6532ab66">
+<section class="sppb-section reviews-section" id="reviews">
  <div class="sppb-row-container">
-  <div class="sppb-row">
-   <div class="sppb-row-column" id="column-wrap-id-e3a8f0f7-6399-43bb-9d8c-7337295c9111">
-    <div class="sppb-column" id="column-id-e3a8f0f7-6399-43bb-9d8c-7337295c9111">
-     <div class="sppb-column-addons">
-      <div class="sppb-addon-wrapper addon-root-divider" id="sppb-addon-wrapper-a770dbf0-9ab7-4e0f-8edc-ccaae0134c01">
-       <div class="clearfix" id="sppb-addon-a770dbf0-9ab7-4e0f-8edc-ccaae0134c01">
-        <div class="sppb-addon-divider-wrap divider-position"><div class="sppb-divider sppb-divider-border" role="none"></div></div>
-       </div>
-      </div>
-      <div class="sppb-addon-wrapper addon-root-heading" id="sppb-addon-wrapper-f1166831-6d5f-4115-b23d-24dbfb4d6ef7">
-       <div class="clearfix" id="sppb-addon-f1166831-6d5f-4115-b23d-24dbfb4d6ef7">
-        <div class="sppb-addon sppb-addon-header"><h5 class="sppb-addon-title">Обратная связь</h5></div>
-       </div>
-      </div>
-      <div class="sppb-addon-wrapper addon-root-heading" id="sppb-addon-wrapper-639b4977-fce1-4d7e-a97a-7849435d3e5f">
-       <div class="clearfix" id="sppb-addon-639b4977-fce1-4d7e-a97a-7849435d3e5f">
-        <div class="sppb-addon sppb-addon-header"><h2 class="sppb-addon-title">Отзывы о нашей работе</h2></div>
-       </div>
-      </div>
-      <div class="sppb-addon-wrapper addon-root-testimonial-carousel" id="sppb-addon-wrapper-b84b92c5-c5b4-4e4a-b5d3-2db57ddc52b6">
-       <div class="clearfix" id="sppb-addon-b84b92c5-c5b4-4e4a-b5d3-2db57ddc52b6">
-        <div class="sppb-addon sppb-carousel-extended sppb-testimonial-carousel-testi_layout3" data-aria-next="Далее" data-aria-prev="Предыдущий" data-arrow="1" data-autoplay="0" data-dots="0" data-interval="4500" data-item-number-lg="3" data-item-number-md="3" data-item-number-sm="3" data-item-number-xl="4" data-item-number-xs="1" data-left-arrow="fa-angle-left" data-loop="true" data-margin-lg="" data-margin-md="" data-margin-sm="" data-margin-xl="12" data-margin-xs="" data-pause-on-hover="0" data-right-arrow="fa-angle-right" data-speed="1500" data-testi-layout="testi_layout3">
-         {% for client in video_clients %}
-         <div class="sppb-carousel-extended-item" id="sppb-testi-b84b92c5-c5b4-4e4a-b5d3-2db57ddc52b6-carousel-item-key-{{ forloop.counter0 }}">
-          <div class="sppb-testimonial-carousel-item-content">
-           <div class="sppb-testimonial-carousel-client-rating rating-key-{{ forloop.counter0 }}"><span class="sppb-testimonial-carousel-rating"></span></div>
-           <div class="sppb-testimonial-carousel-message">
-            <iframe allow="clipboard-write; autoplay" allowfullscreen frameborder="0" height="336" loading="lazy" mozallowfullscreen src="{{ client.rutube_embed_url }}" title="Видео отзыва: {{ client.name }} — {{ client.vehicle }}" webkitallowfullscreen width="263"></iframe>
-           </div>
-          </div>
-          <div class="sppb-testimonial-carousel-content-wrap">
-           <div class="sppb-testimonial-carousel-name-designation">
-            <div class="sppb-testimonial-carousel-name">{{ client.name }}</div>
-            <div class="sppb-testimonial-carousel-designation">{{ client.vehicle }}</div>
-           </div>
-          </div>
-         </div>
-         {% endfor %}
-        </div>
-       </div>
-      </div>
+  <div class="reviews-section__divider" aria-hidden="true"></div>
+  <h5 class="reviews-section__eyebrow">Обратная связь</h5>
+  <h2 class="reviews-section__title">Отзывы о нашей работе</h2>
+  <div class="sppb-carousel-extended reviews-carousel"
+       data-aria-next="Далее" data-aria-prev="Предыдущий"
+       data-arrow="1" data-autoplay="0" data-dots="0" data-interval="4500"
+       data-item-number-xl="4" data-item-number-lg="3" data-item-number-md="3"
+       data-item-number-sm="3" data-item-number-xs="1"
+       data-left-arrow="fa-angle-left" data-right-arrow="fa-angle-right"
+       data-loop="true" data-margin-xl="12" data-pause-on-hover="0" data-speed="1500">
+   {% for client in video_clients %}
+    <article class="sppb-carousel-extended-item reviews-card">
+     <div class="reviews-card__video">
+      <iframe allow="clipboard-write; autoplay" allowfullscreen loading="lazy"
+              src="{{ client.rutube_embed_url }}"
+              title="Видео отзыва: {{ client.name }} — {{ client.vehicle }}"></iframe>
      </div>
-    </div>
-   </div>
+     <div class="reviews-card__meta">
+      <div class="reviews-card__name">{{ client.name }}</div>
+      <div class="reviews-card__vehicle">{{ client.vehicle }}</div>
+     </div>
+    </article>
+   {% endfor %}
   </div>
  </div>
 </section>
