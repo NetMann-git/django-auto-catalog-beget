@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Наши клиенты — управление{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'home/css/client-manage.css' %}">{% endblock %}
+
+{% block content %}
+<div class="client-manage">
+ <div class="client-manage__header">
+  <div>
+   <h1>Наши клиенты</h1>
+   <p>Карточки секции «Наши клиенты» на главной странице. Всего: {{ total }}.</p>
+  </div>
+  <a class="client-btn client-btn--primary" href="{% url 'home:client_create' %}">+ Добавить клиента</a>
+ </div>
+
+ <form class="client-filters" method="get">
+  <input type="search" name="search" value="{{ search }}" placeholder="Имя клиента или автомобиль">
+  <select name="status">
+   <option value=""{% if not status %} selected{% endif %}>Все статусы</option>
+   <option value="published"{% if status == 'published' %} selected{% endif %}>Опубликованные</option>
+   <option value="hidden"{% if status == 'hidden' %} selected{% endif %}>Снятые с публикации</option>
+  </select>
+  <button class="client-btn" type="submit">Найти</button>
+  {% if search or status %}<a class="client-btn client-btn--light" href="{% url 'home:client_list_manage' %}">Сбросить</a>{% endif %}
+ </form>
+
+ {% if clients %}
+ <div class="client-grid">
+  {% for client in clients %}
+  <article class="client-admin-card">
+   <div class="client-admin-card__image">
+    {% if client.image %}
+     <img src="{{ client.image.url }}" alt="{{ client.name }}">
+    {% elif client.legacy_image %}
+     {% load static %}<img src="{% static client.legacy_image %}" alt="{{ client.name }}">
+    {% else %}
+     <span>Нет фото</span>
+    {% endif %}
+   </div>
+   <div class="client-admin-card__body">
+    <div class="client-admin-card__status {% if client.is_published %}is-published{% else %}is-hidden{% endif %}">
+     {% if client.is_published %}Опубликован{% else %}Не опубликован{% endif %}
+    </div>
+    <h2>{{ client.name }}</h2>
+    <p>{{ client.vehicle }}</p>
+    <small>Порядок: {{ client.sort_order }}</small>
+    <div class="client-admin-card__actions">
+     <a class="client-btn" href="{% url 'home:client_edit' client.id %}">Редактировать</a>
+     <form method="post" action="{% url 'home:client_toggle_published' client.id %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button class="client-btn {% if client.is_published %}client-btn--warning{% else %}client-btn--success{% endif %}" type="submit">
+       {% if client.is_published %}Снять с публикации{% else %}Опубликовать{% endif %}
+      </button>
+     </form>
+    </div>
+   </div>
+  </article>
+  {% endfor %}
+ </div>
+
+ {% if clients.paginator.num_pages > 1 %}
+ <nav class="client-pagination">
+  {% if clients.has_previous %}<a href="?page={{ clients.previous_page_number }}&search={{ search|urlencode }}&status={{ status }}">←</a>{% endif %}
+  <span>{{ clients.number }} / {{ clients.paginator.num_pages }}</span>
+  {% if clients.has_next %}<a href="?page={{ clients.next_page_number }}&search={{ search|urlencode }}&status={{ status }}">→</a>{% endif %}
+ </nav>
+ {% endif %}
+ {% else %}
+ <div class="client-empty">Клиенты не найдены.</div>
+ {% endif %}
+
+ <p class="client-manage__back"><a href="{% url 'users:manager_dashboard' %}">← Вернуться в панель менеджера</a></p>
+</div>
+{% endblock %}

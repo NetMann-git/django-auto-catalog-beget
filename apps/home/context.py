@@ -4,6 +4,8 @@ from apps.products.models import Brand
 from apps.products.repository import CatalogRepository
 from apps.reviews.models import Review
 
+from .models import ClientShowcase
+
 
 class HomeContextBuilder:
     """Собирает данные главной страницы из существующих приложений проекта."""
@@ -19,6 +21,8 @@ class HomeContextBuilder:
             .prefetch_related("products")
             .order_by("name")[:12]
         )
+
+        clients = ClientShowcase.objects.filter(is_published=True).order_by("sort_order", "id")
 
         reviews = (
             Review.objects
@@ -39,5 +43,6 @@ class HomeContextBuilder:
             "featured_products": featured_products,
             "featured_brands": featured_brands,
             "reviews": reviews,
+            "clients": clients,
             "wishlist_ids": wishlist_ids,
         }

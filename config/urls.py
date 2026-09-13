@@ -17,6 +17,7 @@ urlpatterns = [
     path('appointments/', include('apps.appointments.urls')),
     path('size-helper/', include('apps.size_helper.urls')),
     path('account/', include('apps.users.urls')),
+    path('account/content/', include('apps.home.urls')),
     path('search/', include('apps.search.urls')),
     path('recommendations/', include('apps.recommendations.urls', namespace='recommendations')),
 ]
