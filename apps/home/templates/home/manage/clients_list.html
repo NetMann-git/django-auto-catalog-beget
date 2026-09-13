@@ -25,15 +25,37 @@
   {% if search or status %}<a class="client-btn client-btn--light" href="{% url 'home:client_list_manage' %}">Сбросить</a>{% endif %}
  </form>
 
+ {% if sortable and clients %}
+ <div class="client-sort-help" id="client-sort-help">
+  <span class="client-sort-help__icon">↕</span>
+  <div>
+   <strong>Порядок карточек можно менять мышкой.</strong>
+   <span>Перетащите карточку за область с точками. Новый порядок сохраняется автоматически.</span>
+  </div>
+  <span class="client-sort-status" id="client-sort-status" aria-live="polite"></span>
+ </div>
+ {% elif search or status %}
+ <div class="client-sort-help client-sort-help--disabled">
+  Сортировка перетаскиванием доступна в полном списке. Сбросьте поиск и фильтры.
+ </div>
+ {% endif %}
+
  {% if clients %}
- <div class="client-grid">
+ <div class="client-grid{% if sortable %} client-grid--sortable{% endif %}"
+      id="client-sortable"
+      {% if sortable %}data-reorder-url="{% url 'home:client_reorder' %}"{% endif %}>
   {% for client in clients %}
-  <article class="client-admin-card">
+  <article class="client-admin-card" data-client-id="{{ client.id }}" {% if sortable %}draggable="true"{% endif %}>
+   {% if sortable %}
+   <div class="client-admin-card__drag" title="Перетащить карточку" aria-label="Перетащить карточку">
+    <span>⠿</span><small>Перетащить</small>
+   </div>
+   {% endif %}
    <div class="client-admin-card__image">
     {% if client.image %}
      <img src="{{ client.image.url }}" alt="{{ client.name }}">
     {% elif client.legacy_image %}
-     {% load static %}<img src="{% static client.legacy_image %}" alt="{{ client.name }}">
+     <img src="{% static client.legacy_image %}" alt="{{ client.name }}">
     {% else %}
      <span>Нет фото</span>
     {% endif %}
@@ -44,7 +66,7 @@
     </div>
     <h2>{{ client.name }}</h2>
     <p>{{ client.vehicle }}</p>
-    <small>Порядок: {{ client.sort_order }}</small>
+    <small>Порядок: <span class="client-order-value">{{ client.sort_order }}</span></small>
     <div class="client-admin-card__actions">
      <a class="client-btn" href="{% url 'home:client_edit' client.id %}">Редактировать</a>
      <form method="post" action="{% url 'home:client_toggle_published' client.id %}">
@@ -54,17 +76,22 @@
        {% if client.is_published %}Снять с публикации{% else %}Опубликовать{% endif %}
       </button>
      </form>
+     <form method="post" action="{% url 'home:client_delete' client.id %}" class="client-delete-form" data-client-name="{{ client.name|escape }}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button class="client-btn client-btn--danger" type="submit">Удалить</button>
+     </form>
     </div>
    </div>
   </article>
   {% endfor %}
  </div>
 
- {% if clients.paginator.num_pages > 1 %}
+ {% if page_obj and page_obj.paginator.num_pages > 1 %}
  <nav class="client-pagination">
-  {% if clients.has_previous %}<a href="?page={{ clients.previous_page_number }}&search={{ search|urlencode }}&status={{ status }}">←</a>{% endif %}
-  <span>{{ clients.number }} / {{ clients.paginator.num_pages }}</span>
-  {% if clients.has_next %}<a href="?page={{ clients.next_page_number }}&search={{ search|urlencode }}&status={{ status }}">→</a>{% endif %}
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&search={{ search|urlencode }}&status={{ status }}">←</a>{% endif %}
+  <span>{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&search={{ search|urlencode }}&status={{ status }}">→</a>{% endif %}
  </nav>
  {% endif %}
  {% else %}
@@ -73,4 +100,8 @@
 
  <p class="client-manage__back"><a href="{% url 'users:manager_dashboard' %}">← Вернуться в панель менеджера</a></p>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'home/js/client-manage.js' %}" defer></script>
 {% endblock %}

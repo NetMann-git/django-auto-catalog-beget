@@ -1,6 +1,8 @@
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.db import transaction
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
@@ -27,16 +29,25 @@ def client_list_manage(request):
         clients = clients.filter(is_published=False)
 
     total = clients.count()
-    page_obj = Paginator(clients, 24).get_page(request.GET.get("page"))
+    sortable = not search and not status
+
+    if sortable:
+        client_items = clients
+        page_obj = None
+    else:
+        page_obj = Paginator(clients, 24).get_page(request.GET.get("page"))
+        client_items = page_obj.object_list
 
     return render(
         request,
         "home/manage/clients_list.html",
         {
-            "clients": page_obj,
+            "clients": client_items,
+            "page_obj": page_obj,
             "total": total,
             "search": search,
             "status": status,
+            "sortable": sortable,
         },
     )
 
@@ -85,4 +96,52 @@ def client_toggle_published(request, client_id):
 
     state = "опубликован" if client.is_published else "снят с публикации"
     messages.success(request, f'Клиент «{client.name}» {state}.')
+    return redirect(request.POST.get("next") or "home:client_list_manage")
+
+
+@require_POST
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
+def client_reorder(request):
+    raw_ids = request.POST.get("ordered_ids", "")
+
+    try:
+        ordered_ids = [int(value) for value in raw_ids.split(",") if value.strip()]
+    except ValueError:
+        return JsonResponse({"ok": False, "error": "Некорректный порядок карточек."}, status=400)
+
+    current_ids = list(ClientShowcase.objects.values_list("id", flat=True))
+    if len(ordered_ids) != len(current_ids) or set(ordered_ids) != set(current_ids):
+        return JsonResponse(
+            {"ok": False, "error": "Список карточек изменился. Обновите страницу и повторите."},
+            status=409,
+        )
+
+    clients_by_id = ClientShowcase.objects.in_bulk(ordered_ids)
+    changed = []
+
+    with transaction.atomic():
+        for position, client_id in enumerate(ordered_ids, start=1):
+            client = clients_by_id[client_id]
+            new_order = position * 10
+            if client.sort_order != new_order:
+                client.sort_order = new_order
+                changed.append(client)
+
+        if changed:
+            ClientShowcase.objects.bulk_update(changed, ("sort_order",))
+
+    return JsonResponse({"ok": True, "updated": len(changed)})
+
+
+@require_POST
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
+def client_delete(request, client_id):
+    client = get_object_or_404(ClientShowcase, pk=client_id)
+    client_name = client.name
+
+    if client.image:
+        client.image.delete(save=False)
+
+    client.delete()
+    messages.success(request, f'Клиент «{client_name}» удалён.')
     return redirect(request.POST.get("next") or "home:client_list_manage")

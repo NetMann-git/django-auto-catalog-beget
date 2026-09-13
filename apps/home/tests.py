@@ -32,3 +32,41 @@ class ClientShowcaseTests(TestCase):
         self.client.force_login(user)
         response = self.client.get(reverse("home:client_list_manage"))
         self.assertEqual(response.status_code, 302)
+
+    def test_manager_can_reorder_all_clients(self):
+        first = ClientShowcase.objects.create(name="Первый", vehicle="KIA", sort_order=10)
+        second = ClientShowcase.objects.create(name="Второй", vehicle="BMW", sort_order=20)
+        third = ClientShowcase.objects.create(name="Третий", vehicle="Audi", sort_order=30)
+
+        user = self.create_user("manager_reorder", ROLE_MANAGER)
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse("home:client_reorder"),
+            {"ordered_ids": f"{third.id},{first.id},{second.id}"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            list(ClientShowcase.objects.values_list("id", flat=True)),
+            [third.id, first.id, second.id],
+        )
+
+    def test_reorder_rejects_partial_list(self):
+        first = ClientShowcase.objects.create(name="Первый", vehicle="KIA", sort_order=10)
+        ClientShowcase.objects.create(name="Второй", vehicle="BMW", sort_order=20)
+
+        user = self.create_user("manager_partial_reorder", ROLE_MANAGER)
+        self.client.force_login(user)
+        response = self.client.post(reverse("home:client_reorder"), {"ordered_ids": str(first.id)})
+
+        self.assertEqual(response.status_code, 409)
+
+    def test_manager_can_delete_client(self):
+        client = ClientShowcase.objects.create(name="Удалить", vehicle="Volvo", sort_order=10)
+        user = self.create_user("manager_delete", ROLE_MANAGER)
+        self.client.force_login(user)
+
+        response = self.client.post(reverse("home:client_delete", args=[client.id]))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(ClientShowcase.objects.filter(pk=client.id).exists())
