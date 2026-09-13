@@ -64,7 +64,8 @@
     content: "";
     flex: 1 1 auto;
     min-width: 24px;
-    border-top: 1px solid rgba(250, 204, 0, 0.65);
+    height: 10px;
+    background: url("/static/home/images/2019/06/11/line-6.svg") no-repeat right center / 100% 10px;
 }
 
 .home-process__step-label {
