@@ -1,15 +1,29 @@
 {% load static %}
-<div class="sppb-carousel-extended-item">
- {% if client.image %}
-  <img alt="{{ client.name }} — {{ client.vehicle }}" decoding="async" loading="lazy" src="{{ client.image.url }}"/>
- {% elif client.legacy_image %}
-  <img alt="{{ client.name }} — {{ client.vehicle }}" decoding="async" loading="lazy" src="{% static client.legacy_image %}"/>
- {% endif %}
- <div class="sppb-carousel-extended-team-content sppb-carousel-layout1">
+<div class="sppb-carousel-extended-item client-showcase-card">
+ <div class="client-showcase-card__media">
+  {% if client.image %}
+   <img
+    class="client-showcase-card__image"
+    alt="{{ client.name }} — {{ client.vehicle }}"
+    decoding="async"
+    loading="lazy"
+    src="{{ client.image.url }}"
+   />
+  {% elif client.legacy_image %}
+   <img
+    class="client-showcase-card__image"
+    alt="{{ client.name }} — {{ client.vehicle }}"
+    decoding="async"
+    loading="lazy"
+    src="{% static client.legacy_image %}"
+   />
+  {% endif %}
+ </div>
+
+ <div class="sppb-carousel-extended-team-content sppb-carousel-layout1 client-showcase-card__content">
   <div class="sppb-carousel-extended-team-content-wrap">
-   <div class="sppb-carousel-extended-team-name">{{ client.name }}</div>
-   <div class="sppb-carousel-extended-team-designation">{{ client.vehicle }}</div>
-   <ul class="sppb-carousel-extended-team-social-icon"></ul>
+   <div class="sppb-carousel-extended-team-name client-showcase-card__name">{{ client.name }}</div>
+   <div class="sppb-carousel-extended-team-designation client-showcase-card__vehicle">{{ client.vehicle }}</div>
   </div>
  </div>
 </div>
