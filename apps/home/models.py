@@ -11,6 +11,12 @@ class ClientShowcase(models.Model):
         blank=True,
         verbose_name="Фотография",
     )
+    rutube_url = models.URLField(
+        max_length=500,
+        blank=True,
+        verbose_name="Ссылка на видеоотзыв Rutube",
+        help_text="Оставьте пустым, если клиент не записывал видеоотзыв.",
+    )
     legacy_image = models.CharField(
         max_length=255,
         blank=True,
@@ -38,3 +44,26 @@ class ClientShowcase(models.Model):
     @property
     def has_image(self):
         return bool(self.image or self.legacy_image)
+
+    @property
+    def rutube_embed_url(self):
+        """Возвращает только проверенную embed-ссылку Rutube."""
+        if not self.rutube_url:
+            return ""
+
+        import re
+        from urllib.parse import urlparse
+
+        try:
+            parsed = urlparse(self.rutube_url)
+        except (TypeError, ValueError):
+            return ""
+
+        if parsed.scheme not in {"http", "https"} or parsed.hostname not in {"rutube.ru", "www.rutube.ru"}:
+            return ""
+
+        match = re.search(r"/(?:video|play/embed)/([0-9a-fA-F]{32})(?:/|$)", parsed.path)
+        if not match:
+            return ""
+
+        return f"https://rutube.ru/play/embed/{match.group(1).lower()}/"

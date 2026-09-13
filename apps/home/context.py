@@ -23,6 +23,7 @@ class HomeContextBuilder:
         )
 
         clients = ClientShowcase.objects.filter(is_published=True).order_by("sort_order", "id")
+        video_clients = clients.exclude(rutube_url="")
 
         reviews = (
             Review.objects
@@ -44,5 +45,6 @@ class HomeContextBuilder:
             "featured_brands": featured_brands,
             "reviews": reviews,
             "clients": clients,
+            "video_clients": video_clients,
             "wishlist_ids": wishlist_ids,
         }

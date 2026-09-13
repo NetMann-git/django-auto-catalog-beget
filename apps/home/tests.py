@@ -98,3 +98,38 @@ class ClientShowcaseTests(TestCase):
             list(ClientShowcase.objects.values_list("id", flat=True)),
             [second.id, first.id, third.id],
         )
+
+
+class ClientVideoReviewTests(TestCase):
+    def test_video_review_section_shows_only_published_clients_with_rutube(self):
+        visible = ClientShowcase.objects.create(
+            name="Видео клиент", vehicle="KIA", legacy_image="x.webp",
+            rutube_url="https://rutube.ru/play/embed/b01059d843b5c69740fb2ae3d1cd682d/",
+            is_published=True,
+        )
+        ClientShowcase.objects.create(
+            name="Без видео", vehicle="BMW", legacy_image="y.webp", is_published=True,
+        )
+        ClientShowcase.objects.create(
+            name="Скрытый видео", vehicle="Audi", legacy_image="z.webp",
+            rutube_url="https://rutube.ru/play/embed/4217e2a2d92bf8fa77e850b174dc72ab/",
+            is_published=False,
+        )
+
+        response = self.client.get(reverse("home"))
+
+        self.assertContains(response, visible.rutube_url)
+        self.assertNotContains(response, "Скрытый видео")
+
+    def test_home_hides_video_review_section_when_no_video_clients(self):
+        ClientShowcase.objects.create(
+            name="Только фото", vehicle="BMW", legacy_image="x.webp", is_published=True,
+        )
+
+        response = self.client.get(reverse("home"))
+
+        self.assertNotContains(response, "Отзывы о нашей работе")
+
+    def test_rutube_embed_url_rejects_non_rutube_host(self):
+        client = ClientShowcase(rutube_url="https://example.com/play/embed/b01059d843b5c69740fb2ae3d1cd682d/")
+        self.assertEqual(client.rutube_embed_url, "")

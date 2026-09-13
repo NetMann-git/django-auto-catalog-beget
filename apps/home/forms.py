@@ -1,3 +1,6 @@
+import re
+from urllib.parse import urlparse
+
 from django import forms
 
 from .models import ClientShowcase
@@ -6,14 +9,35 @@ from .models import ClientShowcase
 class ClientShowcaseForm(forms.ModelForm):
     class Meta:
         model = ClientShowcase
-        fields = ("name", "vehicle", "image", "sort_order", "is_published")
+        fields = ("name", "vehicle", "image", "rutube_url", "sort_order", "is_published")
         widgets = {
             "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Например, Александр"}),
             "vehicle": forms.TextInput(attrs={"class": "form-control", "placeholder": "Например, KIA Sorento"}),
             "image": forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*"}),
+            "rutube_url": forms.URLInput(attrs={"class": "form-control", "placeholder": "https://rutube.ru/video/.../"}),
             "sort_order": forms.NumberInput(attrs={"class": "form-control", "min": 0}),
             "is_published": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
+
+
+    def clean_rutube_url(self):
+        value = (self.cleaned_data.get("rutube_url") or "").strip()
+        if not value:
+            return ""
+
+        try:
+            parsed = urlparse(value)
+        except ValueError:
+            raise forms.ValidationError("Укажите корректную ссылку Rutube.")
+
+        if parsed.scheme not in {"http", "https"} or parsed.hostname not in {"rutube.ru", "www.rutube.ru"}:
+            raise forms.ValidationError("Допустима только ссылка на видео с rutube.ru.")
+
+        match = re.search(r"/(?:video|play/embed)/([0-9a-fA-F]{32})(?:/|$)", parsed.path)
+        if not match:
+            raise forms.ValidationError("Не удалось определить видео Rutube. Вставьте обычную ссылку на видео или embed-ссылку.")
+
+        return f"https://rutube.ru/play/embed/{match.group(1).lower()}/"
 
     def clean(self):
         cleaned = super().clean()

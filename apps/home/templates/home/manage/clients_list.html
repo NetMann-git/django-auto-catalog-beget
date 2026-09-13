@@ -69,6 +69,9 @@
     </div>
     <h2>{{ client.name }}</h2>
     <p>{{ client.vehicle }}</p>
+    {% if client.rutube_url %}
+    <div class="client-admin-card__video-status">▶ Есть видеоотзыв</div>
+    {% endif %}
     <small>Порядок: <span class="client-order-value">{{ client.sort_order }}</span></small>
     <div class="client-admin-card__actions">
      {% if sortable %}
