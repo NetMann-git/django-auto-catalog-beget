@@ -7,7 +7,7 @@ from django.urls import path
 from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime, timedelta
-from .models import Appointment, WorkingHours
+from .models import Appointment, WorkingHours, CallbackRequest
 
 
 class AppointmentAdminForm(forms.ModelForm):
@@ -160,3 +160,18 @@ class WorkingHoursAdmin(admin.ModelAdmin):
     def get_day_display(self, obj):
         return obj.get_day_of_week_display()
     get_day_display.short_description = 'День недели'
+
+
+@admin.register(CallbackRequest)
+class CallbackRequestAdmin(admin.ModelAdmin):
+    list_display = ('name', 'phone', 'status', 'source', 'created_at')
+    list_filter = ('status', 'source', 'created_at')
+    search_fields = ('name', 'phone')
+    readonly_fields = ('source', 'created_at', 'updated_at')
+    list_editable = ('status',)
+    ordering = ('-created_at',)
+
+    fieldsets = (
+        (None, {'fields': ('name', 'phone', 'status')}),
+        ('Служебная информация', {'fields': ('source', 'created_at', 'updated_at')}),
+    )

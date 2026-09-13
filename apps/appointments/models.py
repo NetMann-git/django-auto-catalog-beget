@@ -122,3 +122,40 @@ class WorkingHours(models.Model):
 
     def __str__(self):
         return f'{self.get_day_of_week_display()}: {self.start_time} - {self.end_time}'
+
+class CallbackRequest(models.Model):
+    """Заявка на обратный звонок с главной страницы."""
+
+    STATUS_NEW = 'new'
+    STATUS_PROCESSED = 'processed'
+    STATUS_CANCELLED = 'cancelled'
+    STATUS_CHOICES = [
+        (STATUS_NEW, 'Новая'),
+        (STATUS_PROCESSED, 'Обработана'),
+        (STATUS_CANCELLED, 'Отменена'),
+    ]
+
+    name = models.CharField(max_length=100, blank=True, verbose_name='Имя')
+    phone = models.CharField(max_length=30, verbose_name='Телефон')
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_NEW,
+        db_index=True,
+        verbose_name='Статус',
+    )
+    source = models.CharField(
+        max_length=100,
+        default='homepage',
+        verbose_name='Источник',
+    )
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Создана')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Изменена')
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Заявка на обратный звонок'
+        verbose_name_plural = 'Заявки на обратный звонок'
+
+    def __str__(self):
+        return f'{self.name or "Без имени"} — {self.phone}'

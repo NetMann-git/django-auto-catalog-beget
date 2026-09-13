@@ -1,6 +1,7 @@
 """Контекст главной страницы автомобильного каталога."""
 
 from apps.products.models import Brand
+from apps.appointments.forms import CallbackRequestForm
 from apps.products.repository import CatalogRepository
 from django.db.models import Q
 
@@ -52,4 +53,5 @@ class HomeContextBuilder:
             "clients": clients,
             "video_clients": video_clients,
             "wishlist_ids": wishlist_ids,
+            "callback_form": CallbackRequestForm(),
         }

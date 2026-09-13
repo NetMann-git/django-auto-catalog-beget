@@ -7,7 +7,7 @@ from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 
 from apps.products.models import Product
-from .forms import AppointmentForm
+from .forms import AppointmentForm, CallbackRequestForm
 
 from django.core.mail import send_mail
 from django.conf import settings
@@ -147,3 +147,48 @@ def appointment_submit(request):
 
     context = {'form': form}
     return render(request, 'appointments/appointment_form.html', context)
+
+@require_POST
+def callback_submit(request):
+    """Принимает короткую заявку на обратный звонок с главной страницы."""
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+
+    # Простое honeypot-поле: обычный посетитель его не видит и не заполняет.
+    if request.POST.get('website', '').strip():
+        message = 'Спасибо! Заявка принята. Мы свяжемся с вами в ближайшее время.'
+        if is_ajax:
+            return JsonResponse({'success': True, 'message': message})
+        messages.success(request, message)
+        return redirect(f"{reverse('home')}#callback")
+
+    form = CallbackRequestForm(request.POST)
+    if form.is_valid():
+        callback = form.save(commit=False)
+        callback.source = 'homepage'
+        callback.save()
+
+        message = 'Спасибо! Заявка принята. Мы свяжемся с вами в ближайшее время.'
+        if is_ajax:
+            return JsonResponse({'success': True, 'message': message})
+
+        messages.success(request, message)
+        return redirect(f"{reverse('home')}#callback")
+
+    errors = {
+        field: [str(error) for error in field_errors]
+        for field, field_errors in form.errors.items()
+    }
+
+    if is_ajax:
+        return JsonResponse(
+            {
+                'success': False,
+                'message': 'Проверьте заполнение формы.',
+                'errors': errors,
+            },
+            status=400,
+        )
+
+    first_error = next((items[0] for items in errors.values() if items), 'Проверьте заполнение формы.')
+    messages.error(request, first_error)
+    return redirect(f"{reverse('home')}#callback")

@@ -11,6 +11,7 @@
             <link href="{% static 'home/css/home-catalog.css' %}" rel="stylesheet">
             <link href="{% static 'home/css/home-clients.css' %}" rel="stylesheet">
             <link href="{% static 'home/css/home-reviews.css' %}" rel="stylesheet">
+            <link href="{% static 'home/css/home-callback.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block site_shell %}
@@ -61,6 +62,7 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'home/js/home-callback.js' %}" defer></script>
 <script>
 (function () {
     function loadHeroVideo() {

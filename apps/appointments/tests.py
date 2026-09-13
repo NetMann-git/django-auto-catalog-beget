@@ -8,7 +8,7 @@ from django.test import TestCase
 
 from apps.products.models import Product
 
-from .models import Appointment, WorkingHours
+from .models import Appointment, WorkingHours, CallbackRequest
 
 
 class AppointmentModelTests(TestCase):
@@ -131,3 +131,45 @@ class AvailableSlotsTests(TestCase):
         )
 
         self.assertTrue(free_slot["available"])
+
+class CallbackRequestTests(TestCase):
+    def test_callback_request_is_saved(self):
+        response = self.client.post(
+            '/appointments/callback-submit/',
+            {'name': 'Иван', 'phone': '+7 (999) 123-45-67'},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {
+            'success': True,
+            'message': 'Спасибо! Заявка принята. Мы свяжемся с вами в ближайшее время.',
+        })
+        self.assertEqual(CallbackRequest.objects.count(), 1)
+        callback = CallbackRequest.objects.get()
+        self.assertEqual(callback.name, 'Иван')
+        self.assertEqual(callback.phone, '+7 (999) 123-45-67')
+        self.assertEqual(callback.source, 'homepage')
+
+    def test_callback_request_rejects_invalid_phone(self):
+        response = self.client.post(
+            '/appointments/callback-submit/',
+            {'name': 'Иван', 'phone': '123'},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(response.json()['success'])
+        self.assertIn('phone', response.json()['errors'])
+        self.assertEqual(CallbackRequest.objects.count(), 0)
+
+    def test_honeypot_does_not_create_request(self):
+        response = self.client.post(
+            '/appointments/callback-submit/',
+            {'name': 'Bot', 'phone': '+79991234567', 'website': 'https://spam.example'},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['success'])
+        self.assertEqual(CallbackRequest.objects.count(), 0)

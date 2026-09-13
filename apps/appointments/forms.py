@@ -1,7 +1,7 @@
 # apps/appointments/forms.py
 
 from django import forms
-from .models import Appointment
+from .models import Appointment, CallbackRequest
 
 
 class AppointmentForm(forms.ModelForm):
@@ -31,3 +31,39 @@ class AppointmentForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Поле time будет заполняться через AJAX, пока оно disabled
         self.fields['time'].widget.attrs['disabled'] = 'disabled'
+
+class CallbackRequestForm(forms.ModelForm):
+    """Короткая форма обратного звонка для главной страницы."""
+
+    class Meta:
+        model = CallbackRequest
+        fields = ('name', 'phone')
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'home-callback__input',
+                'id': 'callback-name',
+                'autocomplete': 'name',
+                'placeholder': 'Ваше имя',
+                'maxlength': 100,
+            }),
+            'phone': forms.TextInput(attrs={
+                'class': 'home-callback__input',
+                'id': 'callback-phone',
+                'autocomplete': 'tel',
+                'inputmode': 'tel',
+                'placeholder': 'Номер тел.',
+                'maxlength': 30,
+            }),
+        }
+
+    def clean_name(self):
+        return self.cleaned_data.get('name', '').strip()
+
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone', '').strip()
+        digits = ''.join(ch for ch in phone if ch.isdigit())
+        if len(digits) < 10:
+            raise forms.ValidationError('Введите корректный номер телефона.')
+        if len(digits) > 15:
+            raise forms.ValidationError('Номер телефона слишком длинный.')
+        return phone
