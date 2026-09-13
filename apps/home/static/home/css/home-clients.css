@@ -30,22 +30,18 @@
 #klienty .client-showcase-card__media {
     position: relative;
     width: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 3 / 4;
     overflow: hidden;
-    background: #e9e9e9;
+    background: #f3f3f3;
 }
 
 #klienty .client-showcase-card__image {
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     object-position: center;
     transition: transform .35s ease;
-}
-
-#klienty .client-showcase-card:hover .client-showcase-card__image {
-    transform: scale(1.025);
 }
 
 #klienty .client-showcase-card__content {
@@ -133,7 +129,7 @@
     }
 
     #klienty .client-showcase-card__media {
-        aspect-ratio: 16 / 11;
+        aspect-ratio: 3 / 4;
     }
 
     #klienty .client-showcase-card__content {
@@ -160,6 +156,6 @@
     }
 
     #klienty .client-showcase-card__media {
-        aspect-ratio: 4 / 3;
+        aspect-ratio: 3 / 4;
     }
 }
