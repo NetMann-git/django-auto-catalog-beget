@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Наша команда — управление{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'home/css/client-manage.css' %}">{% endblock %}
+
+{% block content %}
+<div class="client-manage">
+ <div class="client-manage__header">
+  <div><h1>Наша команда</h1><p>Сотрудники секции «Наша команда» на главной странице. Всего: {{ total }}.</p></div>
+  <a class="client-btn client-btn--primary" href="{% url 'home:team_create' %}">+ Добавить сотрудника</a>
+ </div>
+
+ <form class="client-filters" method="get">
+  <input type="search" name="search" value="{{ search }}" placeholder="Имя или должность">
+  <select name="status">
+   <option value=""{% if not status %} selected{% endif %}>Все статусы</option>
+   <option value="published"{% if status == 'published' %} selected{% endif %}>Опубликованные</option>
+   <option value="hidden"{% if status == 'hidden' %} selected{% endif %}>Снятые с публикации</option>
+  </select>
+  <button class="client-btn" type="submit">Найти</button>
+  {% if search or status %}<a class="client-btn client-btn--light" href="{% url 'home:team_list_manage' %}">Сбросить</a>{% endif %}
+ </form>
+
+ {% if sortable and members %}
+ <div class="client-sort-help">
+  <span class="client-sort-help__icon">↕</span>
+  <div><strong>Порядок сотрудников можно менять мышкой.</strong><span>Перетащите карточку за область с точками. Новый порядок сохраняется автоматически.</span></div>
+  <span class="client-sort-status" id="team-sort-status" aria-live="polite"></span>
+ </div>
+ {% elif search or status %}
+ <div class="client-sort-help client-sort-help--disabled">Сортировка перетаскиванием доступна в полном списке. Сбросьте поиск и фильтры.</div>
+ {% endif %}
+
+ {% if members %}
+ <div class="client-grid{% if sortable %} client-grid--sortable{% endif %}" id="team-sortable"{% if sortable %} data-reorder-url="{% url 'home:team_reorder' %}" data-csrf-token="{{ csrf_token }}"{% endif %}>
+  {% for member in members %}
+  <article class="client-admin-card" data-member-id="{{ member.id }}">
+   {% if sortable %}<div class="client-admin-card__drag" draggable="true" title="Перетащить карточку"><span>⠿</span><small>Перетащить</small></div>{% endif %}
+   <div class="client-admin-card__image">
+    {% if member.image %}<img src="{{ member.image.url }}" alt="{{ member.name }}">
+    {% elif member.legacy_image %}<img src="{% static member.legacy_image %}" alt="{{ member.name }}">
+    {% else %}<span class="client-admin-card__placeholder">Нет фото</span>{% endif %}
+   </div>
+   <div class="client-admin-card__body">
+    <div class="client-admin-card__status {% if member.is_published %}is-published{% else %}is-hidden{% endif %}">{% if member.is_published %}Опубликован{% else %}Не опубликован{% endif %}</div>
+    <h2>{{ member.name }}</h2><p>{{ member.position }}</p>
+    <small>Порядок: <span class="team-order-value">{{ member.sort_order }}</span></small>
+    <div class="client-admin-card__actions">
+     {% if sortable %}<div class="client-admin-card__move-actions">
+      {% if not forloop.first %}<form method="post" action="{% url 'home:team_move' member.id %}">{% csrf_token %}<input type="hidden" name="direction" value="up"><input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="client-btn client-btn--move" type="submit">↑ Выше</button></form>{% endif %}
+      {% if not forloop.last %}<form method="post" action="{% url 'home:team_move' member.id %}">{% csrf_token %}<input type="hidden" name="direction" value="down"><input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="client-btn client-btn--move" type="submit">↓ Ниже</button></form>{% endif %}
+     </div>{% endif %}
+     <a class="client-btn" href="{% url 'home:team_edit' member.id %}">Редактировать</a>
+     <form method="post" action="{% url 'home:team_toggle_published' member.id %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="client-btn {% if member.is_published %}client-btn--warning{% else %}client-btn--success{% endif %}" type="submit">{% if member.is_published %}Снять с публикации{% else %}Опубликовать{% endif %}</button></form>
+     <form method="post" action="{% url 'home:team_delete' member.id %}" class="team-delete-form" data-member-name="{{ member.name|escape }}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="client-btn client-btn--danger" type="submit">Удалить</button></form>
+    </div>
+   </div>
+  </article>
+  {% endfor %}
+ </div>
+ {% else %}<div class="client-empty">Сотрудники не найдены.</div>{% endif %}
+ <p class="client-manage__back"><a href="{% url 'users:dashboard' %}">← Вернуться в личный кабинет</a></p>
+</div>
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'home/js/team-manage.js' %}" defer></script>{% endblock %}

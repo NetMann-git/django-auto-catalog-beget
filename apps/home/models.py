@@ -67,3 +67,42 @@ class ClientShowcase(models.Model):
             return ""
 
         return f"https://rutube.ru/play/embed/{match.group(1).lower()}/"
+
+
+class TeamMember(models.Model):
+    """Сотрудник для секции «Наша команда» на главной странице."""
+
+    name = models.CharField(max_length=120, verbose_name="Имя")
+    position = models.CharField(max_length=180, verbose_name="Должность")
+    image = models.ImageField(
+        upload_to="home/team/%Y/%m/",
+        blank=True,
+        verbose_name="Фотография",
+    )
+    legacy_image = models.CharField(
+        max_length=255,
+        blank=True,
+        editable=False,
+        verbose_name="Старое статическое изображение",
+    )
+    sort_order = models.PositiveIntegerField(
+        default=100,
+        db_index=True,
+        verbose_name="Порядок вывода",
+        help_text="Чем меньше число, тем раньше сотрудник показывается.",
+    )
+    is_published = models.BooleanField(default=True, db_index=True, verbose_name="Опубликован")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создан")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Изменён")
+
+    class Meta:
+        ordering = ("sort_order", "id")
+        verbose_name = "Сотрудник команды"
+        verbose_name_plural = "Команда"
+
+    def __str__(self):
+        return f"{self.name} — {self.position}"
+
+    @property
+    def has_image(self):
+        return bool(self.image or self.legacy_image)

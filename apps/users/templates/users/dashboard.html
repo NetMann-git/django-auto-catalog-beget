@@ -49,6 +49,14 @@
         </div>
     {% endif %}
 
+    <!-- Управление секцией «Наша команда» для менеджера, администратора и superuser -->
+    {% if user.is_superuser or user.profile.role == 'manager' or user.profile.role == 'admin' %}
+        <div style="margin: 20px 0; padding: 15px; background: #f7f2e7; border-radius: 8px; border-left: 4px solid #9b762d;">
+            <a href="{% url 'home:team_list_manage' %}" style="color: #79591f; font-weight: bold; font-size: 18px; text-decoration: none;">👤 Наша команда</a>
+            <span style="color: #666; margin-left: 15px; font-size: 14px;">(сотрудники, порядок и публикация)</span>
+        </div>
+    {% endif %}
+
     <div class="dashboard-stats">
         <div class="stat-card">
             <span class="stat-number">{{ appointments_count }}</span>

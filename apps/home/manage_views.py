@@ -9,8 +9,8 @@ from django.views.decorators.http import require_POST
 from apps.users.constants import ROLE_ADMIN, ROLE_MANAGER
 from apps.users.decorators import role_required
 
-from .forms import ClientShowcaseForm
-from .models import ClientShowcase
+from .forms import ClientShowcaseForm, TeamMemberForm
+from .models import ClientShowcase, TeamMember
 
 
 @role_required(ROLE_MANAGER, ROLE_ADMIN)
@@ -182,3 +182,149 @@ def client_delete(request, client_id):
     client.delete()
     messages.success(request, f'Клиент «{client_name}» удалён.')
     return redirect(request.POST.get("next") or "home:client_list_manage")
+
+
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
+def team_list_manage(request):
+    members = TeamMember.objects.all()
+
+    search = request.GET.get("search", "").strip()
+    status = request.GET.get("status", "").strip()
+
+    if search:
+        members = members.filter(Q(name__icontains=search) | Q(position__icontains=search))
+
+    if status == "published":
+        members = members.filter(is_published=True)
+    elif status == "hidden":
+        members = members.filter(is_published=False)
+
+    total = members.count()
+    sortable = not search and not status
+
+    return render(
+        request,
+        "home/manage/team_list.html",
+        {
+            "members": members,
+            "total": total,
+            "search": search,
+            "status": status,
+            "sortable": sortable,
+        },
+    )
+
+
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
+def team_create(request):
+    if request.method == "POST":
+        form = TeamMemberForm(request.POST, request.FILES)
+        if form.is_valid():
+            member = form.save()
+            messages.success(request, f'Сотрудник «{member.name}» добавлен.')
+            return redirect("home:team_list_manage")
+    else:
+        next_order = (TeamMember.objects.order_by("-sort_order").values_list("sort_order", flat=True).first() or 0) + 10
+        form = TeamMemberForm(initial={"sort_order": next_order, "is_published": True})
+
+    return render(request, "home/manage/team_form.html", {"form": form, "title": "Добавить сотрудника"})
+
+
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
+def team_edit(request, member_id):
+    member = get_object_or_404(TeamMember, pk=member_id)
+
+    if request.method == "POST":
+        form = TeamMemberForm(request.POST, request.FILES, instance=member)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Сотрудник «{member.name}» обновлён.')
+            return redirect("home:team_list_manage")
+    else:
+        form = TeamMemberForm(instance=member)
+
+    return render(request, "home/manage/team_form.html", {"form": form, "member": member, "title": "Редактировать сотрудника"})
+
+
+@require_POST
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
+def team_toggle_published(request, member_id):
+    member = get_object_or_404(TeamMember, pk=member_id)
+    member.is_published = not member.is_published
+    member.save(update_fields=("is_published", "updated_at"))
+    state = "опубликован" if member.is_published else "снят с публикации"
+    messages.success(request, f'Сотрудник «{member.name}» {state}.')
+    return redirect(request.POST.get("next") or "home:team_list_manage")
+
+
+@require_POST
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
+def team_move(request, member_id):
+    direction = request.POST.get("direction")
+    if direction not in {"up", "down"}:
+        messages.error(request, "Некорректное направление перемещения.")
+        return redirect("home:team_list_manage")
+
+    ordered = list(TeamMember.objects.order_by("sort_order", "id"))
+    current_index = next((i for i, item in enumerate(ordered) if item.pk == member_id), None)
+    if current_index is None:
+        messages.error(request, "Сотрудник не найден.")
+        return redirect("home:team_list_manage")
+
+    target_index = current_index - 1 if direction == "up" else current_index + 1
+    if not 0 <= target_index < len(ordered):
+        return redirect(request.POST.get("next") or "home:team_list_manage")
+
+    ordered[current_index], ordered[target_index] = ordered[target_index], ordered[current_index]
+    changed = []
+    with transaction.atomic():
+        for position, member in enumerate(ordered, start=1):
+            new_order = position * 10
+            if member.sort_order != new_order:
+                member.sort_order = new_order
+                changed.append(member)
+        if changed:
+            TeamMember.objects.bulk_update(changed, ("sort_order",))
+
+    messages.success(request, "Порядок сотрудников изменён.")
+    return redirect(request.POST.get("next") or "home:team_list_manage")
+
+
+@require_POST
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
+def team_reorder(request):
+    raw_ids = request.POST.get("ordered_ids", "")
+    try:
+        ordered_ids = [int(value) for value in raw_ids.split(",") if value.strip()]
+    except ValueError:
+        return JsonResponse({"ok": False, "error": "Некорректный порядок сотрудников."}, status=400)
+
+    current_ids = list(TeamMember.objects.values_list("id", flat=True))
+    if len(ordered_ids) != len(current_ids) or set(ordered_ids) != set(current_ids):
+        return JsonResponse({"ok": False, "error": "Список сотрудников изменился. Обновите страницу и повторите."}, status=409)
+
+    members_by_id = TeamMember.objects.in_bulk(ordered_ids)
+    changed = []
+    with transaction.atomic():
+        for position, member_id in enumerate(ordered_ids, start=1):
+            member = members_by_id[member_id]
+            new_order = position * 10
+            if member.sort_order != new_order:
+                member.sort_order = new_order
+                changed.append(member)
+        if changed:
+            TeamMember.objects.bulk_update(changed, ("sort_order",))
+
+    return JsonResponse({"ok": True, "updated": len(changed)})
+
+
+@require_POST
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
+def team_delete(request, member_id):
+    member = get_object_or_404(TeamMember, pk=member_id)
+    name = member.name
+    if member.image:
+        member.image.delete(save=False)
+    member.delete()
+    messages.success(request, f'Сотрудник «{name}» удалён.')
+    return redirect(request.POST.get("next") or "home:team_list_manage")

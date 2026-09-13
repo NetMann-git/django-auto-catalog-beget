@@ -3,7 +3,7 @@ from urllib.parse import urlparse
 
 from django import forms
 
-from .models import ClientShowcase
+from .models import ClientShowcase, TeamMember
 
 
 class ClientShowcaseForm(forms.ModelForm):
@@ -39,3 +39,26 @@ class ClientShowcaseForm(forms.ModelForm):
 
         return f"https://rutube.ru/play/embed/{match.group(1).lower()}/"
 
+
+
+class TeamMemberForm(forms.ModelForm):
+    class Meta:
+        model = TeamMember
+        fields = ("name", "position", "image", "sort_order", "is_published")
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Например, Иван"}),
+            "position": forms.TextInput(attrs={"class": "form-control", "placeholder": "Например, Главный менеджер"}),
+            "image": forms.ClearableFileInput(attrs={"class": "form-control", "accept": "image/*"}),
+            "sort_order": forms.NumberInput(attrs={"class": "form-control", "min": 0}),
+            "is_published": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
+
+    def clean(self):
+        cleaned = super().clean()
+        image = cleaned.get("image")
+        has_existing = bool(self.instance and self.instance.pk and self.instance.has_image)
+        if image is False:
+            self.add_error("image", "У сотрудника должна оставаться фотография. Загрузите новую вместо удаления.")
+        elif not image and not has_existing:
+            self.add_error("image", "Добавьте фотографию сотрудника.")
+        return cleaned

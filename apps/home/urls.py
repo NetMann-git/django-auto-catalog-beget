@@ -5,6 +5,13 @@ from . import manage_views
 app_name = "home"
 
 urlpatterns = [
+    path("team/", manage_views.team_list_manage, name="team_list_manage"),
+    path("team/create/", manage_views.team_create, name="team_create"),
+    path("team/reorder/", manage_views.team_reorder, name="team_reorder"),
+    path("team/<int:member_id>/move/", manage_views.team_move, name="team_move"),
+    path("team/<int:member_id>/edit/", manage_views.team_edit, name="team_edit"),
+    path("team/<int:member_id>/toggle-published/", manage_views.team_toggle_published, name="team_toggle_published"),
+    path("team/<int:member_id>/delete/", manage_views.team_delete, name="team_delete"),
     path("clients/", manage_views.client_list_manage, name="client_list_manage"),
     path("clients/create/", manage_views.client_create, name="client_create"),
     path("clients/reorder/", manage_views.client_reorder, name="client_reorder"),

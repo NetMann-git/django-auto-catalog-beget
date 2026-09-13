@@ -7,7 +7,7 @@ from django.urls import reverse
 
 from apps.users.constants import ROLE_CUSTOMER, ROLE_MANAGER
 
-from .models import ClientShowcase
+from .models import ClientShowcase, TeamMember
 
 
 class ClientShowcaseTests(TestCase):
@@ -180,3 +180,45 @@ class ClientMediaRulesTests(TestCase):
         self.assertIn(photo_only, context["clients"])
         self.assertNotIn(video_only, context["clients"])
         self.assertIn(video_only, context["video_clients"])
+
+
+class TeamMemberTests(TestCase):
+    def create_user(self, username, role):
+        user = get_user_model().objects.create_user(username=username, password="testpass123")
+        user.profile.role = role
+        user.profile.save(update_fields=("role",))
+        return user
+
+    def test_home_shows_only_published_team_members(self):
+        TeamMember.objects.create(name="Виден", position="Менеджер", legacy_image="x.webp", is_published=True)
+        TeamMember.objects.create(name="Скрыт", position="Менеджер", legacy_image="y.webp", is_published=False)
+        response = self.client.get(reverse("home"))
+        self.assertContains(response, "Виден")
+        self.assertNotContains(response, "Скрыт")
+
+    def test_manager_can_open_team_management(self):
+        user = self.create_user("manager_team", ROLE_MANAGER)
+        self.client.force_login(user)
+        response = self.client.get(reverse("home:team_list_manage"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_customer_cannot_open_team_management(self):
+        user = self.create_user("customer_team", ROLE_CUSTOMER)
+        self.client.force_login(user)
+        response = self.client.get(reverse("home:team_list_manage"))
+        self.assertEqual(response.status_code, 302)
+
+    def test_manager_can_move_team_member(self):
+        first = TeamMember.objects.create(name="Первый", position="Менеджер", legacy_image="a.webp", sort_order=10)
+        second = TeamMember.objects.create(name="Второй", position="Менеджер", legacy_image="b.webp", sort_order=20)
+        user = self.create_user("manager_team_move", ROLE_MANAGER)
+        self.client.force_login(user)
+        response = self.client.post(reverse("home:team_move", args=[first.id]), {"direction": "down"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(list(TeamMember.objects.values_list("id", flat=True)), [second.id, first.id])
+
+    def test_superuser_can_open_team_management(self):
+        user = get_user_model().objects.create_superuser(username="root_team", email="root-team@example.com", password="testpass123")
+        self.client.force_login(user)
+        response = self.client.get(reverse("home:team_list_manage"))
+        self.assertEqual(response.status_code, 200)
