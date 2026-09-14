@@ -221,7 +221,7 @@
 /* Joomla SPPB row-container: 540 / 720 / 960 / 1140 px + 15px gutters. */
 .home-korea-facts__grid {
     width: 100%;
-    max-width: 1140px;
+    max-width: 1311px;
     margin-right: auto;
     margin-left: auto;
     padding-right: 15px;
@@ -370,13 +370,13 @@
 
 @media (max-width: 1199.98px) {
     .home-korea-facts__grid {
-        max-width: 960px;
+        max-width: 1104px;
     }
 }
 
 @media (max-width: 991.98px) {
     .home-korea-facts__grid {
-        max-width: 720px;
+        max-width: 828px;
     }
 }
 
@@ -386,7 +386,7 @@
     }
 
     .home-korea-facts__grid {
-        max-width: 540px;
+        max-width: 621px;
         grid-template-columns: 1fr;
     }
 
