@@ -3,28 +3,22 @@
     color: #464855;
 }
 
-.home-delivery__heading-wrap,
-.home-delivery__timeline-inner {
-    width: 100%;
-    margin: 0;
-    padding-left: clamp(24px, 4vw, 72px);
-    padding-right: clamp(24px, 4vw, 72px);
+/* Заголовочная часть повторяет Joomla: обычный центрированный контейнер 1200 px. */
+.home-delivery__heading-wrap {
+    width: min(calc(100% - 30px), 1200px);
+    margin: 0 auto;
+    padding: 70px 0 20px;
     box-sizing: border-box;
 }
 
-.home-delivery__heading-wrap {
-    padding: 70px 0 20px;
-}
-
 .home-delivery__heading {
-    width: 100%;
-    max-width: 1500px;
+    width: 75%;
 }
 
 .home-delivery__divider {
     display: block;
     width: 67px;
-    margin: 0 0 5px;
+    margin: -10px 0 5px;
     border-top: 1px solid #001334;
 }
 
@@ -37,35 +31,53 @@
 .home-delivery__title {
     margin: 0 0 30px;
     color: #001334;
-    font: 400 45px/1.15 Verdana, sans-serif;
+    font-family: Verdana, sans-serif;
+    font-size: 45px;
+    font-weight: 400;
+    line-height: 1.15;
 }
 
+/* Основной блок в оригинале Joomla не ограничен контейнером 1200 px. */
 .home-delivery__timeline {
     padding: 20px 0 100px;
     background: #f2f2f2;
+    overflow: hidden;
 }
 
 .home-delivery__timeline-inner {
+    width: calc(100% + 63px);
+    margin-left: -31.5px;
+    margin-right: -31.5px;
     display: grid;
-    grid-template-columns: minmax(0, 1.62fr) minmax(420px, .98fr);
+    grid-template-columns: 50% 50%;
     align-items: center;
-    column-gap: clamp(28px, 3vw, 60px);
+    box-sizing: border-box;
+}
+
+.home-delivery__image-wrap,
+.home-delivery__steps {
+    min-width: 0;
+    padding-left: 31.5px;
+    padding-right: 31.5px;
+    box-sizing: border-box;
 }
 
 .home-delivery__image-wrap {
-    min-width: 0;
     text-align: center;
 }
 
 .home-delivery__image {
     display: block;
     width: 100%;
+    max-width: none;
     height: auto;
+    margin: 0;
 }
 
+/* В Joomla правая колонка имела ещё по 50 px внутреннего отступа. */
 .home-delivery__steps {
-    min-width: 0;
-    padding: 0;
+    padding-left: 81.5px;
+    padding-right: 81.5px;
 }
 
 .home-delivery__step {
@@ -100,13 +112,13 @@
 
 .home-delivery__step-title {
     margin: 0 0 10px;
-    padding: 2px 0 1px;
+    padding: 1px 0 2px;
     overflow: visible;
     color: #0f284d;
     font-family: Verdana, sans-serif;
     font-size: 21px;
     font-weight: 700;
-    line-height: 1.45;
+    line-height: 1.35;
 }
 
 .home-delivery__step-text {
@@ -156,8 +168,13 @@
 }
 
 @media (max-width: 1199.98px) {
-    .home-delivery__timeline-inner {
-        grid-template-columns: minmax(0, 1.35fr) minmax(360px, 1fr);
+    .home-delivery__heading-wrap {
+        width: min(calc(100% - 30px), 1140px);
+    }
+
+    .home-delivery__steps {
+        padding-left: 56.5px;
+        padding-right: 56.5px;
     }
 
     .home-delivery__step {
@@ -165,16 +182,20 @@
     }
 }
 
-
 @media (max-width: 991.98px) {
-    .home-delivery__timeline-inner {
-        grid-template-columns: 1fr 1fr;
-        column-gap: 24px;
+    .home-delivery__heading-wrap {
+        width: min(calc(100% - 30px), 960px);
+    }
+
+    .home-delivery__steps {
+        padding-left: 31.5px;
+        padding-right: 31.5px;
     }
 }
 
 @media (max-width: 767.98px) {
     .home-delivery__heading-wrap {
+        width: calc(100% - 30px);
         padding: 50px 0 20px;
     }
 
@@ -192,16 +213,21 @@
     }
 
     .home-delivery__timeline-inner {
+        width: 100%;
+        margin: 0;
         grid-template-columns: 1fr;
         row-gap: 20px;
     }
 
-    .home-delivery__image-wrap {
-        margin-top: -60px;
+    .home-delivery__image-wrap,
+    .home-delivery__steps {
+        padding-left: 15px;
+        padding-right: 15px;
     }
 
-    .home-delivery__steps {
-        padding: 0;
+    .home-delivery__image-wrap {
+        margin-top: -60px;
+        padding-left: 0;
     }
 
     .home-delivery__step {
@@ -213,7 +239,6 @@
     }
 
     .home-delivery__step-title {
-        padding-top: 2px;
         font-size: 16px;
         line-height: 26px;
     }
@@ -229,11 +254,8 @@
 }
 
 @media (max-width: 575.98px) {
-    .home-delivery__heading-wrap,
-    .home-delivery__timeline-inner {
-        width: 100%;
-        padding-left: 12px;
-        padding-right: 12px;
+    .home-delivery__heading-wrap {
+        width: calc(100% - 24px);
     }
 
     .home-delivery__title {
