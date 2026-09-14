@@ -1,0 +1,235 @@
+.home-delivery {
+    background: #f2f2f2;
+    color: #464855;
+}
+
+.home-delivery__heading-wrap,
+.home-delivery__timeline-inner {
+    width: min(calc(100% - 30px), 1200px);
+    margin: 0 auto;
+}
+
+.home-delivery__heading-wrap {
+    padding: 70px 0 20px;
+}
+
+.home-delivery__heading {
+    width: 75%;
+}
+
+.home-delivery__divider {
+    display: block;
+    width: 67px;
+    margin: 0 0 5px;
+    border-top: 1px solid #001334;
+}
+
+.home-delivery__eyebrow {
+    margin: 0 0 10px;
+    color: #001334;
+    font: 400 18px/26px Verdana, sans-serif;
+}
+
+.home-delivery__title {
+    margin: 0 0 30px;
+    color: #001334;
+    font: 400 45px/1.15 Verdana, sans-serif;
+}
+
+.home-delivery__timeline {
+    padding: 20px 0 100px;
+    background: #f2f2f2;
+}
+
+.home-delivery__timeline-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    column-gap: 63px;
+}
+
+.home-delivery__image-wrap {
+    min-width: 0;
+    text-align: center;
+}
+
+.home-delivery__image {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.home-delivery__steps {
+    min-width: 0;
+    padding: 0 50px;
+}
+
+.home-delivery__step {
+    display: grid;
+    grid-template-columns: 27px minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+    margin: 0;
+    padding: 35px 30px;
+    background: #fff;
+    color: #001334;
+    box-shadow: 6px 9px 27px 1px rgba(0, 0, 0, .18);
+    transition: box-shadow .3s ease;
+}
+
+.home-delivery__step + .home-delivery__step {
+    margin-top: 30px;
+}
+
+.home-delivery__step:hover {
+    box-shadow: 0 0 0 0 #fff;
+}
+
+.home-delivery__step-icon {
+    width: 27px;
+    height: 27px;
+    color: #f50000;
+    font-size: 27px;
+    line-height: 27px;
+    text-align: center;
+}
+
+.home-delivery__step-title {
+    margin: 0 0 10px;
+    color: #0f284d;
+    font: 700 21px/1.15 Verdana, sans-serif;
+}
+
+.home-delivery__step-text {
+    margin: 0;
+    color: #001334;
+    font: 400 16px/21px Verdana, sans-serif;
+}
+
+.home-delivery-access {
+    position: relative;
+    padding: 153px 0;
+    background: url("/static/home/images/2025/09/01/exclisivecars.webp") no-repeat 50% 100% / cover fixed;
+    color: #fff;
+}
+
+.home-delivery-access__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, .45);
+}
+
+.home-delivery-access__container {
+    position: relative;
+    z-index: 1;
+    width: min(calc(100% - 30px), 1200px);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 25% 75%;
+}
+
+.home-delivery-access__content {
+    grid-column: 2;
+    text-align: right;
+}
+
+.home-delivery-access__title {
+    margin: 0 0 10px;
+    color: #fff;
+    font: 900 54px/1 Verdana, sans-serif;
+    letter-spacing: -1px;
+}
+
+.home-delivery-access__text {
+    margin: 0;
+    color: #fff;
+    font: 100 21px/1.25 Verdana, sans-serif;
+}
+
+@media (max-width: 1199.98px) {
+    .home-delivery__steps {
+        padding: 0 25px;
+    }
+
+    .home-delivery__step {
+        padding: 25px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .home-delivery__heading-wrap {
+        padding: 50px 0 20px;
+    }
+
+    .home-delivery__heading {
+        width: 100%;
+    }
+
+    .home-delivery__title {
+        margin-bottom: 10px;
+        font-size: 30px;
+    }
+
+    .home-delivery__timeline {
+        padding: 20px 0 60px;
+    }
+
+    .home-delivery__timeline-inner {
+        grid-template-columns: 1fr;
+        row-gap: 20px;
+    }
+
+    .home-delivery__image-wrap {
+        margin-top: -60px;
+    }
+
+    .home-delivery__steps {
+        padding: 0;
+    }
+
+    .home-delivery__step {
+        padding: 25px;
+    }
+
+    .home-delivery__step + .home-delivery__step {
+        margin-top: 10px;
+    }
+
+    .home-delivery__step-title {
+        font-size: 16px;
+        line-height: 26px;
+    }
+
+    .home-delivery__step-text {
+        font-size: 15px;
+        line-height: 25px;
+    }
+
+    .home-delivery-access {
+        display: none;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .home-delivery__heading-wrap,
+    .home-delivery__timeline-inner {
+        width: min(calc(100% - 24px), 1200px);
+    }
+
+    .home-delivery__title {
+        font-size: 26px;
+    }
+
+    .home-delivery__step {
+        grid-template-columns: 24px minmax(0, 1fr);
+        gap: 14px;
+        padding: 20px;
+    }
+
+    .home-delivery__step-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 24px;
+        line-height: 24px;
+    }
+}
