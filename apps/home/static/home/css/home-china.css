@@ -1,0 +1,19 @@
+.home-china { margin:0; background:#fff; }
+.home-china__heading-container { width:min(calc(100% - 30px),1200px); margin:0 auto; padding:100px 15px 70px; box-sizing:border-box; }
+.home-china__title { margin:0; padding:0 0 30px; color:#d3d3d3; text-align:right; font-family:Verdana,sans-serif; font-size:93px; font-weight:900; line-height:1.08; }
+.home-china__body { display:grid; grid-template-columns:50% 50%; align-items:center; width:100%; margin:0; padding:0 0 50px; background:#f50000; overflow:hidden; }
+.home-china__image-wrap { min-width:0; margin-top:-170px; text-align:center; overflow:visible; }
+.home-china__image { display:block; width:899px; max-width:899px; height:auto; margin:0 auto; transform-origin:50% 50%; transition:transform .5s ease; }
+.home-china__image-wrap:hover .home-china__image { transform:scale(2); }
+.home-china__content { min-width:0; padding:0 70px 0 0; color:#000; text-align:right; box-sizing:border-box; }
+.home-china__divider { width:67px; margin:20px 0 0 auto; border-bottom:1px solid #000; }
+.home-china__subtitle { margin:0 0 10px; padding:0; color:#282828; text-align:right; font-family:Verdana,sans-serif; font-size:25px; font-weight:400; line-height:36px; }
+.home-china__text { margin:0; color:#000; text-align:right; font-family:Verdana,sans-serif; font-size:15px; line-height:1.5; }
+@media(max-width:1199.98px){
+.home-china__title{font-size:120px}.home-china__image-wrap{margin-top:-120px}.home-china__image{width:650px;max-width:650px}.home-china__subtitle{margin-bottom:20px}}
+@media(max-width:991.98px){.home-china__title{font-size:88px}.home-china__content{padding-right:35px}}
+@media(max-width:767.98px){
+.home-china__heading-container{width:calc(100% - 30px);padding:30px 15px}.home-china__title{margin-bottom:30px;padding-bottom:30px;font-size:50px}
+.home-china__body{grid-template-columns:1fr;padding-bottom:50px}.home-china__image-wrap{margin-top:-60px;margin-bottom:10px;text-align:left}
+.home-china__image{width:681px;max-width:681px;margin-left:0}.home-china__content{padding:0 15px}.home-china__divider{margin-top:20px;margin-bottom:5px}.home-china__subtitle{margin-bottom:20px}}
+@media(max-width:575.98px){.home-china__heading-container{width:calc(100% - 24px);padding-right:12px;padding-left:12px}.home-china__image{width:399px;max-width:399px}}
