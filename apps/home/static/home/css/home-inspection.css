@@ -213,84 +213,146 @@
 }
 
 .home-korea-facts {
-    padding: 100px 0;
+    padding: 100px 50px;
     background: #2b2b2b;
-    color: #f2f2f2;
+    color: #464855;
 }
 
 .home-korea-facts__grid {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
     display: grid;
-    grid-template-columns: minmax(210px, 25%) minmax(0, 75%);
-    gap: 50px;
+    grid-template-columns: minmax(0, 25%) minmax(0, 75%);
+    gap: 0;
+    align-items: center;
 }
 
 .home-korea-facts__aside {
-    padding-top: 35px;
+    align-self: stretch;
+    padding: 50px 35px 35px;
+    background: #f50000;
+    color: #fff;
 }
 
 .home-korea-facts__aside > span {
     display: block;
-    margin-bottom: 16px;
-    font: 700 23px/1.25 Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #f2f2f2;
+    font-family: Verdana, sans-serif;
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 42px;
+    text-transform: uppercase;
 }
 
-.home-korea-facts__aside > span:nth-child(2) { opacity: .78; }
-.home-korea-facts__aside > span:nth-child(3) { opacity: .58; }
-.home-korea-facts__aside > span:nth-child(4) { opacity: .42; }
+.home-korea-facts__aside > span:nth-child(1) {
+    opacity: .3;
+    letter-spacing: 2px;
+}
+
+.home-korea-facts__aside > span:nth-child(2) {
+    opacity: .5;
+    letter-spacing: 2px;
+}
+
+.home-korea-facts__aside > span:nth-child(3) {
+    opacity: .8;
+    letter-spacing: 3px;
+}
+
+.home-korea-facts__aside > span:nth-child(4) {
+    opacity: 1;
+    letter-spacing: 4px;
+}
 
 .home-korea-facts__aside p {
-    margin: 32px 0 0;
-    font: 14px/1.55 Verdana, sans-serif;
-    opacity: .85;
+    margin: 20px 0 70px;
+    color: #fff;
+    font-family: Verdana, sans-serif;
+    font-size: 15px;
+    font-weight: 200;
+    line-height: 1.5;
+}
+
+.home-korea-facts__content {
+    min-width: 0;
 }
 
 .home-korea-facts__divider {
-    margin-left: auto;
+    width: 67px;
+    margin: -10px 0 5px auto;
+    border-top: 1px solid #f2f2f2;
 }
 
 .home-korea-facts__eyebrow {
     margin: 0 0 10px;
-    text-align: right;
-    font: 18px/26px Verdana, sans-serif;
+    color: #f2f2f2;
     opacity: .8;
+    text-align: right;
+    font-family: Verdana, sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 26px;
 }
 
 .home-korea-facts__title {
-    margin: 0 0 30px auto;
-    max-width: 900px;
-    text-align: right;
-    font: 700 45px/1.12 Verdana, sans-serif;
+    margin: 0 0 30px;
+    padding: 0;
     color: #f2f2f2;
+    text-align: right;
+    font-family: Verdana, sans-serif;
+    font-size: 45px;
+    font-weight: 400;
+    line-height: normal;
 }
 
 .home-korea-facts__tabs {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 30px;
+    width: fit-content;
+    margin: 0 0 30px;
+    padding: 0;
+    gap: 0;
 }
 
 .home-korea-facts__tab {
     appearance: none;
-    border: 1px solid rgba(242, 242, 242, .55);
-    padding: 0 14px;
     min-height: 41px;
+    margin: 0 15px 0 6px;
+    padding: 0 15px 0 6px;
+    border: 1px solid #f2f2f2;
+    border-radius: 0;
     background: transparent;
+    box-shadow: none;
     color: #f2f2f2;
-    font: 16px/1.2 Verdana, sans-serif;
+    font-family: Verdana, sans-serif;
+    font-size: 16px;
+    font-weight: 100;
+    line-height: 39px;
     cursor: pointer;
-    transition: background .2s ease, border-color .2s ease;
 }
 
 .home-korea-facts__tab:hover,
 .home-korea-facts__tab:focus-visible,
 .home-korea-facts__tab.is-active {
     background: #565656;
-    border-color: #f2f2f2;
+    color: #f2f2f2;
+}
+
+.home-korea-facts__panels {
+    padding-top: 30px;
 }
 
 .home-korea-facts__panel {
-    font: 15px/1.65 Verdana, sans-serif;
+    padding: 5px 0;
+    color: #fff;
+    font-family: Verdana, sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.5;
 }
 
 .home-korea-facts__panel[hidden] {
@@ -298,7 +360,7 @@
 }
 
 .home-korea-facts__panel p {
-    margin: 0 0 14px;
+    margin: 0 0 10px;
 }
 
 @media (max-width: 1199.98px) {
@@ -317,8 +379,7 @@
 
 @media (max-width: 991.98px) {
     .home-inspection-intro__grid,
-    .home-inspection__main,
-    .home-korea-facts__grid {
+    .home-inspection__main {
         grid-template-columns: 1fr;
     }
 
@@ -331,8 +392,21 @@
         max-width: 100%;
     }
 
+    .home-korea-facts__grid {
+        grid-template-columns: 1fr;
+    }
+
     .home-korea-facts__aside {
-        display: none;
+        padding: 15px;
+        margin-bottom: 40px;
+    }
+
+    .home-korea-facts__aside p {
+        margin: 10px 0 20px;
+    }
+
+    .home-korea-facts__panels {
+        padding-left: 30px;
     }
 }
 
@@ -355,7 +429,37 @@
     }
 
     .home-korea-facts {
-        padding: 70px 0;
+        padding: 15px;
+    }
+
+    .home-korea-facts__aside {
+        padding: 15px;
+    }
+
+    .home-korea-facts__aside > span {
+        font-size: 18px;
+        line-height: 24px;
+    }
+
+    .home-korea-facts__tabs {
+        margin-bottom: 10px;
+    }
+
+    .home-korea-facts__tab {
+        margin: 0;
+        padding: 10px 20px;
+        font-size: 16px;
+        line-height: 23px;
+    }
+
+    .home-korea-facts__panels {
+        padding: 1px 0 0;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .home-korea-facts {
+        padding: 70px 10px 15px;
     }
 }
 
