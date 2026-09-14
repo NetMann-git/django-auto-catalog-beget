@@ -96,8 +96,13 @@
 
 .home-delivery__step-title {
     margin: 0 0 10px;
+    padding: 2px 0 1px;
+    overflow: visible;
     color: #0f284d;
-    font: 700 21px/1.15 Verdana, sans-serif;
+    font-family: Verdana, sans-serif;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.45;
 }
 
 .home-delivery__step-text {
@@ -196,6 +201,7 @@
     }
 
     .home-delivery__step-title {
+        padding-top: 2px;
         font-size: 16px;
         line-height: 26px;
     }
