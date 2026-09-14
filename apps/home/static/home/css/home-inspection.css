@@ -60,6 +60,17 @@
     color: #464855;
 }
 
+
+/* Основной блок осмотра занимает всю доступную ширину страницы.
+   Intro и нижний информационный блок сохраняют обычный контейнер. */
+.home-inspection > .home-inspection__container,
+.home-inspection__stage > .home-inspection__container {
+    width: 100%;
+    max-width: none;
+    padding-left: clamp(18px, 3vw, 56px);
+    padding-right: clamp(18px, 3vw, 56px);
+}
+
 .home-inspection__title {
     margin: 0 0 20px;
     padding: 0;
@@ -74,8 +85,8 @@
 
 .home-inspection__main {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 30px;
+    grid-template-columns: minmax(0, 1.62fr) minmax(420px, 1fr);
+    gap: clamp(28px, 2.4vw, 48px);
     align-items: center;
 }
 
@@ -85,10 +96,11 @@
 }
 
 .home-inspection__car img {
-    display: inline-block;
+    display: block;
     width: 100%;
-    max-width: 600px;
+    max-width: none;
     height: auto;
+    margin: 0 auto;
     vertical-align: middle;
 }
 
@@ -275,6 +287,13 @@
     .home-inspection__stage {
         padding-top: 60px;
         padding-bottom: 0;
+    }
+}
+
+@media (max-width: 1199.98px) and (min-width: 992px) {
+    .home-inspection__main {
+        grid-template-columns: minmax(0, 1.45fr) minmax(380px, 1fr);
+        gap: 28px;
     }
 }
 
