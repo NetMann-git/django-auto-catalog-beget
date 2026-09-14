@@ -55,99 +55,131 @@
 }
 
 .home-inspection {
-    padding: 100px 0;
+    padding: 100px 0 0;
     background: #f2f2f2;
     color: #464855;
 }
 
-/* Основной блок осмотра намеренно шире остальных секций: так автомобиль
-   сохраняет масштаб исходного макета и не выглядит зажатым в контейнере. */
-.home-inspection > .home-inspection__container {
-    width: min(calc(100% - 48px), 1720px);
-}
-
 .home-inspection__title {
-    margin: 0 0 40px;
-    max-width: 950px;
+    margin: 0 0 20px;
+    padding: 0;
     font: 900 45px/1.12 Verdana, sans-serif;
     color: #2b2b2b;
 }
 
+.home-inspection__stage {
+    padding: 0 0 100px;
+    background: #f2f2f2;
+}
+
 .home-inspection__main {
     display: grid;
-    grid-template-columns: minmax(0, 1.45fr) minmax(420px, 1fr);
-    gap: clamp(36px, 4vw, 72px);
-    align-items: start;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 30px;
+    align-items: center;
 }
 
 .home-inspection__car {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
     min-width: 0;
+    text-align: center;
 }
 
 .home-inspection__car img {
-    display: block;
+    display: inline-block;
     width: 100%;
-    max-width: 1100px;
+    max-width: 600px;
     height: auto;
+    vertical-align: middle;
 }
 
 .home-inspection__accordion {
-    border-top: 1px solid rgba(43, 43, 43, .22);
+    min-width: 0;
+    margin: 0 0 30px;
 }
 
-.home-inspection__item {
-    border-bottom: 1px solid rgba(43, 43, 43, .22);
+.home-inspection__panel {
+    overflow: hidden;
+    margin-bottom: 10px;
+    background: #fff;
+    border: 1px solid #e8eff1;
+    border-radius: 4px;
 }
 
-.home-inspection__summary {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 18px 2px;
+.home-inspection__panel:last-child {
+    margin-bottom: 0;
+}
+
+.home-inspection__panel-heading {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 17px 30px 17px 15px;
+    border: 0;
+    outline: 0;
+    background: #f6fafb;
+    color: #4b5981;
+    text-align: left;
     cursor: pointer;
-    list-style: none;
-    font: 600 18px/1.35 Verdana, sans-serif;
-    color: #2b2b2b;
 }
 
-.home-inspection__summary::-webkit-details-marker {
+.home-inspection__panel-heading:focus-visible {
+    outline: 2px solid #4b5981;
+    outline-offset: -2px;
+}
+
+.home-inspection__panel-title {
+    display: block;
+    margin: 0;
+    font: 700 18px/1.25 Verdana, sans-serif;
+    color: inherit;
+    opacity: .6;
+    transition: opacity .3s ease;
+}
+
+.home-inspection__panel-heading:hover .home-inspection__panel-title,
+.home-inspection__panel-heading[aria-expanded="true"] .home-inspection__panel-title {
+    opacity: 1;
+}
+
+.home-inspection__panel-chevron {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%) rotate(0deg);
+    transition: transform .3s ease;
+}
+
+.home-inspection__panel-heading[aria-expanded="true"] .home-inspection__panel-chevron {
+    transform: translateY(-50%) rotate(90deg);
+}
+
+.home-inspection__panel-collapse {
+    overflow: hidden;
+    background: #fff;
+}
+
+.home-inspection__panel-collapse[hidden] {
     display: none;
 }
 
-.home-inspection__chevron {
-    width: 10px;
-    height: 10px;
-    flex: 0 0 auto;
-    border-right: 2px solid currentColor;
-    border-bottom: 2px solid currentColor;
-    transform: rotate(45deg);
-    transition: transform .2s ease;
+.home-inspection__panel-body {
+    padding: 15px;
+    border-top: 1px solid #e8eff1;
 }
 
-.home-inspection__item[open] .home-inspection__chevron {
-    transform: rotate(225deg);
-}
-
-.home-inspection__item-body {
-    display: grid;
-    grid-template-columns: 125px minmax(0, 1fr);
-    gap: 20px;
-    align-items: start;
-    padding: 0 0 22px;
-}
-
-.home-inspection__item-body img {
-    width: 100%;
+.home-inspection__panel-body img {
+    display: block;
+    width: 250px;
+    max-width: 100%;
     height: auto;
+    margin: 5px auto 15px;
 }
 
-.home-inspection__item-body p {
+.home-inspection__panel-body p {
     margin: 0;
+    padding-top: 0;
     font: 15px/1.55 Verdana, sans-serif;
+    color: #464855;
 }
 
 .home-korea-facts {
@@ -240,9 +272,9 @@
 }
 
 @media (max-width: 1199.98px) {
-    .home-inspection__main {
-        grid-template-columns: minmax(0, 1.2fr) minmax(360px, .8fr);
-        gap: 32px;
+    .home-inspection__stage {
+        padding-top: 60px;
+        padding-bottom: 0;
     }
 }
 
@@ -258,8 +290,8 @@
         gap: 35px;
     }
 
-    .home-inspection > .home-inspection__container {
-        width: min(calc(100% - 30px), 1200px);
+    .home-inspection__car img {
+        max-width: 100%;
     }
 
     .home-korea-facts__aside {
@@ -273,17 +305,16 @@
     }
 
     .home-inspection {
-        padding: 45px 0;
+        padding: 30px 0 0;
+    }
+
+    .home-inspection__stage {
+        padding: 50px 0 0;
     }
 
     .home-inspection__title,
     .home-korea-facts__title {
         font-size: 36px;
-    }
-
-    .home-inspection__item-body {
-        grid-template-columns: 100px minmax(0, 1fr);
-        gap: 15px;
     }
 
     .home-korea-facts {
@@ -294,7 +325,7 @@
 @media (max-width: 575.98px) {
     .home-inspection__title,
     .home-korea-facts__title {
-        font-size: 30px;
+        font-size: 39px;
     }
 
     .home-inspection-intro__title {
@@ -305,12 +336,20 @@
         margin-left: 10px;
     }
 
-    .home-inspection__item-body {
-        grid-template-columns: 1fr;
+    .home-inspection__main {
+        gap: 25px;
     }
 
-    .home-inspection__item-body img {
-        width: min(180px, 100%);
+    .home-inspection__panel-heading {
+        padding: 17px 30px 17px 15px;
+    }
+
+    .home-inspection__panel-title {
+        font-size: 18px;
+    }
+
+    .home-inspection__panel-body img {
+        width: 250px;
     }
 
     .home-korea-facts__eyebrow,

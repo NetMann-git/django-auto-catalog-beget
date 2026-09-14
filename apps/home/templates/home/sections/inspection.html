@@ -34,73 +34,85 @@
         <h2 class="home-inspection__title" id="inspection-title">
             Осматриваем автомобиль по 5 основным параметрам
         </h2>
+    </div>
 
-        <div class="home-inspection__main">
-            <div class="home-inspection__car" aria-hidden="true">
+    <div class="home-inspection__stage">
+        <div class="home-inspection__container home-inspection__main">
+            <div class="home-inspection__car">
                 <img
                     src="{% static 'home/images/2025/04/15/yellowcar.webp' %}"
-                    alt=""
+                    alt="Автомобиль на профессиональном осмотре"
                     width="1200"
                     height="669"
                     loading="lazy"
                     decoding="async">
             </div>
 
-            <div class="home-inspection__accordion">
-                <details class="home-inspection__item" open>
-                    <summary class="home-inspection__summary">
-                        <span>1. Кузов/ЛКП</span>
-                        <span class="home-inspection__chevron" aria-hidden="true"></span>
-                    </summary>
-                    <div class="home-inspection__item-body">
-                        <img src="{% static 'home/images/2025/01/21/kuzov-auto.webp' %}" alt="Проверка кузова и ЛКП" width="250" height="115" loading="lazy" decoding="async">
-                        <p>Проверка состояния кузова осуществляется опытными специалистами. Толщиномером пробивается слой лакокрасочного покрытия: каждые 10-15 см. на каждом отдельном элементе кузова как навесном, так и несущем. Тщательно проверяется состояние болтов, сварных швов, наличие заводского герметика, резинок, уплотнителей. Проверяются стекла, фары, скрытые полости, лонжероны и т.д. Отдельно проверяется состояние резины и колесных дисков. Все недочеты в обязательном порядке фиксируются материалами осмотра и предоставляются заказчику.</p>
+            <div class="home-inspection__accordion" data-inspection-accordion>
+                <article class="home-inspection__panel is-active">
+                    <button class="home-inspection__panel-heading" type="button" aria-expanded="true" aria-controls="inspection-panel-1" id="inspection-heading-1">
+                        <span class="home-inspection__panel-title">1. Кузов/ЛКП</span>
+                        <i class="fa fa-chevron-right home-inspection__panel-chevron" aria-hidden="true"></i>
+                    </button>
+                    <div class="home-inspection__panel-collapse" id="inspection-panel-1" role="region" aria-labelledby="inspection-heading-1">
+                        <div class="home-inspection__panel-body">
+                            <img src="{% static 'home/images/2025/01/21/kuzov-auto.webp' %}" alt="Проверка кузова и ЛКП" width="250" height="115" loading="lazy" decoding="async">
+                            <p>Проверка состояния кузова осуществляется опытными специалистами. Толщиномером пробивается слой лакокрасочного покрытия: каждые 10-15 см. на каждом отдельном элементе кузова как навесном, так и несущем. Тщательно проверяется состояние болтов, сварных швов, наличие заводского герметика, резинок, уплотнителей. Проверяются стекла, фары, скрытые полости, лонжероны и т.д. Отдельно проверяется состояние резины и колесных дисков. Все недочеты в обязательном порядке фиксируются материалами осмотра и предоставляются заказчику.</p>
+                        </div>
                     </div>
-                </details>
+                </article>
 
-                <details class="home-inspection__item">
-                    <summary class="home-inspection__summary">
-                        <span>2. Двигатель/трансмиссия</span>
-                        <span class="home-inspection__chevron" aria-hidden="true"></span>
-                    </summary>
-                    <div class="home-inspection__item-body">
-                        <img src="{% static 'home/images/2025/01/23/engine-n-transmission.webp' %}" alt="Проверка двигателя и трансмиссии" width="250" height="115" loading="lazy" decoding="async">
-                        <p>В данной части осмотр предусматривает визуальную проверку уровня масла в двигателе, состояния масла, наличие масляных запотеваний и подтеков. На слух определяется работа двигателя и турбины на предмет отсутствия посторонних шумов. Визуально диагностируется наличие ошибок и неисправностей на приборной панели. Проверяется плавность работы КПП, отсутствие пинков, рывков и задержек при переключении передач.</p>
+                <article class="home-inspection__panel">
+                    <button class="home-inspection__panel-heading" type="button" aria-expanded="false" aria-controls="inspection-panel-2" id="inspection-heading-2">
+                        <span class="home-inspection__panel-title">2. Двигатель/трансмиссия</span>
+                        <i class="fa fa-chevron-right home-inspection__panel-chevron" aria-hidden="true"></i>
+                    </button>
+                    <div class="home-inspection__panel-collapse" id="inspection-panel-2" role="region" aria-labelledby="inspection-heading-2" hidden>
+                        <div class="home-inspection__panel-body">
+                            <img src="{% static 'home/images/2025/01/23/engine-n-transmission.webp' %}" alt="Проверка двигателя и трансмиссии" width="250" height="115" loading="lazy" decoding="async">
+                            <p>В данной части осмотр предусматривает визуальную проверку уровня масла в двигателе, состояния масла, наличие масляных запотеваний и подтеков. На слух определяется работа двигателя и турбины на предмет отсутствия посторонних шумов. Визуально диагностируется наличие ошибок и неисправностей на приборной панели. Проверяется плавность работы КПП, отсутствие пинков, рывков и задержек при переключении передач.</p>
+                        </div>
                     </div>
-                </details>
+                </article>
 
-                <details class="home-inspection__item">
-                    <summary class="home-inspection__summary">
-                        <span>3. Электрическая часть</span>
-                        <span class="home-inspection__chevron" aria-hidden="true"></span>
-                    </summary>
-                    <div class="home-inspection__item-body">
-                        <img src="{% static 'home/images/2025/01/23/electrica.webp' %}" alt="Проверка электрической части" width="250" height="115" loading="lazy" decoding="async">
-                        <p>В ходе осмотра электрической части, проверяется работа электрики и электроники автомобиля: наружное освещение, дворники, зеркала, датчики парковки, стеклоподьемники, система кондиционирования, аудиосистема, эл.регулировка сидений (при наличии), работа бортового компьютера и т.д. При выявлении нареканий в работе электрической части автомобиля, всё фиксируется материалами осмотра и предоставляется заказчику.</p>
+                <article class="home-inspection__panel">
+                    <button class="home-inspection__panel-heading" type="button" aria-expanded="false" aria-controls="inspection-panel-3" id="inspection-heading-3">
+                        <span class="home-inspection__panel-title">3. Электрическая часть</span>
+                        <i class="fa fa-chevron-right home-inspection__panel-chevron" aria-hidden="true"></i>
+                    </button>
+                    <div class="home-inspection__panel-collapse" id="inspection-panel-3" role="region" aria-labelledby="inspection-heading-3" hidden>
+                        <div class="home-inspection__panel-body">
+                            <img src="{% static 'home/images/2025/01/23/electrica.webp' %}" alt="Проверка электрической части" width="250" height="115" loading="lazy" decoding="async">
+                            <p>В ходе осмотра электрической части, проверяется работа электрики и электроники автомобиля: наружное освещение, дворники, зеркала, датчики парковки, стеклоподьемники, система кондиционирования, аудиосистема, эл.регулировка сидений (при наличии), работа бортового компьютера и т.д. При выявлении нареканий в работе электрической части автомобиля, всё фиксируется материалами осмотра и предоставляется заказчику.</p>
+                        </div>
                     </div>
-                </details>
+                </article>
 
-                <details class="home-inspection__item">
-                    <summary class="home-inspection__summary">
-                        <span>4. Тормозная система</span>
-                        <span class="home-inspection__chevron" aria-hidden="true"></span>
-                    </summary>
-                    <div class="home-inspection__item-body">
-                        <img src="{% static 'home/images/2025/01/23/brake.webp' %}" alt="Проверка тормозной системы" width="250" height="115" loading="lazy" decoding="async">
-                        <p>В данной части работ наши специалисты визуально осматривают состояние тормозных дисков и колодок, проверяют их выработку. Проверяется работа тормозной системы автомобиля и уровень тормозной жидкости в бачке. Так же проверяется работоспособность стояночного тормоза и функция удержания Auto Hold.</p>
+                <article class="home-inspection__panel">
+                    <button class="home-inspection__panel-heading" type="button" aria-expanded="false" aria-controls="inspection-panel-4" id="inspection-heading-4">
+                        <span class="home-inspection__panel-title">4. Тормозная система</span>
+                        <i class="fa fa-chevron-right home-inspection__panel-chevron" aria-hidden="true"></i>
+                    </button>
+                    <div class="home-inspection__panel-collapse" id="inspection-panel-4" role="region" aria-labelledby="inspection-heading-4" hidden>
+                        <div class="home-inspection__panel-body">
+                            <img src="{% static 'home/images/2025/01/23/brake.webp' %}" alt="Проверка тормозной системы" width="250" height="115" loading="lazy" decoding="async">
+                            <p>В данной части работ наши специалисты визуально осматривают состояние тормозных дисков и колодок, проверяют их выработку. Проверяется работа тормозной системы автомобиля и уровень тормозной жидкости в бачке. Так же проверяется работоспособность стояночного тормоза и функция удержания Auto Hold.</p>
+                        </div>
                     </div>
-                </details>
+                </article>
 
-                <details class="home-inspection__item">
-                    <summary class="home-inspection__summary">
-                        <span>5. Подвеска</span>
-                        <span class="home-inspection__chevron" aria-hidden="true"></span>
-                    </summary>
-                    <div class="home-inspection__item-body">
-                        <img src="{% static 'home/images/2025/01/23/car-suspension.webp' %}" alt="Проверка подвески" width="250" height="115" loading="lazy" decoding="async">
-                        <p>Проверка подески автомобиля включает в себя диагностику рулевой рейки на наличие посторонних стуков при поворотах руля. Проводится визуальный осмотр состояния амортизаторов передней и задней оси автомобиля. Так же проводится осмотр рычагов, стоек, пыльников, втулок, сайлентблоков и прочих элементов подвески автомобиля. Результаты осмотра тщательно фиксируются на фото и видео, и в полном объеме предоставляются заказчику.</p>
+                <article class="home-inspection__panel">
+                    <button class="home-inspection__panel-heading" type="button" aria-expanded="false" aria-controls="inspection-panel-5" id="inspection-heading-5">
+                        <span class="home-inspection__panel-title">5. Подвеска</span>
+                        <i class="fa fa-chevron-right home-inspection__panel-chevron" aria-hidden="true"></i>
+                    </button>
+                    <div class="home-inspection__panel-collapse" id="inspection-panel-5" role="region" aria-labelledby="inspection-heading-5" hidden>
+                        <div class="home-inspection__panel-body">
+                            <img src="{% static 'home/images/2025/01/23/car-suspension.webp' %}" alt="Проверка подвески" width="250" height="115" loading="lazy" decoding="async">
+                            <p>Проверка подески автомобиля включает в себя диагностику рулевой рейки на наличие посторонних стуков при поворотах руля. Проводится визуальный осмотр состояния амортизаторов передней и задней оси автомобиля. Так же проводится осмотр рычагов, стоек, пыльников, втулок, сайлентблоков и прочих элементов подвески автомобиля. Результаты осмотра тщательно фиксируются на фото и видео, и в полном объеме предоставляются заказчику.</p>
+                        </div>
                     </div>
-                </details>
+                </article>
             </div>
         </div>
     </div>
