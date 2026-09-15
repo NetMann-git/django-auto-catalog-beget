@@ -1,0 +1,44 @@
+/* Hero: restored Joomla v78 geometry */
+.sp-page-builder .page-content #section-id-sA877hScVrXJKWEoIl0Rc {
+    padding: 100px 0;
+    margin: 0;
+}
+
+#column-wrap-id-B3B4l-0tF70Nt3VFy8ISW {
+    max-width: 100%;
+    flex-basis: 100%;
+}
+
+#sppb-addon-guWQl2Yf4jAfAnye1IvSF {
+    border-radius: 0;
+}
+
+#sppb-addon-guWQl2Yf4jAfAnye1IvSF .hero-slider div[class*="sp-slider-content-align"] {
+    background-color: rgba(39,39,39,0.6);
+}
+
+#sppb-addon-guWQl2Yf4jAfAnye1IvSF .sp-slider .sp-dots {
+    height: 100%;
+    max-width: 39px;
+}
+
+#sppb-addon-guWQl2Yf4jAfAnye1IvSF .sp-slider .sp-dots ul {
+    width: 39px;
+}
+
+#sppb-addon-guWQl2Yf4jAfAnye1IvSF .sp-slider .sp-dots ul li {
+    border: 0 solid;
+    border-radius: 18px;
+    height: 1px;
+    width: 39px;
+}
+
+#sppb-addon-guWQl2Yf4jAfAnye1IvSF .sp-slider.dot-controller-line .sp-dots ul li.active {
+    width: 55px;
+}
+
+@media (min-width:1400px){
+    .sppb-row-container {
+        max-width:1320px;
+    }
+}
