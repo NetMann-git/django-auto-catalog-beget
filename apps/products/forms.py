@@ -2,7 +2,7 @@
 from django import forms
 from django.utils.safestring import mark_safe
 from django.utils.text import slugify
-from .models import Product, ProductGalleryImage, Badge
+from .models import Product, ProductGalleryImage, Badge, Brand
 
 
 class ImagePreviewWidget(forms.ClearableFileInput):
@@ -89,6 +89,34 @@ class ProductForm(forms.ModelForm):
         if not slug and title:
             slug = slugify(title)
         
+        return slug
+
+
+class BrandForm(forms.ModelForm):
+    """Форма управления брендом для менеджера."""
+
+    class Meta:
+        model = Brand
+        fields = [
+            "name", "slug", "logo", "description", "country", "sort_order",
+            "meta_title", "meta_description",
+        ]
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "slug": forms.TextInput(attrs={"class": "form-control"}),
+            "logo": ImagePreviewWidget(attrs={"class": "form-control"}),
+            "description": forms.Textarea(attrs={"class": "form-control", "rows": 5}),
+            "country": forms.TextInput(attrs={"class": "form-control"}),
+            "sort_order": forms.NumberInput(attrs={"class": "form-control", "min": 0}),
+            "meta_title": forms.TextInput(attrs={"class": "form-control"}),
+            "meta_description": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+        }
+
+    def clean_slug(self):
+        slug = self.cleaned_data.get("slug")
+        name = self.cleaned_data.get("name")
+        if not slug and name:
+            slug = slugify(name)
         return slug
 
 

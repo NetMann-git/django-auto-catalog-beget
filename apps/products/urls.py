@@ -18,6 +18,10 @@ urlpatterns = [
     
     # Управление товарами (менеджер) - ДОБАВИТЬ ЭТОТ БЛОК
     path("manage/", views.product_list_manage, name="product_list_manage"),
+    path("manage/brands/", views.brand_list_manage, name="brand_list_manage"),
+    path("manage/brands/create/", views.brand_create, name="brand_create"),
+    path("manage/brands/<int:brand_id>/edit/", views.brand_edit, name="brand_edit"),
+    path("manage/brands/<int:brand_id>/delete/", views.brand_delete, name="brand_delete"),
     path("create/", views.product_create, name="product_create"),
     path("edit/<int:product_id>/", views.product_edit, name="product_edit"),
     path("delete/<int:product_id>/", views.product_delete, name="product_delete"),

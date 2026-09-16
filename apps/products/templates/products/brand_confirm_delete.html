@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'products/css/manage.css' %}">
+{% endblock %}
+
+{% block title %}Удаление бренда{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Удаление бренда</h1>
+    <p>Удалить бренд <strong>{{ brand.name }}</strong>?</p>
+    <p style="color:#777;">Товары этого бренда не удаляются.</p>
+
+    <form method="post" style="margin-top:20px;">
+        {% csrf_token %}
+        <button type="submit" class="btn-delete" style="padding:10px 20px;">Удалить</button>
+        <a href="{% url 'catalog:brand_list_manage' %}" class="btn-cancel">Отмена</a>
+    </form>
+</div>
+{% endblock %}
