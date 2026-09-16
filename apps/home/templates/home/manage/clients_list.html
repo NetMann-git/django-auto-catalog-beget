@@ -14,6 +14,8 @@
   <a class="client-btn client-btn--primary" href="{% url 'home:client_create' %}">+ Добавить клиента</a>
  </div>
 
+ <p class="client-manage__back"><a href="{% url 'users:manager_dashboard' %}">← Вернуться в панель менеджера</a></p>
+
  <form class="client-filters" method="get">
   <input type="search" name="search" value="{{ search }}" placeholder="Имя клиента или автомобиль">
   <select name="status">
