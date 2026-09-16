@@ -20,13 +20,29 @@ from .models import Brand
 
 @admin.register(Brand)
 class BrandAdmin(admin.ModelAdmin):
-    list_display = ("name", "slug", "country")
+    list_display = ("logo_tag", "name", "slug", "country", "sort_order")
+    list_editable = ("sort_order",)
+    ordering = ("sort_order", "name")
     prepopulated_fields = {"slug": ("name",)}
     search_fields = ("name", "country")
     fieldsets = (
-        (None, {"fields": ("name", "slug", "logo", "description", "country")}),
+        (None, {"fields": ("name", "slug", "logo", "description", "country", "sort_order")}),
         ("SEO", {"fields": ("meta_title", "meta_description")}),
     )
+
+    @admin.display(description="Логотип")
+    def logo_tag(self, obj):
+        if not obj.logo:
+            return format_html('<span style="color:#aaa;">Нет</span>')
+
+        thumbnail = get_thumbnailer(obj.logo).get_thumbnail({
+            "size": (60, 40),
+            "crop": False,
+        })
+        return format_html(
+            '<img src="{}" style="width:60px;height:40px;object-fit:contain;" alt="" />',
+            thumbnail.url,
+        )
 
 
 class AttributeValueInline(admin.TabularInline):

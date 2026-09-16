@@ -14,6 +14,12 @@ class Brand(models.Model):
     )
     description = models.TextField(blank=True, verbose_name="Описание")
     country = models.CharField(max_length=100, blank=True, verbose_name="Страна")
+    sort_order = models.PositiveIntegerField(
+        default=0,
+        db_index=True,
+        verbose_name="Порядок",
+        help_text="Меньшее число выводится раньше."
+    )
 
     # SEO
     meta_title = models.CharField(

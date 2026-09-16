@@ -22,7 +22,7 @@ class HomeContextBuilder:
             .filter(products__is_active=True)
             .distinct()
             .prefetch_related("products")
-            .order_by("name")[:12]
+            .order_by("sort_order", "name")[:24]
         )
 
         published_clients = ClientShowcase.objects.filter(is_published=True)
