@@ -131,10 +131,32 @@
             </div>
             <div class="sppb-addon-wrapper addon-root-image" id="sppb-addon-wrapper-47d95aa9-243f-4a1a-8e7e-e460216a2e14">
              <div class="clearfix" id="sppb-addon-47d95aa9-243f-4a1a-8e7e-e460216a2e14">
-              <div class="sppb-addon sppb-addon-single-image sppb-addon-image-shape">
+              <div class="sppb-addon sppb-addon-clients"
+                   data-arrow="0"
+                   data-autoplay="0"
+                   data-dots="0"
+                   data-interval="3500"
+                   data-item-number-lg="4"
+                   data-item-number-md="3"
+                   data-item-number-sm="3"
+                   data-item-number-xl="5"
+                   data-item-number-xs="2"
+                   data-loop="true"
+                   data-speed="2000">
                <div class="sppb-addon-content">
-                <div class="sppb-addon-single-image-container">
-                 <img alt="Image" class="sppb-img-responsive" decoding="async" height="420" loading="lazy" src="{% static 'home/images/2025/08/09/autobrands.webp' %}" width="764"/>
+                <div class="sppb-row">
+                 {% for brand in featured_brands|slice:":12" %}
+                  {% if brand.logo %}
+                   <div class="sppb-col-xs-3 sppb-col-sm-3 sppb-col-md-3 sppb-col-lg-3">
+                    <img alt="{{ brand.name }}"
+                         class="sppb-img-responsive sppb-addon-clients-image"
+                         decoding="async"
+                         loading="lazy"
+                         src="{{ brand.logo.url }}"
+                         style="width:70px;height:52px;object-fit:contain;margin:0 auto 16px;"/>
+                   </div>
+                  {% endif %}
+                 {% endfor %}
                 </div>
                </div>
               </div>
