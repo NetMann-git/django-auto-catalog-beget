@@ -36,7 +36,7 @@
                                                             <div class="sppb-addon-content">
                                                                   <div class="sppb-row">
                                                                         <!-- Логотипы -->
-                                                                        {% for brand in featured_brands %}
+                                                                        {% for brand in featured_brands|slice:":24" %}
                                                                               {% if brand.logo %}
                                                                         <div class="sppb-col-sm-2">
                                                                               <img alt="{{ brand.name }}"
@@ -104,11 +104,11 @@
             <div class="sppb-addon-wrapper addon-root-divider" id="sppb-addon-wrapper-c7067a43-ccb7-4262-99af-6ba3087ffbb2">
              <div class="clearfix" id="sppb-addon-c7067a43-ccb7-4262-99af-6ba3087ffbb2">
               <div class="sppb-addon-divider-wrap divider-position">
-               <div class="sppb-divider sppb-divider-border" role="none">
-               </div>
+               <div class="sppb-divider sppb-divider-border" role="none"></div>
               </div>
              </div>
             </div>
+
             <div class="sppb-addon-wrapper addon-root-heading" id="sppb-addon-wrapper-6918ba78-feeb-4d05-a74e-5b60e1b989ca">
              <div class="clearfix" id="sppb-addon-6918ba78-feeb-4d05-a74e-5b60e1b989ca">
               <div class="sppb-addon sppb-addon-header">
@@ -120,6 +120,7 @@
               </div>
              </div>
             </div>
+
             <div class="sppb-addon-wrapper addon-root-heading" id="sppb-addon-wrapper-6d3812ef-48d4-4edf-ba13-bf32636593e8">
              <div class="clearfix" id="sppb-addon-6d3812ef-48d4-4edf-ba13-bf32636593e8">
               <div class="sppb-addon sppb-addon-header">
@@ -129,25 +130,17 @@
               </div>
              </div>
             </div>
+
             <div class="sppb-addon-wrapper addon-root-image" id="sppb-addon-wrapper-47d95aa9-243f-4a1a-8e7e-e460216a2e14">
              <div class="clearfix" id="sppb-addon-47d95aa9-243f-4a1a-8e7e-e460216a2e14">
-              <div class="sppb-addon sppb-addon-clients"
-                   data-arrow="0"
-                   data-autoplay="0"
-                   data-dots="0"
-                   data-interval="3500"
-                   data-item-number-lg="4"
-                   data-item-number-md="3"
-                   data-item-number-sm="3"
-                   data-item-number-xl="5"
-                   data-item-number-xs="2"
-                   data-loop="true"
-                   data-speed="2000">
+              <div class="sppb-addon sppb-addon-clients">
                <div class="sppb-addon-content">
-                <div class="sppb-row">
+
+                <!-- SM/LG: 12 динамических брендов -->
+                <div class="sppb-row sppb-hidden-xs">
                  {% for brand in featured_brands|slice:":12" %}
                   {% if brand.logo %}
-                   <div class="sppb-col-xs-3 sppb-col-sm-3 sppb-col-md-3 sppb-col-lg-3">
+                   <div class="sppb-col-sm-3 sppb-col-md-3 sppb-col-lg-3" style="flex:0 0 25%;max-width:25%;width:25%;">
                     <img alt="{{ brand.name }}"
                          class="sppb-img-responsive sppb-addon-clients-image"
                          decoding="async"
@@ -158,10 +151,29 @@
                   {% endif %}
                  {% endfor %}
                 </div>
+
+                <!-- XS: 6 динамических брендов, строго 2 столбца -->
+                <div class="sppb-row sppb-hidden-sm sppb-hidden-md sppb-hidden-lg sppb-hidden-xl">
+                 {% for brand in featured_brands|slice:":6" %}
+                  {% if brand.logo %}
+                   <div class="sppb-col-xs-6"
+                        style="flex:0 0 50%;max-width:50%;width:50%;">
+                    <img alt="{{ brand.name }}"
+                         class="sppb-img-responsive sppb-addon-clients-image"
+                         decoding="async"
+                         loading="lazy"
+                         src="{{ brand.logo.url }}"
+                         style="width:64px;height:48px;object-fit:contain;margin:0 auto 16px;"/>
+                   </div>
+                  {% endif %}
+                 {% endfor %}
+                </div>
+
                </div>
               </div>
              </div>
             </div>
+
            </div>
           </div>
          </div>
