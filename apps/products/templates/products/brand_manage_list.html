@@ -26,6 +26,12 @@
     {% if brands %}
     <form method="post">
         {% csrf_token %}
+
+        <div style="margin-bottom:20px;display:flex;gap:12px;flex-wrap:wrap;">
+            <button type="submit" class="btn-save">💾 Сохранить порядок</button>
+            <a href="{% url 'users:manager_dashboard' %}" class="btn-cancel">← Панель менеджера</a>
+        </div>
+
         <table class="product-table">
             <thead>
                 <tr>
