@@ -36,198 +36,366 @@
                                                             <div class="sppb-addon-content">
                                                                   <div class="sppb-row">
                                                                         <!-- Логотипы -->
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="ауди"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/audi-logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="кадиллак"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/cadillac-logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="лексус"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/lexus-logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="бмв"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/bmw-logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="хендэ"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/hyundai-logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="мини"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/mini-logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="лендровер"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/landrover-logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="вв"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/volkswagen-logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="киа"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/kia-logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="мерс"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/merc_logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="пежо"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/peugeot-logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="ламба"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/lambo_logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="тойота"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/toyota-logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="генесис"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/genesis_logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="мазда"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/mazda-logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="порше"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/porsche-logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="ситроен"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/citroen-logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="финик"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/infinity-logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="опель"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/opel-logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="рено"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/renault-logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="майбах"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/maybach-logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="ссаньенг"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/ssangyong-logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="шевроле"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/chevy_logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
+                                                                        {% if featured_brands %}
+                                                                        {% for brand in featured_brands %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="вольво"
+                                                                              {% if brand.logo %}
+                                                                              <img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
-                                                                                   src="/static/home/images/2025/02/05/volvo_logo.jpg"
-                                                                                   width="100" decoding="async">
+                                                                                   src="{{ brand.logo.url }}"
+                                                                                   width="100"
+                                                                                   decoding="async">
+                                                                              {% endif %}
                                                                         </div>
+                                                                        {% endfor %}
+                                                                        {% endif %}
                                                                   </div>
                                                             </div>
                                                       </div>
