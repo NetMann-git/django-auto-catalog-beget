@@ -18,8 +18,8 @@ class ClientShowcaseTests(TestCase):
         return user
 
     def test_home_shows_only_published_clients(self):
-        ClientShowcase.objects.create(name="Виден", vehicle="KIA", image="x.webp", is_published=True)
-        ClientShowcase.objects.create(name="Скрыт", vehicle="BMW", image="y.webp", is_published=False)
+        ClientShowcase.objects.create(name="Виден", vehicle="KIA", legacy_image="x.webp", is_published=True)
+        ClientShowcase.objects.create(name="Скрыт", vehicle="BMW", legacy_image="y.webp", is_published=False)
         response = self.client.get(reverse("home"))
         self.assertContains(response, "Виден")
         self.assertNotContains(response, "Скрыт")
@@ -106,15 +106,15 @@ class ClientShowcaseTests(TestCase):
 class ClientVideoReviewTests(TestCase):
     def test_video_review_section_shows_only_published_clients_with_rutube(self):
         visible = ClientShowcase.objects.create(
-            name="Видео клиент", vehicle="KIA", image="x.webp",
+            name="Видео клиент", vehicle="KIA", legacy_image="x.webp",
             rutube_url="https://rutube.ru/play/embed/b01059d843b5c69740fb2ae3d1cd682d/",
             is_published=True,
         )
         ClientShowcase.objects.create(
-            name="Без видео", vehicle="BMW", image="y.webp", is_published=True,
+            name="Без видео", vehicle="BMW", legacy_image="y.webp", is_published=True,
         )
         ClientShowcase.objects.create(
-            name="Скрытый видео", vehicle="Audi", image="z.webp",
+            name="Скрытый видео", vehicle="Audi", legacy_image="z.webp",
             rutube_url="https://rutube.ru/play/embed/4217e2a2d92bf8fa77e850b174dc72ab/",
             is_published=False,
         )
@@ -126,7 +126,7 @@ class ClientVideoReviewTests(TestCase):
 
     def test_home_hides_video_review_section_when_no_video_clients(self):
         ClientShowcase.objects.create(
-            name="Только фото", vehicle="BMW", image="x.webp", is_published=True,
+            name="Только фото", vehicle="BMW", legacy_image="x.webp", is_published=True,
         )
 
         response = self.client.get(reverse("home"))
@@ -160,7 +160,7 @@ class ClientMediaRulesTests(TestCase):
         photo_only = ClientShowcase.objects.create(
             name="Фото",
             vehicle="Авто 1",
-            image="home/images/test.webp",
+            legacy_image="home/images/test.webp",
             is_published=True,
         )
         video_only = ClientShowcase.objects.create(
@@ -190,8 +190,8 @@ class TeamMemberTests(TestCase):
         return user
 
     def test_home_shows_only_published_team_members(self):
-        TeamMember.objects.create(name="Виден", position="Менеджер", image="x.webp", is_published=True)
-        TeamMember.objects.create(name="Скрыт", position="Менеджер", image="y.webp", is_published=False)
+        TeamMember.objects.create(name="Виден", position="Менеджер", legacy_image="x.webp", is_published=True)
+        TeamMember.objects.create(name="Скрыт", position="Менеджер", legacy_image="y.webp", is_published=False)
         response = self.client.get(reverse("home"))
         self.assertContains(response, "Виден")
         self.assertNotContains(response, "Скрыт")
@@ -209,8 +209,8 @@ class TeamMemberTests(TestCase):
         self.assertEqual(response.status_code, 302)
 
     def test_manager_can_move_team_member(self):
-        first = TeamMember.objects.create(name="Первый", position="Менеджер", image="a.webp", sort_order=10)
-        second = TeamMember.objects.create(name="Второй", position="Менеджер", image="b.webp", sort_order=20)
+        first = TeamMember.objects.create(name="Первый", position="Менеджер", legacy_image="a.webp", sort_order=10)
+        second = TeamMember.objects.create(name="Второй", position="Менеджер", legacy_image="b.webp", sort_order=20)
         user = self.create_user("manager_team_move", ROLE_MANAGER)
         self.client.force_login(user)
         response = self.client.post(reverse("home:team_move", args=[first.id]), {"direction": "down"})

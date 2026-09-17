@@ -5,13 +5,13 @@ TEAM = (
     {
         "name": "ИВАН",
         "position": "Главный менеджер",
-        "image": "home/images/2025/09/01/ivan.webp",
+        "legacy_image": "home/images/2025/09/01/ivan.webp",
         "sort_order": 10,
     },
     {
         "name": "ДАНИЛ",
         "position": "Главный менеджер",
-        "image": "home/images/2025/09/01/danil_aksyuk.webp",
+        "legacy_image": "home/images/2025/09/01/danil_aksyuk.webp",
         "sort_order": 20,
     },
 )
@@ -21,7 +21,7 @@ def seed_team(apps, schema_editor):
     TeamMember = apps.get_model("home", "TeamMember")
     for row in TEAM:
         TeamMember.objects.get_or_create(
-            image=row["image"],
+            legacy_image=row["legacy_image"],
             defaults={
                 "name": row["name"],
                 "position": row["position"],
@@ -33,7 +33,7 @@ def seed_team(apps, schema_editor):
 
 def unseed_team(apps, schema_editor):
     TeamMember = apps.get_model("home", "TeamMember")
-    TeamMember.objects.filter(image__in=[row["image"] for row in TEAM]).delete()
+    TeamMember.objects.filter(legacy_image__in=[row["legacy_image"] for row in TEAM]).delete()
 
 
 class Migration(migrations.Migration):

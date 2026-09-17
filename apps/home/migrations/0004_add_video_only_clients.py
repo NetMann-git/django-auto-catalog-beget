@@ -60,7 +60,7 @@ def remove_video_only_clients(apps, schema_editor):
             vehicle=item["vehicle"],
             rutube_url=item["rutube_url"],
             image="",
-            image="",
+            legacy_image="",
         ).delete()
 
 

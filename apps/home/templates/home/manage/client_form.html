@@ -22,8 +22,8 @@
    <span>Текущее фото</span>
    {% if client.image %}
     <img src="{{ client.image.url }}" alt="{{ client.name }}">
-   {% elif client.image %}
-    <img src="{% static client.image %}" alt="{{ client.name }}">
+   {% elif client.legacy_image %}
+    <img src="{% static client.legacy_image %}" alt="{{ client.name }}">
    {% endif %}
   </div>
   {% endif %}

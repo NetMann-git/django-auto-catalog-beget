@@ -27,12 +27,12 @@ class HomeContextBuilder:
 
         published_clients = ClientShowcase.objects.filter(is_published=True)
         clients = published_clients.filter(
-            Q(image__isnull=False, image__gt="") | Q(image__gt="")
+            Q(image__isnull=False, image__gt="")
         ).order_by("sort_order", "id")
         video_clients = published_clients.exclude(rutube_url="").order_by("sort_order", "id")
 
         team_members = TeamMember.objects.filter(is_published=True).filter(
-            Q(image__isnull=False, image__gt="") | Q(image__gt="")
+            Q(image__isnull=False, image__gt="")
         ).order_by("sort_order", "id")
 
         contact_settings = ContactSettings.objects.filter(pk=1, is_published=True).first()
