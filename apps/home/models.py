@@ -17,12 +17,6 @@ class ClientShowcase(models.Model):
         verbose_name="Ссылка на видеоотзыв Rutube",
         help_text="Оставьте пустым, если клиент не записывал видеоотзыв.",
     )
-    legacy_image = models.CharField(
-        max_length=255,
-        blank=True,
-        editable=False,
-        verbose_name="Старое статическое изображение",
-    )
     sort_order = models.PositiveIntegerField(
         default=100,
         db_index=True,

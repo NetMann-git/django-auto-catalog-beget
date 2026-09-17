@@ -59,17 +59,6 @@
    <div class="client-admin-card__image">
     {% if client.image %}
      <img src="{{ client.image.url }}" alt="{{ client.name }}">
-    {% elif client.legacy_image %}
-     <img src="{% static client.legacy_image %}" alt="{{ client.name }}">
-    {% elif client.rutube_embed_url %}
-     <iframe
-      class="client-admin-card__video-preview"
-      src="{{ client.rutube_embed_url }}"
-      title="Видеоотзыв {{ client.name }}"
-      loading="lazy"
-      allow="clipboard-write; autoplay"
-      allowfullscreen>
-     </iframe>
     {% else %}
      <span class="client-admin-card__placeholder">Нет фото и видео</span>
     {% endif %}
