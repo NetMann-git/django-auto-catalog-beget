@@ -14,7 +14,7 @@ def move_client_images_to_media(apps, schema_editor):
     Копирует legacy-фотографии клиентов из apps/home/static в MEDIA_ROOT
     и переключает ClientShowcase.image на новый media-файл.
 
-    Старый legacy_image намеренно пока не очищается: это безопасный fallback
+    Старый image намеренно пока не очищается: это безопасный fallback
     на время первого деплоя и проверки переноса.
     """
     ClientShowcase = apps.get_model("home", "ClientShowcase")
@@ -22,11 +22,11 @@ def move_client_images_to_media(apps, schema_editor):
 
     queryset = ClientShowcase.objects.filter(
         image="",
-        legacy_image__startswith=STATIC_PREFIX,
+        image__startswith=STATIC_PREFIX,
     )
 
     for client in queryset.iterator():
-        source = static_root / client.legacy_image
+        source = static_root / client.image
         if not source.is_file():
             # Не ломаем migrate, если конкретный старый файл уже отсутствует.
             continue
@@ -49,7 +49,7 @@ def restore_legacy_usage(apps, schema_editor):
     ClientShowcase = apps.get_model("home", "ClientShowcase")
     ClientShowcase.objects.filter(
         image__startswith=MEDIA_PREFIX,
-        legacy_image__startswith=STATIC_PREFIX,
+        image__startswith=STATIC_PREFIX,
     ).update(image="")
 
 

@@ -3,6 +3,8 @@
  <div class="client-showcase-card__media">
   {% if client.image %}
    <img class="client-showcase-card__image" alt="{{ client.name }} — {{ client.vehicle }}" decoding="async" loading="lazy" src="{{ client.image.url }}" />
+  {% elif client.image %}
+   <img class="client-showcase-card__image" alt="{{ client.name }} — {{ client.vehicle }}" decoding="async" loading="lazy" src="{% static client.image %}" />
   {% endif %}
  </div>
  <div class="client-showcase-card__content">

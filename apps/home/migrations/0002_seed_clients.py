@@ -61,18 +61,18 @@ def seed_clients(apps, schema_editor):
             ClientShowcase(
                 name=name,
                 vehicle=vehicle,
-                legacy_image=legacy_image,
+                image=image,
                 sort_order=sort_order,
                 is_published=True,
             )
-            for name, vehicle, legacy_image, sort_order in rows
+            for name, vehicle, image, sort_order in rows
         ]
     )
 
 
 def unseed_clients(apps, schema_editor):
     ClientShowcase = apps.get_model("home", "ClientShowcase")
-    ClientShowcase.objects.filter(legacy_image__startswith="home/images/2026/05/04/").delete()
+    ClientShowcase.objects.filter(image__startswith="home/images/2026/05/04/").delete()
 
 
 class Migration(migrations.Migration):

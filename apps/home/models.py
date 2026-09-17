@@ -17,7 +17,7 @@ class ClientShowcase(models.Model):
         verbose_name="Ссылка на видеоотзыв Rutube",
         help_text="Оставьте пустым, если клиент не записывал видеоотзыв.",
     )
-    legacy_image = models.CharField(
+    image = models.CharField(
         max_length=255,
         blank=True,
         editable=False,
@@ -43,7 +43,7 @@ class ClientShowcase(models.Model):
 
     @property
     def has_image(self):
-        return bool(self.image)
+        return bool(self.image or self.image)
 
     @property
     def rutube_embed_url(self):
@@ -79,7 +79,7 @@ class TeamMember(models.Model):
         blank=True,
         verbose_name="Фотография",
     )
-    legacy_image = models.CharField(
+    image = models.CharField(
         max_length=255,
         blank=True,
         editable=False,
@@ -105,7 +105,7 @@ class TeamMember(models.Model):
 
     @property
     def has_image(self):
-        return bool(self.image or self.legacy_image)
+        return bool(self.image or self.image)
 
 
 class ContactSettings(models.Model):
