@@ -42,7 +42,18 @@
                             <td style="padding:10px; border-bottom:1px solid #eee; white-space:nowrap;">{{ callback.created_at|date:"d.m.Y H:i" }}</td>
                             <td style="padding:10px; border-bottom:1px solid #eee;">{{ callback.name|default:"Без имени" }}</td>
                             <td style="padding:10px; border-bottom:1px solid #eee;"><a href="tel:{{ callback.phone }}">{{ callback.phone }}</a></td>
-                            <td style="padding:10px; border-bottom:1px solid #eee;">{{ callback.get_status_display }}</td>
+                            <td style="padding:10px; border-bottom:1px solid #eee;">
+                                <form method="post" action="{% url 'appointments:callback_request_status_update' callback.pk %}" style="display:flex; gap:8px; align-items:center; margin:0;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="current_filter" value="{{ status }}">
+                                    <select name="status" aria-label="Статус заявки {{ callback.pk }}" style="padding:7px 9px; min-width:130px;">
+                                        {% for value, label in status_choices %}
+                                            <option value="{{ value }}"{% if callback.status == value %} selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                                </form>
+                            </td>
                             <td style="padding:10px; border-bottom:1px solid #eee;">{{ callback.source }}</td>
                         </tr>
                     {% endfor %}

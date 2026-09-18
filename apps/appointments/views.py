@@ -222,3 +222,25 @@ def callback_request_list(request):
     }
     return render(request, "appointments/callback_request_list.html", context)
 
+@require_POST
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
+def callback_request_status_update(request, pk):
+    """Изменяет статус заявки на обратный звонок."""
+    callback = get_object_or_404(CallbackRequest, pk=pk)
+    status = request.POST.get("status", "").strip()
+    valid_statuses = {value for value, _label in CallbackRequest.STATUS_CHOICES}
+
+    if status not in valid_statuses:
+        messages.error(request, "Некорректный статус заявки.")
+    elif callback.status != status:
+        callback.status = status
+        callback.save(update_fields=["status", "updated_at"])
+        messages.success(request, "Статус заявки изменён.")
+
+    redirect_url = reverse("appointments:callback_request_list")
+    current_filter = request.POST.get("current_filter", "").strip()
+    if current_filter in valid_statuses:
+        redirect_url = f"{redirect_url}?status={current_filter}"
+
+    return redirect(redirect_url)
+
