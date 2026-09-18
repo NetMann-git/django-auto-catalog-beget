@@ -8,6 +8,7 @@ from django.http import JsonResponse
 
 from apps.products.models import Product
 from .forms import AppointmentForm, CallbackRequestForm
+from .notifications import send_email_notification
 
 from django.core.mail import send_mail
 from django.conf import settings
@@ -166,6 +167,9 @@ def callback_submit(request):
         callback = form.save(commit=False)
         callback.source = 'homepage'
         callback.save()
+
+        # Заявка уже сохранена в БД. Ошибка SMTP не влияет на результат формы.
+        send_email_notification(callback)
 
         message = 'Спасибо! Заявка принята. Мы свяжемся с вами в ближайшее время.'
         if is_ajax:

@@ -2,13 +2,16 @@
 
 import json
 from datetime import date, time
+from unittest.mock import patch
 
+from django.core import mail
 from django.core.exceptions import ValidationError
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from apps.products.models import Product
 
 from .models import Appointment, WorkingHours, CallbackRequest
+from .notifications import send_email_notification
 
 
 class AppointmentModelTests(TestCase):
@@ -173,3 +176,49 @@ class CallbackRequestTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json()['success'])
         self.assertEqual(CallbackRequest.objects.count(), 0)
+
+
+@override_settings(
+    EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+    DEFAULT_FROM_EMAIL="site@example.com",
+    MANAGER_EMAIL="manager@example.com",
+)
+class CallbackEmailNotificationTests(TestCase):
+    def test_send_email_notification(self):
+        callback = CallbackRequest.objects.create(
+            name="Иван",
+            phone="+7 (999) 123-45-67",
+        )
+
+        result = send_email_notification(callback)
+
+        self.assertTrue(result)
+        self.assertEqual(len(mail.outbox), 1)
+
+        message = mail.outbox[0]
+        self.assertEqual(
+            message.subject,
+            "Новая заявка на обратный звонок от Иван",
+        )
+        self.assertEqual(message.to, ["manager@example.com"])
+        self.assertEqual(message.from_email, "site@example.com")
+        self.assertIn("Имя: Иван", message.body)
+        self.assertIn("Телефон: +7 (999) 123-45-67", message.body)
+        self.assertIn("Комментарий: Не указан", message.body)
+        self.assertEqual(len(message.alternatives), 1)
+        self.assertEqual(message.alternatives[0].mimetype, "text/html")
+
+    @patch(
+        "apps.appointments.notifications.EmailMultiAlternatives.send",
+        side_effect=ConnectionError("SMTP unavailable"),
+    )
+    def test_email_error_does_not_raise_and_request_stays_in_db(self, mocked_send):
+        callback = CallbackRequest.objects.create(
+            name="Иван",
+            phone="+7 (999) 123-45-67",
+        )
+
+        result = send_email_notification(callback)
+
+        self.assertFalse(result)
+        self.assertTrue(CallbackRequest.objects.filter(pk=callback.pk).exists())
