@@ -7,6 +7,8 @@ from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 
 from apps.products.models import Product
+from apps.users.constants import ROLE_ADMIN, ROLE_MANAGER
+from apps.users.decorators import role_required
 from .forms import AppointmentForm, CallbackRequestForm
 from .notifications import send_email_notification
 
@@ -15,7 +17,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 
 from datetime import datetime, timedelta
-from .models import Appointment, WorkingHours
+from .models import Appointment, CallbackRequest, WorkingHours
 
 
 def get_available_slots(request, date):
@@ -196,3 +198,27 @@ def callback_submit(request):
     first_error = next((items[0] for items in errors.values() if items), 'Проверьте заполнение формы.')
     messages.error(request, first_error)
     return redirect(f"{reverse('home')}#callback")
+
+@role_required(ROLE_MANAGER, ROLE_ADMIN)
+def callback_request_list(request):
+    """Список заявок на обратный звонок для менеджера и администратора."""
+    status = request.GET.get("status", "").strip()
+    valid_statuses = {value for value, _label in CallbackRequest.STATUS_CHOICES}
+
+    callbacks = CallbackRequest.objects.all()
+    if status in valid_statuses:
+        callbacks = callbacks.filter(status=status)
+    else:
+        status = ""
+
+    context = {
+        "callbacks": callbacks,
+        "status": status,
+        "status_choices": CallbackRequest.STATUS_CHOICES,
+        "total": CallbackRequest.objects.count(),
+        "new_count": CallbackRequest.objects.filter(
+            status=CallbackRequest.STATUS_NEW
+        ).count(),
+    }
+    return render(request, "appointments/callback_request_list.html", context)
+

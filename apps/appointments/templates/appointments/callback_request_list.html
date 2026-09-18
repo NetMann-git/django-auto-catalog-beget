@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Заявки на обратный звонок{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 30px; padding-bottom: 50px;">
+    <div style="display:flex; justify-content:space-between; gap:20px; align-items:flex-start; flex-wrap:wrap; margin-bottom:20px;">
+        <div>
+            <h1>Заявки на обратный звонок</h1>
+            <p style="color:#666;">Всего: {{ total }} · Новых: {{ new_count }}</p>
+        </div>
+        <a href="{% url 'users:manager_dashboard' %}" class="btn btn-primary">← Панель менеджера</a>
+    </div>
+
+    <form method="get" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:20px;">
+        <label for="callback-status"><strong>Статус:</strong></label>
+        <select id="callback-status" name="status" style="padding:8px 10px;">
+            <option value="">Все</option>
+            {% for value, label in status_choices %}
+                <option value="{{ value }}"{% if status == value %} selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary">Показать</button>
+        {% if status %}<a href="{% url 'appointments:callback_request_list' %}" class="btn btn-secondary">Сбросить</a>{% endif %}
+    </form>
+
+    {% if callbacks %}
+        <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; min-width:720px;">
+                <thead>
+                    <tr>
+                        <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Дата</th>
+                        <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Имя</th>
+                        <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Телефон</th>
+                        <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Статус</th>
+                        <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Источник</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for callback in callbacks %}
+                        <tr>
+                            <td style="padding:10px; border-bottom:1px solid #eee; white-space:nowrap;">{{ callback.created_at|date:"d.m.Y H:i" }}</td>
+                            <td style="padding:10px; border-bottom:1px solid #eee;">{{ callback.name|default:"Без имени" }}</td>
+                            <td style="padding:10px; border-bottom:1px solid #eee;"><a href="tel:{{ callback.phone }}">{{ callback.phone }}</a></td>
+                            <td style="padding:10px; border-bottom:1px solid #eee;">{{ callback.get_status_display }}</td>
+                            <td style="padding:10px; border-bottom:1px solid #eee;">{{ callback.source }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>Заявок пока нет.</p>
+    {% endif %}
+</div>
+{% endblock %}
