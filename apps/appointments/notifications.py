@@ -11,10 +11,10 @@ logger = logging.getLogger(__name__)
 
 def send_email_notification(callback_request) -> bool:
     """Отправляет менеджеру уведомление о новой заявке на обратный звонок."""
-    manager_email = getattr(settings, "MANAGER_EMAIL", "")
-    if not manager_email:
+    manager_emails = getattr(settings, "MANAGER_EMAILS", [])
+    if not manager_emails:
         logger.error(
-            "Не задан MANAGER_EMAIL: уведомление о заявке #%s не отправлено",
+            "Не задан MANAGER_EMAILS: уведомление о заявке #%s не отправлено",
             callback_request.pk,
         )
         return False
@@ -51,7 +51,7 @@ def send_email_notification(callback_request) -> bool:
             subject=subject,
             body=text_body,
             from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[manager_email],
+            to=manager_emails,
         )
         message.attach_alternative(html_body, "text/html")
         message.send(fail_silently=False)
@@ -63,7 +63,7 @@ def send_email_notification(callback_request) -> bool:
         return False
 
     logger.info(
-        "Email-уведомление о заявке #%s отправлено менеджеру",
+        "Email-уведомление о заявке #%s отправлено менеджерам",
         callback_request.pk,
     )
     return True

@@ -198,7 +198,11 @@ EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool, default=False)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default=EMAIL_HOST_USER)
-MANAGER_EMAIL = config("MANAGER_EMAIL", default="")
+MANAGER_EMAILS = [
+    email.strip()
+    for email in config("MANAGER_EMAILS", default="").split(",")
+    if email.strip()
+]
 
 # -----------------------------------------------------------------------------
 # Прочее

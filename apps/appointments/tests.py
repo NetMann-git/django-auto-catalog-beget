@@ -181,7 +181,7 @@ class CallbackRequestTests(TestCase):
 @override_settings(
     EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
     DEFAULT_FROM_EMAIL="site@example.com",
-    MANAGER_EMAIL="manager@example.com",
+    MANAGER_EMAILS=["manager1@example.com", "manager2@example.com"],
 )
 class CallbackEmailNotificationTests(TestCase):
     def test_send_email_notification(self):
@@ -200,7 +200,10 @@ class CallbackEmailNotificationTests(TestCase):
             message.subject,
             "Новая заявка на обратный звонок от Иван",
         )
-        self.assertEqual(message.to, ["manager@example.com"])
+        self.assertEqual(
+            message.to,
+            ["manager1@example.com", "manager2@example.com"],
+        )
         self.assertEqual(message.from_email, "site@example.com")
         self.assertIn("Имя: Иван", message.body)
         self.assertIn("Телефон: +7 (999) 123-45-67", message.body)
