@@ -13,7 +13,11 @@ from django.test import TestCase, override_settings
 from apps.products.models import Product
 
 from .models import Appointment, WorkingHours, CallbackRequest
-from .notifications import send_email_notification, send_telegram_notification
+from .notifications import (
+    send_email_notification,
+    send_telegram_notification,
+    send_max_notification,
+)
 
 
 class AppointmentModelTests(TestCase):
@@ -270,6 +274,57 @@ class CallbackTelegramNotificationTests(TestCase):
         )
 
         result = send_telegram_notification(callback)
+
+        self.assertFalse(result)
+        self.assertTrue(CallbackRequest.objects.filter(pk=callback.pk).exists())
+
+
+@override_settings(
+    MAX_BOT_TOKEN="max-test-token",
+    MAX_MANAGER_CHAT_ID="987654321",
+)
+class CallbackMaxNotificationTests(TestCase):
+    @patch("apps.appointments.notifications.requests.post")
+    def test_send_max_notification(self, mocked_post):
+        mocked_post.return_value.raise_for_status.return_value = None
+        callback = CallbackRequest.objects.create(
+            name="Иван Иванов",
+            phone="+7 (999) 123-45-67",
+        )
+
+        result = send_max_notification(callback)
+
+        self.assertTrue(result)
+        mocked_post.assert_called_once_with(
+            "https://platform-api2.max.ru/messages",
+            headers={
+                "Authorization": "max-test-token",
+                "Content-Type": "application/json",
+            },
+            params={"chat_id": "987654321"},
+            json={
+                "text": (
+                    "📞 *Новая заявка на звонок*\n"
+                    "*Имя:* Иван Иванов\n"
+                    "*Телефон:* +7 (999) 123-45-67\n"
+                    "*Комментарий:* Не указан"
+                ),
+                "format": "markdown",
+            },
+            timeout=10,
+        )
+
+    @patch(
+        "apps.appointments.notifications.requests.post",
+        side_effect=requests.RequestException("MAX unavailable"),
+    )
+    def test_max_error_does_not_raise_and_request_stays_in_db(self, mocked_post):
+        callback = CallbackRequest.objects.create(
+            name="Иван",
+            phone="+7 (999) 123-45-67",
+        )
+
+        result = send_max_notification(callback)
 
         self.assertFalse(result)
         self.assertTrue(CallbackRequest.objects.filter(pk=callback.pk).exists())

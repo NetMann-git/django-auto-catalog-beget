@@ -130,3 +130,57 @@ def send_telegram_notification(callback_request) -> bool:
         callback_request.pk,
     )
     return True
+
+
+def send_max_notification(callback_request) -> bool:
+    """Отправляет менеджеру MAX-уведомление о новой заявке."""
+    bot_token = getattr(settings, "MAX_BOT_TOKEN", "").strip()
+    chat_id = str(getattr(settings, "MAX_MANAGER_CHAT_ID", "")).strip()
+
+    if not bot_token or not chat_id:
+        logger.warning(
+            "MAX-уведомление о заявке #%s не отправлено: "
+            "MAX_BOT_TOKEN или MAX_MANAGER_CHAT_ID не настроены",
+            callback_request.pk,
+        )
+        return False
+
+    name = callback_request.name.strip() if callback_request.name else "Без имени"
+    phone = callback_request.phone.strip()
+    comment = getattr(callback_request, "comment", "") or ""
+    comment = comment.strip() or "Не указан"
+
+    text = (
+        "📞 *Новая заявка на звонок*\n"
+        f"*Имя:* {name}\n"
+        f"*Телефон:* {phone}\n"
+        f"*Комментарий:* {comment}"
+    )
+
+    try:
+        response = requests.post(
+            "https://platform-api2.max.ru/messages",
+            headers={
+                "Authorization": bot_token,
+                "Content-Type": "application/json",
+            },
+            params={"chat_id": chat_id},
+            json={
+                "text": text,
+                "format": "markdown",
+            },
+            timeout=10,
+        )
+        response.raise_for_status()
+    except requests.RequestException:
+        logger.exception(
+            "Ошибка отправки MAX-уведомления о заявке #%s",
+            callback_request.pk,
+        )
+        return False
+
+    logger.info(
+        "MAX-уведомление о заявке #%s отправлено менеджеру",
+        callback_request.pk,
+    )
+    return True

@@ -207,6 +207,9 @@ MANAGER_EMAILS = [
 TELEGRAM_BOT_TOKEN = config("TELEGRAM_BOT_TOKEN", default="")
 TELEGRAM_MANAGER_CHAT_ID = config("TELEGRAM_MANAGER_CHAT_ID", default="")
 
+MAX_BOT_TOKEN = config("MAX_BOT_TOKEN", default="")
+MAX_MANAGER_CHAT_ID = config("MAX_MANAGER_CHAT_ID", default="")
+
 # -----------------------------------------------------------------------------
 # Прочее
 # -----------------------------------------------------------------------------
