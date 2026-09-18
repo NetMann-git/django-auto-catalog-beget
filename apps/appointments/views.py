@@ -10,7 +10,7 @@ from apps.products.models import Product
 from apps.users.constants import ROLE_ADMIN, ROLE_MANAGER
 from apps.users.decorators import role_required
 from .forms import AppointmentForm, CallbackRequestForm
-from .notifications import send_email_notification
+from .notifications import send_email_notification, send_telegram_notification
 
 from django.core.mail import send_mail
 from django.conf import settings
@@ -172,6 +172,7 @@ def callback_submit(request):
 
         # Заявка уже сохранена в БД. Ошибка SMTP не влияет на результат формы.
         send_email_notification(callback)
+        send_telegram_notification(callback)
 
         message = 'Спасибо! Заявка принята. Мы свяжемся с вами в ближайшее время.'
         if is_ajax:

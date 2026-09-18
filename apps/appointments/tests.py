@@ -4,6 +4,8 @@ import json
 from datetime import date, time
 from unittest.mock import patch
 
+import requests
+
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
@@ -11,7 +13,7 @@ from django.test import TestCase, override_settings
 from apps.products.models import Product
 
 from .models import Appointment, WorkingHours, CallbackRequest
-from .notifications import send_email_notification
+from .notifications import send_email_notification, send_telegram_notification
 
 
 class AppointmentModelTests(TestCase):
@@ -222,6 +224,52 @@ class CallbackEmailNotificationTests(TestCase):
         )
 
         result = send_email_notification(callback)
+
+        self.assertFalse(result)
+        self.assertTrue(CallbackRequest.objects.filter(pk=callback.pk).exists())
+
+
+@override_settings(
+    TELEGRAM_BOT_TOKEN="test-token",
+    TELEGRAM_MANAGER_CHAT_ID="123456789",
+)
+class CallbackTelegramNotificationTests(TestCase):
+    @patch("apps.appointments.notifications.requests.post")
+    def test_send_telegram_notification(self, mocked_post):
+        mocked_post.return_value.raise_for_status.return_value = None
+        callback = CallbackRequest.objects.create(
+            name="Иван Иванов",
+            phone="+7 (999) 123-45-67",
+        )
+
+        result = send_telegram_notification(callback)
+
+        self.assertTrue(result)
+        mocked_post.assert_called_once()
+        args, kwargs = mocked_post.call_args
+        self.assertEqual(
+            args[0],
+            "https://api.telegram.org/bottest-token/sendMessage",
+        )
+        self.assertEqual(kwargs["timeout"], 10)
+        self.assertEqual(kwargs["data"]["chat_id"], "123456789")
+        self.assertEqual(kwargs["data"]["parse_mode"], "MarkdownV2")
+        self.assertIn("📞 *Новая заявка на звонок*", kwargs["data"]["text"])
+        self.assertIn("Иван Иванов", kwargs["data"]["text"])
+        self.assertIn(r"+7 \(999\) 123\-45\-67", kwargs["data"]["text"])
+        self.assertIn("Комментарий:* Не указан", kwargs["data"]["text"])
+
+    @patch(
+        "apps.appointments.notifications.requests.post",
+        side_effect=requests.RequestException("Telegram unavailable"),
+    )
+    def test_telegram_error_does_not_raise_and_request_stays_in_db(self, mocked_post):
+        callback = CallbackRequest.objects.create(
+            name="Иван",
+            phone="+7 (999) 123-45-67",
+        )
+
+        result = send_telegram_notification(callback)
 
         self.assertFalse(result)
         self.assertTrue(CallbackRequest.objects.filter(pk=callback.pk).exists())

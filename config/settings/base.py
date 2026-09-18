@@ -204,6 +204,9 @@ MANAGER_EMAILS = [
     if email.strip()
 ]
 
+TELEGRAM_BOT_TOKEN = config("TELEGRAM_BOT_TOKEN", default="")
+TELEGRAM_MANAGER_CHAT_ID = config("TELEGRAM_MANAGER_CHAT_ID", default="")
+
 # -----------------------------------------------------------------------------
 # Прочее
 # -----------------------------------------------------------------------------
