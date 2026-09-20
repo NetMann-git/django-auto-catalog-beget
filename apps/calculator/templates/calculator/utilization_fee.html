@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Калькулятор утилизационного сбора{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'calculator/css/utilization_fee.css' %}">
+{% endblock %}
+
+{% block body_class %}util-sbor__page{% endblock %}
+
+{% block content %}
+<main class="util-sbor" id="util-sbor-calculator">
+    <div class="util-sbor__container">
+        <nav class="util-sbor__breadcrumbs" aria-label="Хлебные крошки">
+            <a href="{% url 'home' %}">Главная</a>
+            <span aria-hidden="true">/</span>
+            <span>Калькулятор утильсбора</span>
+        </nav>
+
+        <header class="util-sbor__header">
+            <p class="util-sbor__eyebrow">Для физических лиц</p>
+            <h1 class="util-sbor__title">Калькулятор утилизационного сбора</h1>
+            <p class="util-sbor__lead">
+                Расчёт для легковых автомобилей категории M1 по ставкам,
+                действующим в 2026 году.
+            </p>
+        </header>
+
+        <div class="util-sbor__layout">
+            <section class="util-sbor__card" aria-labelledby="util-sbor-form-title">
+                <h2 class="util-sbor__subtitle" id="util-sbor-form-title">
+                    Параметры автомобиля
+                </h2>
+
+                <form method="post" class="util-sbor__form" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="util-sbor__errors" role="alert">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="util-sbor__field">
+                        <label for="{{ form.powertrain.id_for_label }}">
+                            {{ form.powertrain.label }}
+                        </label>
+                        {{ form.powertrain }}
+                        {{ form.powertrain.errors }}
+                    </div>
+
+                    <div class="util-sbor__field">
+                        <label for="{{ form.age_group.id_for_label }}">
+                            {{ form.age_group.label }}
+                        </label>
+                        {{ form.age_group }}
+                        {{ form.age_group.errors }}
+                    </div>
+
+                    <div class="util-sbor__field" data-util-sbor-engine-capacity>
+                        <label for="{{ form.engine_capacity.id_for_label }}">
+                            {{ form.engine_capacity.label }}
+                        </label>
+                        {{ form.engine_capacity }}
+                        {% if form.engine_capacity.help_text %}
+                            <small>{{ form.engine_capacity.help_text }}</small>
+                        {% endif %}
+                        {{ form.engine_capacity.errors }}
+                    </div>
+
+                    <div class="util-sbor__power-row">
+                        <div class="util-sbor__field util-sbor__field--power">
+                            <label for="{{ form.power_value.id_for_label }}">
+                                {{ form.power_value.label }}
+                            </label>
+                            {{ form.power_value }}
+                            {{ form.power_value.errors }}
+                        </div>
+                        <div class="util-sbor__field util-sbor__field--unit">
+                            <label for="{{ form.power_unit.id_for_label }}">
+                                {{ form.power_unit.label }}
+                            </label>
+                            {{ form.power_unit }}
+                            {{ form.power_unit.errors }}
+                        </div>
+                    </div>
+
+                    <div class="util-sbor__confirm">
+                        {{ form.personal_use_confirmed }}
+                        <label for="{{ form.personal_use_confirmed.id_for_label }}">
+                            {{ form.personal_use_confirmed.label }}
+                        </label>
+                    </div>
+                    {{ form.personal_use_confirmed.errors }}
+
+                    <button class="util-sbor__submit" type="submit">
+                        Рассчитать сбор
+                    </button>
+                </form>
+            </section>
+
+            <aside class="util-sbor__result" aria-live="polite">
+                {% if configuration_error %}
+                    <div class="util-sbor__notice util-sbor__notice--error" role="alert">
+                        <h2>Расчёт временно недоступен</h2>
+                        <p>{{ configuration_error }}</p>
+                    </div>
+                {% elif result %}
+                    <div class="util-sbor__result-card">
+                        <p class="util-sbor__result-label">Утилизационный сбор</p>
+                        <p class="util-sbor__amount">{{ formatted_amount }} ₽</p>
+                        <dl class="util-sbor__details">
+                            <div>
+                                <dt>Базовая ставка</dt>
+                                <dd>{{ formatted_base_rate }} ₽</dd>
+                            </div>
+                            <div>
+                                <dt>Коэффициент</dt>
+                                <dd>{{ result.coefficient }}</dd>
+                            </div>
+                            <div>
+                                <dt>Версия ставок</dt>
+                                <dd>{{ result.rate_version.name }}</dd>
+                            </div>
+                        </dl>
+                        {% if result.rate_version.source_url %}
+                            <a class="util-sbor__source"
+                               href="{{ result.rate_version.source_url }}"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                Нормативный источник
+                            </a>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="util-sbor__placeholder">
+                        <span class="util-sbor__placeholder-icon">₽</span>
+                        <h2>Результат появится здесь</h2>
+                        <p>Заполните параметры автомобиля и нажмите «Рассчитать сбор».</p>
+                    </div>
+                {% endif %}
+
+                <div class="util-sbor__notice">
+                    <h2>Важно</h2>
+                    <p>
+                        Расчёт носит информационный характер. Личные ставки применяются
+                        при соблюдении условий постановления, включая ограничения по
+                        повторному ввозу и отчуждению автомобиля в течение 12 месяцев.
+                        Итоговую сумму определяет таможенный орган.
+                    </p>
+                </div>
+            </aside>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'calculator/js/utilization_fee.js' %}" defer></script>
+{% endblock %}

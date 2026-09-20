@@ -1,9 +1,9 @@
 # config/urls.py
 
-from django.contrib import admin
-from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import include, path
 
 from apps.home.views import home
 
@@ -20,6 +20,7 @@ urlpatterns = [
     path('account/content/', include('apps.home.urls')),
     path('search/', include('apps.search.urls')),
     path('recommendations/', include('apps.recommendations.urls', namespace='recommendations')),
+    path('calculator/', include('apps.calculator.urls')),
 ]
 
 if settings.DEBUG:
