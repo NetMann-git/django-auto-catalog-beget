@@ -1,0 +1,241 @@
+{
+  "calculator": {
+    "slug": "customs-clearance",
+    "title": "Калькулятор растаможки автомобилей",
+    "description": "Расчёт платежей для легковых автомобилей физических лиц.",
+    "is_active": true,
+    "sort_order": 20
+  },
+  "rate_version": {
+    "name": "Растаможка автомобилей — 2026 год",
+    "effective_from": "2026-01-01",
+    "effective_to": "2026-12-31",
+    "base_rate": "0.00",
+    "source_name": "Решение Совета ЕЭК № 107; постановления Правительства РФ № 1637 и № 1638",
+    "source_url": "https://www.alta.ru/tamdoc/17sr0107/",
+    "notes": "Легковые автомобили с ДВС для личного пользования. Таможенные сборы в редакции, действующей с 01.01.2026.",
+    "is_active": true
+  },
+  "duty_rates": [
+    {
+      "age_group": "up_to_3",
+      "value_eur_min": "0.00",
+      "value_eur_max": "8500.00",
+      "value_percentage": "54.0000",
+      "minimum_eur_per_cc": "2.5000",
+      "sort_order": 10,
+      "notes": "Решение Совета ЕЭК от 20.12.2017 № 107, приложение № 2, таблица 2."
+    },
+    {
+      "age_group": "up_to_3",
+      "value_eur_min": "8500.01",
+      "value_eur_max": "16700.00",
+      "value_percentage": "48.0000",
+      "minimum_eur_per_cc": "3.5000",
+      "sort_order": 20
+    },
+    {
+      "age_group": "up_to_3",
+      "value_eur_min": "16700.01",
+      "value_eur_max": "42300.00",
+      "value_percentage": "48.0000",
+      "minimum_eur_per_cc": "5.5000",
+      "sort_order": 30
+    },
+    {
+      "age_group": "up_to_3",
+      "value_eur_min": "42300.01",
+      "value_eur_max": "84500.00",
+      "value_percentage": "48.0000",
+      "minimum_eur_per_cc": "7.5000",
+      "sort_order": 40
+    },
+    {
+      "age_group": "up_to_3",
+      "value_eur_min": "84500.01",
+      "value_eur_max": "169000.00",
+      "value_percentage": "48.0000",
+      "minimum_eur_per_cc": "15.0000",
+      "sort_order": 50
+    },
+    {
+      "age_group": "up_to_3",
+      "value_eur_min": "169000.01",
+      "value_eur_max": null,
+      "value_percentage": "48.0000",
+      "minimum_eur_per_cc": "20.0000",
+      "sort_order": 60
+    },
+    {
+      "age_group": "3_to_5",
+      "engine_capacity_min": 1,
+      "engine_capacity_max": 1000,
+      "fixed_eur_per_cc": "1.5000",
+      "sort_order": 70
+    },
+    {
+      "age_group": "3_to_5",
+      "engine_capacity_min": 1001,
+      "engine_capacity_max": 1500,
+      "fixed_eur_per_cc": "1.7000",
+      "sort_order": 80
+    },
+    {
+      "age_group": "3_to_5",
+      "engine_capacity_min": 1501,
+      "engine_capacity_max": 1800,
+      "fixed_eur_per_cc": "2.5000",
+      "sort_order": 90
+    },
+    {
+      "age_group": "3_to_5",
+      "engine_capacity_min": 1801,
+      "engine_capacity_max": 2300,
+      "fixed_eur_per_cc": "2.7000",
+      "sort_order": 100
+    },
+    {
+      "age_group": "3_to_5",
+      "engine_capacity_min": 2301,
+      "engine_capacity_max": 3000,
+      "fixed_eur_per_cc": "3.0000",
+      "sort_order": 110
+    },
+    {
+      "age_group": "3_to_5",
+      "engine_capacity_min": 3001,
+      "engine_capacity_max": null,
+      "fixed_eur_per_cc": "3.6000",
+      "sort_order": 120
+    },
+    {
+      "age_group": "over_5",
+      "engine_capacity_min": 1,
+      "engine_capacity_max": 1000,
+      "fixed_eur_per_cc": "3.0000",
+      "sort_order": 130
+    },
+    {
+      "age_group": "over_5",
+      "engine_capacity_min": 1001,
+      "engine_capacity_max": 1500,
+      "fixed_eur_per_cc": "3.2000",
+      "sort_order": 140
+    },
+    {
+      "age_group": "over_5",
+      "engine_capacity_min": 1501,
+      "engine_capacity_max": 1800,
+      "fixed_eur_per_cc": "3.5000",
+      "sort_order": 150
+    },
+    {
+      "age_group": "over_5",
+      "engine_capacity_min": 1801,
+      "engine_capacity_max": 2300,
+      "fixed_eur_per_cc": "4.8000",
+      "sort_order": 160
+    },
+    {
+      "age_group": "over_5",
+      "engine_capacity_min": 2301,
+      "engine_capacity_max": 3000,
+      "fixed_eur_per_cc": "5.0000",
+      "sort_order": 170
+    },
+    {
+      "age_group": "over_5",
+      "engine_capacity_min": 3001,
+      "engine_capacity_max": null,
+      "fixed_eur_per_cc": "5.7000",
+      "sort_order": 180
+    }
+  ],
+  "clearance_fee_rates": [
+    {
+      "customs_value_rub_min": "0.00",
+      "customs_value_rub_max": "200000.00",
+      "fee_rub": "1231.00",
+      "sort_order": 10
+    },
+    {
+      "customs_value_rub_min": "200000.01",
+      "customs_value_rub_max": "450000.00",
+      "fee_rub": "2462.00",
+      "sort_order": 20
+    },
+    {
+      "customs_value_rub_min": "450000.01",
+      "customs_value_rub_max": "1200000.00",
+      "fee_rub": "4924.00",
+      "sort_order": 30
+    },
+    {
+      "customs_value_rub_min": "1200000.01",
+      "customs_value_rub_max": "2700000.00",
+      "fee_rub": "13541.00",
+      "sort_order": 40
+    },
+    {
+      "customs_value_rub_min": "2700000.01",
+      "customs_value_rub_max": "4200000.00",
+      "fee_rub": "18465.00",
+      "sort_order": 50
+    },
+    {
+      "customs_value_rub_min": "4200000.01",
+      "customs_value_rub_max": "5500000.00",
+      "fee_rub": "21344.00",
+      "sort_order": 60
+    },
+    {
+      "customs_value_rub_min": "5500000.01",
+      "customs_value_rub_max": "10000000.00",
+      "fee_rub": "49240.00",
+      "sort_order": 70
+    },
+    {
+      "customs_value_rub_min": "10000000.01",
+      "customs_value_rub_max": null,
+      "fee_rub": "73860.00",
+      "sort_order": 80
+    }
+  ],
+  "currency_rates": [
+    {
+      "code": "RUB",
+      "nominal": 1,
+      "rate_to_rub": "1.000000",
+      "effective_date": "2026-09-19",
+      "source_url": "https://www.cbr.ru/scripts/XML_daily.asp"
+    },
+    {
+      "code": "USD",
+      "nominal": 1,
+      "rate_to_rub": "84.197500",
+      "effective_date": "2026-09-19",
+      "source_url": "https://www.cbr.ru/scripts/XML_daily.asp"
+    },
+    {
+      "code": "EUR",
+      "nominal": 1,
+      "rate_to_rub": "96.667100",
+      "effective_date": "2026-09-19",
+      "source_url": "https://www.cbr.ru/scripts/XML_daily.asp"
+    },
+    {
+      "code": "CNY",
+      "nominal": 1,
+      "rate_to_rub": "12.567000",
+      "effective_date": "2026-09-19",
+      "source_url": "https://www.cbr.ru/scripts/XML_daily.asp"
+    },
+    {
+      "code": "KRW",
+      "nominal": 1000,
+      "rate_to_rub": "60.999400",
+      "effective_date": "2026-09-19",
+      "source_url": "https://www.cbr.ru/scripts/XML_daily.asp"
+    }
+  ]
+}

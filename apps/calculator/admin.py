@@ -2,7 +2,14 @@
 
 from django.contrib import admin
 
-from .models import CalculatorDefinition, RateVersion, UtilizationRate
+from .models import (
+    CalculatorDefinition,
+    CurrencyRate,
+    CustomsClearanceFeeRate,
+    CustomsDutyRate,
+    RateVersion,
+    UtilizationRate,
+)
 
 
 @admin.register(CalculatorDefinition)
@@ -66,3 +73,57 @@ class UtilizationRateAdmin(admin.ModelAdmin):
         "engine_capacity_min",
         "power_kw_min",
     )
+
+
+@admin.register(CurrencyRate)
+class CurrencyRateAdmin(admin.ModelAdmin):
+    """Курсы валют, используемые калькуляторами."""
+
+    list_display = (
+        "code",
+        "nominal",
+        "rate_to_rub",
+        "effective_date",
+        "updated_at",
+    )
+    list_filter = ("code", "effective_date")
+    search_fields = ("code",)
+    ordering = ("-effective_date", "code")
+    readonly_fields = ("created_at", "updated_at")
+
+
+@admin.register(CustomsDutyRate)
+class CustomsDutyRateAdmin(admin.ModelAdmin):
+    """Ставки пошлины для автомобилей физических лиц."""
+
+    list_display = (
+        "rate_version",
+        "age_group",
+        "value_eur_min",
+        "value_eur_max",
+        "engine_capacity_min",
+        "engine_capacity_max",
+        "value_percentage",
+        "minimum_eur_per_cc",
+        "fixed_eur_per_cc",
+    )
+    list_filter = ("rate_version", "age_group")
+    search_fields = ("rate_version__name", "notes")
+    autocomplete_fields = ("rate_version",)
+    ordering = ("rate_version", "age_group", "sort_order")
+
+
+@admin.register(CustomsClearanceFeeRate)
+class CustomsClearanceFeeRateAdmin(admin.ModelAdmin):
+    """Ставки сборов за таможенные операции."""
+
+    list_display = (
+        "rate_version",
+        "customs_value_rub_min",
+        "customs_value_rub_max",
+        "fee_rub",
+    )
+    list_filter = ("rate_version",)
+    search_fields = ("rate_version__name", "notes")
+    autocomplete_fields = ("rate_version",)
+    ordering = ("rate_version", "sort_order")

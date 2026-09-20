@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Калькулятор растаможки автомобилей{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'calculator/css/customs_clearance.css' %}">
+{% endblock %}
+
+{% block body_class %}customs-calc__page{% endblock %}
+
+{% block content %}
+<main class="customs-calc" id="customs-clearance-calculator">
+    <div class="customs-calc__container">
+        <nav class="customs-calc__breadcrumbs" aria-label="Хлебные крошки">
+            <a href="{% url 'home' %}">Главная</a>
+            <span aria-hidden="true">/</span>
+            <span>Калькулятор растаможки</span>
+        </nav>
+
+        <header class="customs-calc__header">
+            <p class="customs-calc__eyebrow">Для физических лиц</p>
+            <h1 class="customs-calc__title">
+                Калькулятор растаможки автомобилей
+            </h1>
+            <p class="customs-calc__lead">
+                Пошлина, сбор за таможенные операции и утилизационный
+                сбор для легкового автомобиля с ДВС.
+            </p>
+        </header>
+
+        <div class="customs-calc__layout">
+            <section class="customs-calc__card" aria-labelledby="customs-form-title">
+                <h2 class="customs-calc__subtitle" id="customs-form-title">
+                    Параметры автомобиля
+                </h2>
+
+                <form method="post" class="customs-calc__form" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="customs-calc__errors" role="alert">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="customs-calc__value-row">
+                        <div class="customs-calc__field">
+                            <label for="{{ form.customs_value.id_for_label }}">
+                                {{ form.customs_value.label }}
+                            </label>
+                            {{ form.customs_value }}
+                            <small>{{ form.customs_value.help_text }}</small>
+                            {{ form.customs_value.errors }}
+                        </div>
+                        <div class="customs-calc__field">
+                            <label for="{{ form.currency_code.id_for_label }}">
+                                {{ form.currency_code.label }}
+                            </label>
+                            {{ form.currency_code }}
+                            {{ form.currency_code.errors }}
+                        </div>
+                    </div>
+
+                    <div class="customs-calc__field">
+                        <label for="{{ form.age_group.id_for_label }}">
+                            {{ form.age_group.label }}
+                        </label>
+                        {{ form.age_group }}
+                        {{ form.age_group.errors }}
+                    </div>
+
+                    <div class="customs-calc__field">
+                        <label for="{{ form.engine_capacity.id_for_label }}">
+                            {{ form.engine_capacity.label }}
+                        </label>
+                        {{ form.engine_capacity }}
+                        {{ form.engine_capacity.errors }}
+                    </div>
+
+                    <div class="customs-calc__power-row">
+                        <div class="customs-calc__field">
+                            <label for="{{ form.power_value.id_for_label }}">
+                                {{ form.power_value.label }}
+                            </label>
+                            {{ form.power_value }}
+                            <small>{{ form.power_value.help_text }}</small>
+                            {{ form.power_value.errors }}
+                        </div>
+                        <div class="customs-calc__field">
+                            <label for="{{ form.power_unit.id_for_label }}">
+                                {{ form.power_unit.label }}
+                            </label>
+                            {{ form.power_unit }}
+                            {{ form.power_unit.errors }}
+                        </div>
+                    </div>
+
+                    <div class="customs-calc__confirm">
+                        {{ form.personal_use_confirmed }}
+                        <label for="{{ form.personal_use_confirmed.id_for_label }}">
+                            {{ form.personal_use_confirmed.label }}
+                        </label>
+                    </div>
+                    {{ form.personal_use_confirmed.errors }}
+
+                    <button class="customs-calc__submit" type="submit">
+                        Рассчитать платежи
+                    </button>
+                </form>
+            </section>
+
+            <aside class="customs-calc__result" aria-live="polite">
+                {% if configuration_error %}
+                    <div class="customs-calc__notice customs-calc__notice--error"
+                         role="alert">
+                        <h2>Расчёт временно недоступен</h2>
+                        <p>{{ configuration_error }}</p>
+                    </div>
+                {% elif result %}
+                    <div class="customs-calc__result-card">
+                        <p class="customs-calc__result-label">
+                            Таможенные платежи
+                        </p>
+                        <p class="customs-calc__amount">
+                            {{ formatted_total }} ₽
+                        </p>
+                        <dl class="customs-calc__details">
+                            <div>
+                                <dt>Таможенная пошлина</dt>
+                                <dd>{{ formatted_duty }} ₽</dd>
+                            </div>
+                            <div>
+                                <dt>Таможенный сбор</dt>
+                                <dd>{{ formatted_clearance_fee }} ₽</dd>
+                            </div>
+                            <div>
+                                <dt>Утилизационный сбор</dt>
+                                <dd>{{ formatted_utilization_fee }} ₽</dd>
+                            </div>
+                            <div>
+                                <dt>Стоимость для расчёта</dt>
+                                <dd>
+                                    {{ formatted_value_rub }} ₽<br>
+                                    <small>{{ result.customs_value_eur }} €</small>
+                                </dd>
+                            </div>
+                            <div>
+                                <dt>Курс {{ result.currency_rate.code }}</dt>
+                                <dd>
+                                    {{ result.currency_rate.rate_to_rub }} ₽
+                                    за {{ result.currency_rate.nominal }} ед.<br>
+                                    <small>{{ result.currency_rate.effective_date|date:"d.m.Y" }}</small>
+                                </dd>
+                            </div>
+                        </dl>
+                    </div>
+                {% else %}
+                    <div class="customs-calc__placeholder">
+                        <span class="customs-calc__placeholder-icon">₽</span>
+                        <h2>Результат появится здесь</h2>
+                        <p>
+                            Заполните параметры автомобиля и нажмите
+                            «Рассчитать платежи».
+                        </p>
+                    </div>
+                {% endif %}
+
+                <div class="customs-calc__notice">
+                    <h2>Важно</h2>
+                    <p>
+                        Первая версия рассчитана для легковых автомобилей
+                        с ДВС и непоследовательных гибридов, ввозимых физическим
+                        лицом для личного пользования. Электромобили требуют
+                        расчёта совокупного таможенного платежа.
+                    </p>
+                    <p>
+                        Результат информационный: таможенный орган может
+                        скорректировать стоимость и итоговые платежи.
+                    </p>
+                    <div class="customs-calc__sources">
+                        <a href="https://www.alta.ru/tamdoc/17sr0107/"
+                           target="_blank" rel="noopener noreferrer">
+                            Ставки ЕАЭС
+                        </a>
+                        <a href="https://www.alta.ru/tamdoc/24ps1637/"
+                           target="_blank" rel="noopener noreferrer">
+                            Таможенные сборы
+                        </a>
+                        <a href="https://www.cbr.ru/scripts/XML_daily.asp"
+                           target="_blank" rel="noopener noreferrer">
+                            Курсы Банка России
+                        </a>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</main>
+{% endblock %}

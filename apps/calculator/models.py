@@ -110,7 +110,10 @@ class RateVersion(models.Model):
                 is_active=True,
                 effective_from__lte=period_end,
             )
-            .filter(Q(effective_to__isnull=True) | Q(effective_to__gte=self.effective_from))
+            .filter(
+                Q(effective_to__isnull=True)
+                | Q(effective_to__gte=self.effective_from)
+            )
             .exclude(pk=self.pk)
         )
         if overlapping.exists():
@@ -265,3 +268,213 @@ class UtilizationRate(models.Model):
 
         if errors:
             raise ValidationError(errors)
+
+
+class CurrencyRate(models.Model):
+    """Курс иностранной валюты к рублю на определённую дату."""
+
+    code = models.CharField(max_length=3, verbose_name="Код валюты")
+    nominal = models.PositiveIntegerField(default=1, verbose_name="Номинал")
+    rate_to_rub = models.DecimalField(
+        max_digits=18,
+        decimal_places=6,
+        verbose_name="Курс к рублю",
+    )
+    effective_date = models.DateField(verbose_name="Дата курса")
+    source_url = models.URLField(blank=True, verbose_name="Источник")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("-effective_date", "code")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("code", "effective_date"),
+                name="calculator_unique_currency_rate_date",
+            ),
+            models.CheckConstraint(
+                condition=Q(rate_to_rub__gt=0),
+                name="calculator_currency_rate_positive",
+            ),
+        ]
+        verbose_name = "Курс валюты"
+        verbose_name_plural = "Курсы валют"
+
+    def __str__(self) -> str:
+        return f"{self.code} на {self.effective_date}: {self.rate_to_rub}"
+
+
+class CustomsDutyRate(models.Model):
+    """Ставка таможенной пошлины для автомобиля физического лица."""
+
+    class AgeGroup(models.TextChoices):
+        UP_TO_THREE = "up_to_3", "Не более 3 лет"
+        THREE_TO_FIVE = "3_to_5", "Более 3, но не более 5 лет"
+        OVER_FIVE = "over_5", "Более 5 лет"
+
+    rate_version = models.ForeignKey(
+        RateVersion,
+        on_delete=models.CASCADE,
+        related_name="customs_duty_rates",
+        verbose_name="Версия ставок",
+    )
+    age_group = models.CharField(
+        max_length=12,
+        choices=AgeGroup.choices,
+        verbose_name="Возраст автомобиля",
+    )
+    value_eur_min = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="Стоимость от, евро",
+    )
+    value_eur_max = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="Стоимость до, евро",
+    )
+    engine_capacity_min = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        verbose_name="Объём двигателя от, см³",
+    )
+    engine_capacity_max = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        verbose_name="Объём двигателя до, см³",
+    )
+    value_percentage = models.DecimalField(
+        max_digits=7,
+        decimal_places=4,
+        blank=True,
+        null=True,
+        verbose_name="Процент от стоимости",
+    )
+    minimum_eur_per_cc = models.DecimalField(
+        max_digits=8,
+        decimal_places=4,
+        blank=True,
+        null=True,
+        verbose_name="Минимум евро за см³",
+    )
+    fixed_eur_per_cc = models.DecimalField(
+        max_digits=8,
+        decimal_places=4,
+        blank=True,
+        null=True,
+        verbose_name="Евро за см³",
+    )
+    sort_order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
+    notes = models.CharField(max_length=255, blank=True, verbose_name="Примечание")
+
+    class Meta:
+        ordering = ("rate_version", "age_group", "sort_order")
+        indexes = [
+            models.Index(
+                fields=("rate_version", "age_group"),
+                name="calc_customs_duty_lookup_idx",
+            )
+        ]
+        verbose_name = "Ставка таможенной пошлины"
+        verbose_name_plural = "Ставки таможенной пошлины"
+
+    def __str__(self) -> str:
+        return f"{self.rate_version.name}: {self.get_age_group_display()}"
+
+    def clean(self) -> None:
+        """Проверяет обязательные параметры формулы ставки."""
+        super().clean()
+        errors: dict[str, str] = {}
+
+        if self.age_group == self.AgeGroup.UP_TO_THREE:
+            if self.value_percentage is None:
+                errors["value_percentage"] = "Укажите процент от стоимости."
+            if self.minimum_eur_per_cc is None:
+                errors["minimum_eur_per_cc"] = "Укажите минимум за см³."
+        elif self.fixed_eur_per_cc is None:
+            errors["fixed_eur_per_cc"] = "Укажите ставку за см³."
+
+        if (
+            self.value_eur_min is not None
+            and self.value_eur_max is not None
+            and self.value_eur_min > self.value_eur_max
+        ):
+            errors["value_eur_max"] = "Некорректный диапазон стоимости."
+
+        if (
+            self.engine_capacity_min is not None
+            and self.engine_capacity_max is not None
+            and self.engine_capacity_min > self.engine_capacity_max
+        ):
+            errors["engine_capacity_max"] = "Некорректный диапазон объёма."
+
+        if errors:
+            raise ValidationError(errors)
+
+
+class CustomsClearanceFeeRate(models.Model):
+    """Ставка сбора за таможенные операции."""
+
+    rate_version = models.ForeignKey(
+        RateVersion,
+        on_delete=models.CASCADE,
+        related_name="customs_clearance_fee_rates",
+        verbose_name="Версия ставок",
+    )
+    customs_value_rub_min = models.DecimalField(
+        max_digits=16,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="Таможенная стоимость от, ₽",
+    )
+    customs_value_rub_max = models.DecimalField(
+        max_digits=16,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="Таможенная стоимость до, ₽",
+    )
+    fee_rub = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        verbose_name="Сбор, ₽",
+    )
+    sort_order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
+    notes = models.CharField(max_length=255, blank=True, verbose_name="Примечание")
+
+    class Meta:
+        ordering = ("rate_version", "sort_order")
+        indexes = [
+            models.Index(
+                fields=("rate_version",),
+                name="calc_customs_fee_lookup_idx",
+            )
+        ]
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(fee_rub__gte=0),
+                name="calculator_customs_fee_nonnegative",
+            )
+        ]
+        verbose_name = "Таможенный сбор"
+        verbose_name_plural = "Таможенные сборы"
+
+    def __str__(self) -> str:
+        return f"{self.rate_version.name}: {self.fee_rub} ₽"
+
+    def clean(self) -> None:
+        """Проверяет диапазон таможенной стоимости."""
+        super().clean()
+        if (
+            self.customs_value_rub_min is not None
+            and self.customs_value_rub_max is not None
+            and self.customs_value_rub_min > self.customs_value_rub_max
+        ):
+            raise ValidationError(
+                {"customs_value_rub_max": "Некорректный диапазон стоимости."}
+            )
