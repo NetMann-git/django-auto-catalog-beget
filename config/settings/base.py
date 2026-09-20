@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'apps.users',
     'apps.search',
     'apps.recommendations',
+    'apps.calculator',
 ]
 
 MIDDLEWARE = [
