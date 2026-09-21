@@ -86,6 +86,11 @@ def horsepower_to_kw(horsepower: Decimal) -> Decimal:
     return horsepower * HORSEPOWER_TO_KW
 
 
+def kw_to_horsepower(kilowatts: Decimal) -> Decimal:
+    """Переводит киловатты в метрические лошадиные силы."""
+    return kilowatts / HORSEPOWER_TO_KW
+
+
 def calculate_fee(base_rate: Decimal, coefficient: Decimal) -> Decimal:
     """Возвращает сумму сбора."""
     return (base_rate * coefficient).quantize(
@@ -134,10 +139,11 @@ class UtilizationFeeCalculator:
         data: UtilizationCalculationInput,
         *,
         calculation_date: date | None = None,
+        rate_version: RateVersion | None = None,
     ) -> UtilizationCalculationResult:
         """Рассчитывает сбор для автомобиля физлица."""
         actual_date = calculation_date or date.today()
-        version = cls._get_rate_version(actual_date)
+        version = rate_version or cls.get_rate_version(actual_date)
         rate = cls._get_rate(version, data)
 
         return UtilizationCalculationResult(
@@ -149,10 +155,11 @@ class UtilizationFeeCalculator:
         )
 
     @staticmethod
-    def _get_rate_version(calculation_date: date) -> RateVersion:
+    def get_rate_version(calculation_date: date | None = None) -> RateVersion:
+        """Возвращает опубликованную версию ставок на указанную дату."""
         return _get_rate_version(
             UTILIZATION_CALCULATOR_SLUG,
-            calculation_date,
+            calculation_date or date.today(),
         )
 
     @staticmethod

@@ -54,6 +54,16 @@
     line-height: 1.6;
 }
 
+.util-sbor__version {
+    display: inline-block;
+    margin: 14px 0 0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #eef1f5;
+    color: #4f5868;
+    font-size: 14px;
+}
+
 .util-sbor__layout {
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
@@ -120,12 +130,6 @@
     font-size: 13px;
 }
 
-.util-sbor__power-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 150px;
-    gap: 14px;
-}
-
 .util-sbor__confirm {
     display: flex;
     gap: 10px;
@@ -160,6 +164,33 @@
     transform: translateY(-1px);
 }
 
+.util-sbor__submit:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.util-sbor__accuracy {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid #e4e7eb;
+}
+
+.util-sbor__accuracy h3 {
+    margin: 0 0 12px;
+    font-size: 17px;
+}
+
+.util-sbor__accuracy ul {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding-left: 20px;
+    color: #626b79;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
 .util-sbor__result {
     display: grid;
     gap: 18px;
@@ -191,10 +222,71 @@
     line-height: 1;
 }
 
+.util-sbor__selection {
+    display: grid;
+    gap: 4px;
+    margin-bottom: 24px;
+    padding: 14px;
+    border-radius: 10px;
+    background: #f6f7f9;
+    color: #5e6675;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.util-sbor__selection p {
+    margin: 0;
+}
+
+.util-sbor__comparison-title {
+    margin: 0 0 12px;
+    font-size: 17px;
+}
+
+.util-sbor__comparison {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 22px;
+}
+
+.util-sbor__comparison-item {
+    display: grid;
+    gap: 6px;
+    padding: 14px;
+    border: 1px solid #e0e3e8;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.util-sbor__comparison-item span {
+    color: #6a7281;
+    font-size: 13px;
+}
+
+.util-sbor__comparison-item strong {
+    font-size: 18px;
+}
+
+.util-sbor__comparison-item--selected {
+    border-color: #cf202f;
+    background: #fff7f8;
+}
+
+.util-sbor__details-wrap {
+    margin-bottom: 20px;
+}
+
+.util-sbor__details-wrap summary {
+    color: #4f5868;
+    cursor: pointer;
+    font-weight: 700;
+}
+
 .util-sbor__details {
     display: grid;
     gap: 12px;
-    margin: 0 0 20px;
+    margin: 16px 0 0;
 }
 
 .util-sbor__details div {
@@ -292,7 +384,7 @@
         border-radius: 14px;
     }
 
-    .util-sbor__power-row {
+    .util-sbor__comparison {
         grid-template-columns: 1fr;
     }
 }

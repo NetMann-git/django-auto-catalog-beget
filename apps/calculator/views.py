@@ -6,7 +6,8 @@ from typing import Any
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-from .forms import CustomsClearanceForm, UtilizationFeeForm
+from .forms import CustomsClearanceForm
+from .models import RateVersion, UtilizationRate
 from .services import (
     CustomsCalculationInput,
     CustomsClearanceCalculator,
@@ -14,6 +15,7 @@ from .services import (
     UtilizationCalculationInput,
     UtilizationFeeCalculator,
 )
+from .utilization_forms import UtilizationFeeForm
 
 
 def _format_money(value: Decimal) -> str:
@@ -21,21 +23,79 @@ def _format_money(value: Decimal) -> str:
     return f"{value:,.0f}".replace(",", " ")
 
 
-def utilization_fee(request: HttpRequest) -> HttpResponse:
-    """Показывает форму и результат расчёта."""
-    form = UtilizationFeeForm(request.POST or None)
-    context: dict[str, Any] = {"form": form}
+def _utilization_input(
+    form: UtilizationFeeForm,
+    *,
+    age_group: str,
+) -> UtilizationCalculationInput:
+    """Создаёт входные данные сервиса из проверенной формы."""
+    return UtilizationCalculationInput(
+        powertrain=str(form.cleaned_data["powertrain"]),
+        age_group=age_group,
+        engine_capacity=form.cleaned_data["engine_capacity"],
+        power_kw=form.cleaned_data["power_kw"],
+    )
 
-    if request.method == "POST" and form.is_valid():
+
+def _comparison_results(
+    form: UtilizationFeeForm,
+    rate_version: RateVersion,
+) -> list[dict[str, object]]:
+    """Рассчитывает обе возрастные ставки для сравнения."""
+    selected_age = str(form.cleaned_data["age_group"])
+    results: list[dict[str, object]] = []
+    for age_group, label in UtilizationRate.AgeGroup.choices:
+        calculation = UtilizationFeeCalculator.calculate(
+            _utilization_input(form, age_group=age_group),
+            rate_version=rate_version,
+        )
+        results.append(
+            {
+                "label": label,
+                "formatted_amount": _format_money(calculation.amount),
+                "is_selected": age_group == selected_age,
+            }
+        )
+    return results
+
+
+def utilization_fee(request: HttpRequest) -> HttpResponse:
+    """Показывает форму, итоговый расчёт и сравнение по возрасту."""
+    context: dict[str, Any] = {}
+    try:
+        rate_version = UtilizationFeeCalculator.get_rate_version()
+    except RateConfigurationError as error:
+        rate_version = None
+        context["configuration_error"] = str(error)
+
+    form = UtilizationFeeForm(
+        request.POST or None,
+        rate_version=rate_version,
+    )
+    context.update(
+        {
+            "form": form,
+            "rate_version": rate_version,
+            "power_choices_by_powertrain": (
+                form.power_choices_by_powertrain
+            ),
+        }
+    )
+
+    if (
+        request.method == "POST"
+        and rate_version is not None
+        and form.is_valid()
+    ):
         try:
             result = UtilizationFeeCalculator.calculate(
-                UtilizationCalculationInput(
-                    powertrain=str(form.cleaned_data["powertrain"]),
+                _utilization_input(
+                    form,
                     age_group=str(form.cleaned_data["age_group"]),
-                    engine_capacity=form.cleaned_data["engine_capacity"],
-                    power_kw=form.cleaned_data["power_kw"],
-                )
+                ),
+                rate_version=rate_version,
             )
+            comparison_results = _comparison_results(form, rate_version)
         except RateConfigurationError as error:
             context["configuration_error"] = str(error)
         else:
@@ -44,6 +104,11 @@ def utilization_fee(request: HttpRequest) -> HttpResponse:
                     "result": result,
                     "formatted_amount": _format_money(result.amount),
                     "formatted_base_rate": _format_money(result.base_rate),
+                    "comparison_results": comparison_results,
+                    "selected_capacity_label": form.selected_label(
+                        "engine_capacity_range"
+                    ),
+                    "selected_power_label": form.selected_label("power_range"),
                 }
             )
 
