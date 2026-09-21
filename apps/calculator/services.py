@@ -10,8 +10,10 @@ from django.db.models import Q
 from .models import (
     CalculatorDefinition,
     CurrencyRate,
+    CustomsAggregateRate,
     CustomsClearanceFeeRate,
     CustomsDutyRate,
+    ExciseRate,
     RateVersion,
     UtilizationRate,
 )
@@ -24,6 +26,7 @@ RateModel = TypeVar(
     "RateModel",
     CustomsDutyRate,
     CustomsClearanceFeeRate,
+    ExciseRate,
 )
 
 
@@ -58,9 +61,11 @@ class CustomsCalculationInput:
 
     customs_value: Decimal
     currency_code: str
+    powertrain: str
     age_group: str
-    engine_capacity: int
+    engine_capacity: int | None
     power_kw: Decimal
+    power_hp: Decimal
 
 
 @dataclass(frozen=True, slots=True)
@@ -70,10 +75,15 @@ class CustomsCalculationResult:
     customs_value_rub: Decimal
     customs_value_eur: Decimal
     customs_duty: Decimal
+    excise: Decimal
+    vat: Decimal
+    aggregate_customs_payment: Decimal
     clearance_fee: Decimal
     utilization_fee: Decimal
     total: Decimal
-    duty_rate: CustomsDutyRate
+    duty_rate: CustomsDutyRate | None
+    aggregate_rate: CustomsAggregateRate | None
+    excise_rate: ExciseRate | None
     clearance_rate: CustomsClearanceFeeRate
     customs_rate_version: RateVersion
     utilization_result: UtilizationCalculationResult
@@ -206,7 +216,7 @@ class UtilizationFeeCalculator:
 
 
 class CustomsClearanceCalculator:
-    """Рассчитывает пошлину, таможенный сбор и утильсбор."""
+    """Рассчитывает платежи для ДВС и электрической категории."""
 
     @classmethod
     def calculate(
@@ -214,10 +224,11 @@ class CustomsClearanceCalculator:
         data: CustomsCalculationInput,
         *,
         calculation_date: date | None = None,
+        rate_version: RateVersion | None = None,
     ) -> CustomsCalculationResult:
-        """Возвращает детализацию платежей для автомобиля с ДВС."""
+        """Возвращает детализацию платежей по типу силовой установки."""
         actual_date = calculation_date or date.today()
-        version = _get_rate_version(CUSTOMS_CALCULATOR_SLUG, actual_date)
+        version = rate_version or cls.get_rate_version(actual_date)
         currency_rate = cls._get_currency_rate(
             data.currency_code,
             actual_date,
@@ -231,20 +242,46 @@ class CustomsClearanceCalculator:
             rounding=ROUND_HALF_UP,
         )
 
-        duty_rate = cls._get_duty_rate(
-            version,
-            data,
-            customs_value_eur,
-        )
-        duty_eur = cls._calculate_duty_eur(
-            duty_rate,
-            data,
-            customs_value_eur,
-        )
-        customs_duty = (duty_eur * eur_to_rub).quantize(
-            MONEY_STEP,
-            rounding=ROUND_HALF_UP,
-        )
+        duty_rate: CustomsDutyRate | None = None
+        aggregate_rate: CustomsAggregateRate | None = None
+        excise_rate: ExciseRate | None = None
+        excise = Decimal("0.00")
+        vat = Decimal("0.00")
+
+        if data.powertrain == UtilizationRate.Powertrain.COMBUSTION:
+            if data.engine_capacity is None:
+                raise ValueError("Для автомобиля с ДВС нужен объём двигателя.")
+            duty_rate = cls._get_duty_rate(version, data, customs_value_eur)
+            duty_eur = cls._calculate_duty_eur(
+                duty_rate,
+                data,
+                customs_value_eur,
+            )
+            customs_duty = (duty_eur * eur_to_rub).quantize(
+                MONEY_STEP,
+                rounding=ROUND_HALF_UP,
+            )
+        elif data.powertrain == UtilizationRate.Powertrain.ELECTRIC:
+            aggregate_rate = cls._get_aggregate_rate(version, data.powertrain)
+            excise_rate = cls._get_excise_rate(version, data.power_hp)
+            customs_duty = cls._percentage(
+                customs_value_rub,
+                aggregate_rate.import_duty_percentage,
+            )
+            excise = (data.power_hp * excise_rate.rub_per_hp).quantize(
+                MONEY_STEP,
+                rounding=ROUND_HALF_UP,
+            )
+            vat = cls._percentage(
+                customs_value_rub + customs_duty + excise,
+                aggregate_rate.vat_percentage,
+            )
+        else:
+            raise ValueError("Неизвестный тип силовой установки.")
+
+        aggregate_customs_payment = (
+            customs_duty + excise + vat
+        ).quantize(MONEY_STEP, rounding=ROUND_HALF_UP)
 
         clearance_rate = cls._get_clearance_rate(
             version,
@@ -252,7 +289,7 @@ class CustomsClearanceCalculator:
         )
         utilization_result = UtilizationFeeCalculator.calculate(
             UtilizationCalculationInput(
-                powertrain=UtilizationRate.Powertrain.COMBUSTION,
+                powertrain=data.powertrain,
                 age_group=cls._utilization_age_group(data.age_group),
                 engine_capacity=data.engine_capacity,
                 power_kw=data.power_kw,
@@ -260,7 +297,7 @@ class CustomsClearanceCalculator:
             calculation_date=actual_date,
         )
         total = (
-            customs_duty
+            aggregate_customs_payment
             + clearance_rate.fee_rub
             + utilization_result.amount
         ).quantize(MONEY_STEP, rounding=ROUND_HALF_UP)
@@ -269,15 +306,28 @@ class CustomsClearanceCalculator:
             customs_value_rub=customs_value_rub,
             customs_value_eur=customs_value_eur,
             customs_duty=customs_duty,
+            excise=excise,
+            vat=vat,
+            aggregate_customs_payment=aggregate_customs_payment,
             clearance_fee=clearance_rate.fee_rub,
             utilization_fee=utilization_result.amount,
             total=total,
             duty_rate=duty_rate,
+            aggregate_rate=aggregate_rate,
+            excise_rate=excise_rate,
             clearance_rate=clearance_rate,
             customs_rate_version=version,
             utilization_result=utilization_result,
             currency_rate=currency_rate,
             eur_rate=eur_rate,
+        )
+
+    @staticmethod
+    def get_rate_version(calculation_date: date | None = None) -> RateVersion:
+        """Возвращает опубликованную версию ставок растаможки."""
+        return _get_rate_version(
+            CUSTOMS_CALCULATOR_SLUG,
+            calculation_date or date.today(),
         )
 
     @staticmethod
@@ -316,6 +366,8 @@ class CustomsClearanceCalculator:
                 | Q(value_eur_max__gte=customs_value_eur),
             )
         else:
+            if data.engine_capacity is None:
+                raise ValueError("Для автомобиля с ДВС нужен объём двигателя.")
             rates = rates.filter(
                 Q(engine_capacity_min__isnull=True)
                 | Q(engine_capacity_min__lte=data.engine_capacity),
@@ -325,6 +377,36 @@ class CustomsClearanceCalculator:
         return CustomsClearanceCalculator._single_rate(
             rates.order_by("sort_order", "id")[:2],
             "ставка таможенной пошлины",
+        )
+
+    @staticmethod
+    def _get_aggregate_rate(
+        version: RateVersion,
+        powertrain: str,
+    ) -> CustomsAggregateRate:
+        try:
+            return version.customs_aggregate_rates.get(powertrain=powertrain)
+        except CustomsAggregateRate.DoesNotExist as error:
+            raise RateConfigurationError(
+                "Не найдены ставки совокупного таможенного платежа."
+            ) from error
+        except CustomsAggregateRate.MultipleObjectsReturned as error:
+            raise RateConfigurationError(
+                "Найдено несколько ставок совокупного платежа."
+            ) from error
+
+    @staticmethod
+    def _get_excise_rate(
+        version: RateVersion,
+        power_hp: Decimal,
+    ) -> ExciseRate:
+        rates = version.excise_rates.filter(
+            Q(power_hp_over__isnull=True) | Q(power_hp_over__lt=power_hp),
+            Q(power_hp_up_to__isnull=True) | Q(power_hp_up_to__gte=power_hp),
+        )
+        return CustomsClearanceCalculator._single_rate(
+            rates.order_by("sort_order", "id")[:2],
+            "ставка акциза",
         )
 
     @staticmethod
@@ -377,7 +459,7 @@ class CustomsClearanceCalculator:
                 / Decimal("100")
             )
             minimum_amount = (
-                Decimal(data.engine_capacity)
+                Decimal(data.engine_capacity or 0)
                 * rate.minimum_eur_per_cc
             )
             return max(percentage_amount, minimum_amount)
@@ -386,7 +468,15 @@ class CustomsClearanceCalculator:
             raise RateConfigurationError(
                 "Не заполнена ставка пошлины за см³."
             )
-        return Decimal(data.engine_capacity) * rate.fixed_eur_per_cc
+        return Decimal(data.engine_capacity or 0) * rate.fixed_eur_per_cc
+
+    @staticmethod
+    def _percentage(amount: Decimal, percentage: Decimal) -> Decimal:
+        """Считает процент от суммы с денежным округлением."""
+        return (amount * percentage / Decimal("100")).quantize(
+            MONEY_STEP,
+            rounding=ROUND_HALF_UP,
+        )
 
     @staticmethod
     def _utilization_age_group(customs_age_group: str) -> str:

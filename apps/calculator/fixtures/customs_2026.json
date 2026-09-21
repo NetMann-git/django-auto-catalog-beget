@@ -11,9 +11,9 @@
     "effective_from": "2026-01-01",
     "effective_to": "2026-12-31",
     "base_rate": "0.00",
-    "source_name": "Решение Совета ЕЭК № 107; постановления Правительства РФ № 1637 и № 1638",
-    "source_url": "https://www.alta.ru/tamdoc/17sr0107/",
-    "notes": "Легковые автомобили с ДВС для личного пользования. Таможенные сборы в редакции, действующей с 01.01.2026.",
+    "source_name": "Решение Совета ЕЭК № 107; ЕТТ ЕАЭС; НК РФ; постановления Правительства РФ № 1637 и № 1638",
+    "source_url": "https://eec.eaeunion.org/comission/department/catr/ett/",
+    "notes": "Легковые автомобили физических лиц. Для EV и последовательных гибридов: ввозная пошлина 15%, акциз по мощности и НДС 22%. Ставки 2026 года.",
     "is_active": true
   },
   "duty_rates": [
@@ -149,6 +149,59 @@
       "engine_capacity_max": null,
       "fixed_eur_per_cc": "5.7000",
       "sort_order": 180
+    }
+  ],
+  "aggregate_rates": [
+    {
+      "powertrain": "electric",
+      "import_duty_percentage": "15.0000",
+      "vat_percentage": "22.0000",
+      "notes": "EV и транспортные средства с последовательной гибридной установкой: пошлина по ЕТТ ЕАЭС, НДС по статье 164 НК РФ в редакции с 01.01.2026."
+    }
+  ],
+  "excise_rates": [
+    {
+      "power_hp_over": null,
+      "power_hp_up_to": "90.00",
+      "rub_per_hp": "0.00",
+      "sort_order": 10,
+      "notes": "Статья 193 НК РФ, 2026 год."
+    },
+    {
+      "power_hp_over": "90.00",
+      "power_hp_up_to": "150.00",
+      "rub_per_hp": "64.00",
+      "sort_order": 20
+    },
+    {
+      "power_hp_over": "150.00",
+      "power_hp_up_to": "200.00",
+      "rub_per_hp": "613.00",
+      "sort_order": 30
+    },
+    {
+      "power_hp_over": "200.00",
+      "power_hp_up_to": "300.00",
+      "rub_per_hp": "1004.00",
+      "sort_order": 40
+    },
+    {
+      "power_hp_over": "300.00",
+      "power_hp_up_to": "400.00",
+      "rub_per_hp": "1711.00",
+      "sort_order": 50
+    },
+    {
+      "power_hp_over": "400.00",
+      "power_hp_up_to": "500.00",
+      "rub_per_hp": "1771.00",
+      "sort_order": 60
+    },
+    {
+      "power_hp_over": "500.00",
+      "power_hp_up_to": null,
+      "rub_per_hp": "1829.00",
+      "sort_order": 70
     }
   ],
   "clearance_fee_rates": [

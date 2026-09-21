@@ -7,8 +7,10 @@ from django.test import TestCase
 
 from apps.calculator.models import (
     CurrencyRate,
+    CustomsAggregateRate,
     CustomsClearanceFeeRate,
     CustomsDutyRate,
+    ExciseRate,
 )
 
 
@@ -26,5 +28,7 @@ class LoadCustomsRatesCommandTests(TestCase):
         call_command("load_customs_rates", fixture)
 
         self.assertEqual(CustomsDutyRate.objects.count(), 18)
+        self.assertEqual(CustomsAggregateRate.objects.count(), 1)
+        self.assertEqual(ExciseRate.objects.count(), 7)
         self.assertEqual(CustomsClearanceFeeRate.objects.count(), 8)
         self.assertEqual(CurrencyRate.objects.count(), 5)

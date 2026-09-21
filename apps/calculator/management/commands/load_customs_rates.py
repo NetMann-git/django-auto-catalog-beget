@@ -13,8 +13,10 @@ from django.db.models import Q
 from apps.calculator.models import (
     CalculatorDefinition,
     CurrencyRate,
+    CustomsAggregateRate,
     CustomsClearanceFeeRate,
     CustomsDutyRate,
+    ExciseRate,
     RateVersion,
 )
 
@@ -41,7 +43,7 @@ class Command(BaseCommand):
         payload = self._read_payload(options["file"])
         try:
             with transaction.atomic():
-                version, duty_count, fee_count, currency_count = self._load(
+                counts = self._load(
                     payload,
                     deactivate_overlapping=options[
                         "deactivate_overlapping"
@@ -55,8 +57,11 @@ class Command(BaseCommand):
         action = "Проверено" if options["dry_run"] else "Загружено"
         self.stdout.write(
             self.style.SUCCESS(
-                f"{action}: {version.name}; пошлин: {duty_count}; "
-                f"сборов: {fee_count}; валют: {currency_count}."
+                f"{action}: {counts['version'].name}; "
+                f"пошлин: {counts['duty']}; "
+                f"совокупных ставок: {counts['aggregate']}; "
+                f"акцизов: {counts['excise']}; "
+                f"сборов: {counts['fee']}; валют: {counts['currency']}."
             )
         )
 
@@ -78,14 +83,16 @@ class Command(BaseCommand):
         payload: dict[str, Any],
         *,
         deactivate_overlapping: bool,
-    ) -> tuple[RateVersion, int, int, int]:
+    ) -> dict[str, Any]:
         calculator_data = payload["calculator"]
         version_data = payload["rate_version"]
         duty_data = payload["duty_rates"]
         fee_data = payload["clearance_fee_rates"]
+        aggregate_data = payload.get("aggregate_rates", [])
+        excise_data = payload.get("excise_rates", [])
         currency_data = payload.get("currency_rates", [])
 
-        if not duty_data or not fee_data:
+        if not all((duty_data, fee_data, aggregate_data, excise_data)):
             raise ValueError("Списки ставок не могут быть пустыми.")
 
         calculator, _ = CalculatorDefinition.objects.update_or_create(
@@ -119,6 +126,11 @@ class Command(BaseCommand):
         version.full_clean()
         version.save()
 
+        version.customs_duty_rates.all().delete()
+        version.customs_clearance_fee_rates.all().delete()
+        version.customs_aggregate_rates.all().delete()
+        version.excise_rates.all().delete()
+
         duty_rates = [
             CustomsDutyRate(rate_version=version, **item)
             for item in duty_data
@@ -127,13 +139,26 @@ class Command(BaseCommand):
             CustomsClearanceFeeRate(rate_version=version, **item)
             for item in fee_data
         ]
-        for rate in [*duty_rates, *fee_rates]:
+        aggregate_rates = [
+            CustomsAggregateRate(rate_version=version, **item)
+            for item in aggregate_data
+        ]
+        excise_rates = [
+            ExciseRate(rate_version=version, **item)
+            for item in excise_data
+        ]
+        for rate in [
+            *duty_rates,
+            *fee_rates,
+            *aggregate_rates,
+            *excise_rates,
+        ]:
             rate.full_clean()
 
-        version.customs_duty_rates.all().delete()
-        version.customs_clearance_fee_rates.all().delete()
         CustomsDutyRate.objects.bulk_create(duty_rates)
         CustomsClearanceFeeRate.objects.bulk_create(fee_rates)
+        CustomsAggregateRate.objects.bulk_create(aggregate_rates)
+        ExciseRate.objects.bulk_create(excise_rates)
 
         for item in currency_data:
             code = item["code"].upper()
@@ -151,7 +176,14 @@ class Command(BaseCommand):
             currency.full_clean()
             currency.save()
 
-        return version, len(duty_rates), len(fee_rates), len(currency_data)
+        return {
+            "version": version,
+            "duty": len(duty_rates),
+            "aggregate": len(aggregate_rates),
+            "excise": len(excise_rates),
+            "fee": len(fee_rates),
+            "currency": len(currency_data),
+        }
 
     @staticmethod
     def _parse_date(value: str | date | None) -> date | None:

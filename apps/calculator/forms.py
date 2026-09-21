@@ -88,7 +88,7 @@ class UtilizationFeeForm(forms.Form):
 
 
 class CustomsClearanceForm(forms.Form):
-    """Параметры растаможки легкового автомобиля с ДВС."""
+    """Параметры растаможки легкового автомобиля физического лица."""
 
     POWER_UNIT_HORSEPOWER = "hp"
     POWER_UNIT_KILOWATTS = "kw"
@@ -103,6 +103,12 @@ class CustomsClearanceForm(forms.Form):
         "CNY": "Китайский юань (CNY)",
         "KRW": "Южнокорейская вона (KRW)",
     }
+    ALLOWED_CURRENCIES = ("RUB", "USD", "EUR", "CNY", "KRW")
+
+    powertrain = forms.ChoiceField(
+        label="Тип силовой установки",
+        choices=UtilizationRate.Powertrain.choices,
+    )
 
     customs_value = forms.DecimalField(
         label="Таможенная стоимость",
@@ -123,6 +129,8 @@ class CustomsClearanceForm(forms.Form):
         label="Объём двигателя, см³",
         min_value=1,
         max_value=20000,
+        required=False,
+        help_text="Для электрической категории поле не используется.",
     )
     power_value = forms.DecimalField(
         label="Мощность",
@@ -130,7 +138,9 @@ class CustomsClearanceForm(forms.Form):
         max_value=Decimal("5000"),
         max_digits=8,
         decimal_places=2,
-        help_text="Нужна для расчёта утилизационного сбора.",
+        help_text=(
+            "Для EV укажите максимальную 30-минутную мощность из ЭПТС."
+        ),
     )
     power_unit = forms.ChoiceField(
         label="Единица мощности",
@@ -148,22 +158,33 @@ class CustomsClearanceForm(forms.Form):
     def __init__(self, *args: object, **kwargs: object) -> None:
         """Заполняет список валют, для которых есть курс в БД."""
         super().__init__(*args, **kwargs)
-        codes = set(
+        available_codes = set(
             CurrencyRate.objects.filter(
                 effective_date__lte=timezone.localdate(),
             ).values_list("code", flat=True)
         )
         choices = [
             (code, self.CURRENCY_LABELS.get(code, code))
-            for code in sorted(codes)
+            for code in self.ALLOWED_CURRENCIES
+            if code in available_codes
         ]
         self.fields["currency_code"].choices = choices
-        if "USD" in codes:
+        if "USD" in available_codes:
             self.fields["currency_code"].initial = "USD"
 
     def clean(self) -> dict[str, object]:
-        """Добавляет нормализованную мощность в киловаттах."""
+        """Проверяет поля и добавляет мощность в кВт и л. с."""
         cleaned_data = super().clean()
+        powertrain = cleaned_data.get("powertrain")
+        engine_capacity = cleaned_data.get("engine_capacity")
+        if (
+            powertrain == UtilizationRate.Powertrain.COMBUSTION
+            and engine_capacity is None
+        ):
+            self.add_error("engine_capacity", "Укажите объём двигателя.")
+        if powertrain == UtilizationRate.Powertrain.ELECTRIC:
+            cleaned_data["engine_capacity"] = None
+
         power_value = cleaned_data.get("power_value")
         power_unit = cleaned_data.get("power_unit")
         if isinstance(power_value, Decimal):
@@ -171,5 +192,10 @@ class CustomsClearanceForm(forms.Form):
                 horsepower_to_kw(power_value)
                 if power_unit == self.POWER_UNIT_HORSEPOWER
                 else power_value
+            )
+            cleaned_data["power_hp"] = (
+                power_value
+                if power_unit == self.POWER_UNIT_HORSEPOWER
+                else power_value / Decimal("0.75")
             )
         return cleaned_data

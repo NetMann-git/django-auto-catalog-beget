@@ -5,8 +5,10 @@ from django.contrib import admin
 from .models import (
     CalculatorDefinition,
     CurrencyRate,
+    CustomsAggregateRate,
     CustomsClearanceFeeRate,
     CustomsDutyRate,
+    ExciseRate,
     RateVersion,
     UtilizationRate,
 )
@@ -125,5 +127,34 @@ class CustomsClearanceFeeRateAdmin(admin.ModelAdmin):
     )
     list_filter = ("rate_version",)
     search_fields = ("rate_version__name", "notes")
+    autocomplete_fields = ("rate_version",)
+    ordering = ("rate_version", "sort_order")
+
+
+@admin.register(CustomsAggregateRate)
+class CustomsAggregateRateAdmin(admin.ModelAdmin):
+    """Ставки пошлины и НДС для электрической категории."""
+
+    list_display = (
+        "rate_version",
+        "powertrain",
+        "import_duty_percentage",
+        "vat_percentage",
+    )
+    list_filter = ("rate_version", "powertrain")
+    autocomplete_fields = ("rate_version",)
+
+
+@admin.register(ExciseRate)
+class ExciseRateAdmin(admin.ModelAdmin):
+    """Ставки акциза по мощности."""
+
+    list_display = (
+        "rate_version",
+        "power_hp_over",
+        "power_hp_up_to",
+        "rub_per_hp",
+    )
+    list_filter = ("rate_version",)
     autocomplete_fields = ("rate_version",)
     ordering = ("rate_version", "sort_order")

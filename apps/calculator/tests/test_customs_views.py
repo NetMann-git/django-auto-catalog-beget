@@ -9,8 +9,10 @@ from django.urls import reverse
 from apps.calculator.models import (
     CalculatorDefinition,
     CurrencyRate,
+    CustomsAggregateRate,
     CustomsClearanceFeeRate,
     CustomsDutyRate,
+    ExciseRate,
     RateVersion,
     UtilizationRate,
 )
@@ -44,6 +46,18 @@ class CustomsClearanceViewTests(TestCase):
             customs_value_rub_max=Decimal("1200000"),
             fee_rub=Decimal("4924"),
         )
+        CustomsAggregateRate.objects.create(
+            rate_version=customs_version,
+            powertrain=UtilizationRate.Powertrain.ELECTRIC,
+            import_duty_percentage=Decimal("15"),
+            vat_percentage=Decimal("22"),
+        )
+        ExciseRate.objects.create(
+            rate_version=customs_version,
+            power_hp_over=Decimal("90"),
+            power_hp_up_to=Decimal("150"),
+            rub_per_hp=Decimal("64"),
+        )
 
         utilization = CalculatorDefinition.objects.create(
             slug="util-sbor",
@@ -63,6 +77,15 @@ class CustomsClearanceViewTests(TestCase):
             age_group=UtilizationRate.AgeGroup.USED,
             engine_capacity_min=1001,
             engine_capacity_max=1500,
+            power_kw_min=Decimal("0"),
+            power_kw_max=Decimal("117.68"),
+            coefficient=Decimal("0.26"),
+        )
+        UtilizationRate.objects.create(
+            rate_version=utilization_version,
+            powertrain=UtilizationRate.Powertrain.ELECTRIC,
+            usage_mode=UtilizationRate.UsageMode.PERSONAL,
+            age_group=UtilizationRate.AgeGroup.USED,
             power_kw_min=Decimal("0"),
             power_kw_max=Decimal("117.68"),
             coefficient=Decimal("0.26"),
@@ -87,6 +110,7 @@ class CustomsClearanceViewTests(TestCase):
             {
                 "customs_value": "10000",
                 "currency_code": "USD",
+                "powertrain": UtilizationRate.Powertrain.COMBUSTION,
                 "age_group": CustomsDutyRate.AgeGroup.THREE_TO_FIVE,
                 "engine_capacity": "1500",
                 "power_value": "150",
@@ -97,5 +121,24 @@ class CustomsClearanceViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "265 124 ₽")
-        self.assertContains(response, "Таможенная пошлина")
+        self.assertContains(response, "Ввозная пошлина")
         self.assertContains(response, "Утилизационный сбор")
+
+    def test_electric_form_does_not_require_engine_capacity(self) -> None:
+        response = self.client.post(
+            reverse("calculator:customs_clearance"),
+            {
+                "customs_value": "10000",
+                "currency_code": "USD",
+                "powertrain": UtilizationRate.Powertrain.ELECTRIC,
+                "age_group": CustomsDutyRate.AgeGroup.THREE_TO_FIVE,
+                "power_value": "150",
+                "power_unit": "hp",
+                "personal_use_confirmed": "on",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Укажите объём двигателя")
+        self.assertContains(response, "384 536 ₽")
+        self.assertContains(response, "Совокупный таможенный платёж")

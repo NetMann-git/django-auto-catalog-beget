@@ -189,7 +189,11 @@ class UtilizationRate(models.Model):
         verbose_name="Коэффициент",
     )
     sort_order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
-    notes = models.CharField(max_length=255, blank=True, verbose_name="Примечание")
+    notes = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="Примечание",
+    )
 
     class Meta:
         ordering = (
@@ -369,7 +373,11 @@ class CustomsDutyRate(models.Model):
         verbose_name="Евро за см³",
     )
     sort_order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
-    notes = models.CharField(max_length=255, blank=True, verbose_name="Примечание")
+    notes = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="Примечание",
+    )
 
     class Meta:
         ordering = ("rate_version", "age_group", "sort_order")
@@ -477,4 +485,117 @@ class CustomsClearanceFeeRate(models.Model):
         ):
             raise ValidationError(
                 {"customs_value_rub_max": "Некорректный диапазон стоимости."}
+            )
+
+
+class CustomsAggregateRate(models.Model):
+    """Процентные ставки совокупного платежа для электрических ТС."""
+
+    rate_version = models.ForeignKey(
+        RateVersion,
+        on_delete=models.CASCADE,
+        related_name="customs_aggregate_rates",
+        verbose_name="Версия ставок",
+    )
+    powertrain = models.CharField(
+        max_length=20,
+        choices=UtilizationRate.Powertrain.choices,
+        default=UtilizationRate.Powertrain.ELECTRIC,
+        verbose_name="Тип силовой установки",
+    )
+    import_duty_percentage = models.DecimalField(
+        max_digits=7,
+        decimal_places=4,
+        verbose_name="Ввозная пошлина, %",
+    )
+    vat_percentage = models.DecimalField(
+        max_digits=7,
+        decimal_places=4,
+        verbose_name="НДС, %",
+    )
+    notes = models.CharField(max_length=255, blank=True, verbose_name="Примечание")
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("rate_version", "powertrain"),
+                name="calculator_unique_aggregate_powertrain",
+            ),
+            models.CheckConstraint(
+                condition=Q(import_duty_percentage__gte=0),
+                name="calculator_aggregate_duty_nonnegative",
+            ),
+            models.CheckConstraint(
+                condition=Q(vat_percentage__gte=0),
+                name="calculator_aggregate_vat_nonnegative",
+            ),
+        ]
+        verbose_name = "Ставка совокупного таможенного платежа"
+        verbose_name_plural = "Ставки совокупного таможенного платежа"
+
+    def __str__(self) -> str:
+        return f"{self.rate_version.name}: {self.get_powertrain_display()}"
+
+
+class ExciseRate(models.Model):
+    """Ставка акциза по мощности легкового автомобиля."""
+
+    rate_version = models.ForeignKey(
+        RateVersion,
+        on_delete=models.CASCADE,
+        related_name="excise_rates",
+        verbose_name="Версия ставок",
+    )
+    power_hp_over = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="Мощность свыше, л. с.",
+    )
+    power_hp_up_to = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="Мощность до включительно, л. с.",
+    )
+    rub_per_hp = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        verbose_name="Акциз за 1 л. с., ₽",
+    )
+    sort_order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
+    notes = models.CharField(max_length=255, blank=True, verbose_name="Примечание")
+
+    class Meta:
+        ordering = ("rate_version", "sort_order")
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(rub_per_hp__gte=0),
+                name="calculator_excise_nonnegative",
+            ),
+            models.CheckConstraint(
+                condition=Q(power_hp_over__isnull=True)
+                | Q(power_hp_up_to__isnull=True)
+                | Q(power_hp_up_to__gt=models.F("power_hp_over")),
+                name="calculator_excise_valid_power",
+            ),
+        ]
+        verbose_name = "Ставка акциза"
+        verbose_name_plural = "Ставки акциза"
+
+    def __str__(self) -> str:
+        return f"{self.rate_version.name}: {self.rub_per_hp} ₽/л. с."
+
+    def clean(self) -> None:
+        """Проверяет границы диапазона мощности."""
+        super().clean()
+        if (
+            self.power_hp_over is not None
+            and self.power_hp_up_to is not None
+            and self.power_hp_over >= self.power_hp_up_to
+        ):
+            raise ValidationError(
+                {"power_hp_up_to": "Верхняя граница должна быть больше нижней."}
             )

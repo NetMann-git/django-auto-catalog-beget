@@ -119,17 +119,30 @@ def customs_clearance(request: HttpRequest) -> HttpResponse:
     """Показывает форму и результат расчёта растаможки."""
     form = CustomsClearanceForm(request.POST or None)
     context: dict[str, Any] = {"form": form}
+    try:
+        rate_version = CustomsClearanceCalculator.get_rate_version()
+    except RateConfigurationError as error:
+        rate_version = None
+        context["configuration_error"] = str(error)
+    context["rate_version"] = rate_version
 
-    if request.method == "POST" and form.is_valid():
+    if (
+        request.method == "POST"
+        and rate_version is not None
+        and form.is_valid()
+    ):
         try:
             result = CustomsClearanceCalculator.calculate(
                 CustomsCalculationInput(
                     customs_value=form.cleaned_data["customs_value"],
                     currency_code=str(form.cleaned_data["currency_code"]),
+                    powertrain=str(form.cleaned_data["powertrain"]),
                     age_group=str(form.cleaned_data["age_group"]),
                     engine_capacity=form.cleaned_data["engine_capacity"],
                     power_kw=form.cleaned_data["power_kw"],
-                )
+                    power_hp=form.cleaned_data["power_hp"],
+                ),
+                rate_version=rate_version,
             )
         except RateConfigurationError as error:
             context["configuration_error"] = str(error)
@@ -139,6 +152,11 @@ def customs_clearance(request: HttpRequest) -> HttpResponse:
                     "result": result,
                     "formatted_total": _format_money(result.total),
                     "formatted_duty": _format_money(result.customs_duty),
+                    "formatted_excise": _format_money(result.excise),
+                    "formatted_vat": _format_money(result.vat),
+                    "formatted_aggregate_payment": _format_money(
+                        result.aggregate_customs_payment
+                    ),
                     "formatted_clearance_fee": _format_money(
                         result.clearance_fee
                     ),
