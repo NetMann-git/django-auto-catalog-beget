@@ -117,14 +117,28 @@ def utilization_fee(request: HttpRequest) -> HttpResponse:
 
 def customs_clearance(request: HttpRequest) -> HttpResponse:
     """Показывает форму и результат расчёта растаможки."""
-    form = CustomsClearanceForm(request.POST or None)
-    context: dict[str, Any] = {"form": form}
+    context: dict[str, Any] = {}
     try:
         rate_version = CustomsClearanceCalculator.get_rate_version()
+        utilization_rate_version = UtilizationFeeCalculator.get_rate_version()
     except RateConfigurationError as error:
         rate_version = None
+        utilization_rate_version = None
         context["configuration_error"] = str(error)
-    context["rate_version"] = rate_version
+
+    form = CustomsClearanceForm(
+        request.POST or None,
+        utilization_rate_version=utilization_rate_version,
+    )
+    context.update(
+        {
+            "form": form,
+            "rate_version": rate_version,
+            "power_choices_by_powertrain": (
+                form.power_choices_by_powertrain
+            ),
+        }
+    )
 
     if (
         request.method == "POST"
@@ -165,6 +179,12 @@ def customs_clearance(request: HttpRequest) -> HttpResponse:
                     ),
                     "formatted_value_rub": _format_money(
                         result.customs_value_rub
+                    ),
+                    "selected_capacity_label": form.selected_label(
+                        "engine_capacity_range"
+                    ),
+                    "selected_power_label": form.selected_label(
+                        "power_range"
                     ),
                 }
             )

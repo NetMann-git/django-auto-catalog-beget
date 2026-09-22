@@ -1,19 +1,50 @@
 document.addEventListener("DOMContentLoaded", () => {
     const powertrain = document.getElementById("id_powertrain");
     const engineField = document.getElementById("customs-engine-field");
-    const engineInput = document.getElementById("id_engine_capacity");
+    const engineSelect = document.getElementById("id_engine_capacity_range");
+    const powerSelect = document.getElementById("id_power_range");
+    const optionsData = document.getElementById("customs-power-options");
     const categoryNote = document.getElementById("customs-category-note");
     const powerHelp = document.getElementById("customs-power-help");
 
-    if (!powertrain || !engineField || !engineInput) {
+    if (
+        !powertrain
+        || !engineField
+        || !engineSelect
+        || !powerSelect
+        || !optionsData
+    ) {
         return;
     }
+
+    let powerOptions = {};
+    try {
+        powerOptions = JSON.parse(optionsData.textContent);
+    } catch (error) {
+        return;
+    }
+
+    const updatePowerOptions = () => {
+        const previousValue = powerSelect.value;
+        const options = powerOptions[powertrain.value] || [];
+        powerSelect.replaceChildren();
+        powerSelect.add(new Option("Выберите диапазон мощности", ""));
+        options.forEach((item) => {
+            powerSelect.add(new Option(item.label, item.value));
+        });
+        if (options.some((item) => item.value === previousValue)) {
+            powerSelect.value = previousValue;
+        }
+    };
 
     const updateFields = () => {
         const isElectric = powertrain.value === "electric";
         engineField.hidden = isElectric;
-        engineInput.disabled = isElectric;
-        engineInput.required = !isElectric;
+        engineSelect.disabled = isElectric;
+        engineSelect.required = !isElectric;
+        if (isElectric) {
+            engineSelect.value = "";
+        }
         if (isElectric) {
             categoryNote.textContent =
                 "Для EV и последовательного гибрида применяется совокупный " +
@@ -29,6 +60,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    powertrain.addEventListener("change", updateFields);
+    powertrain.addEventListener("change", () => {
+        updateFields();
+        updatePowerOptions();
+    });
     updateFields();
 });

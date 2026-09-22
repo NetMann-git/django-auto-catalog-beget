@@ -58,6 +58,12 @@ class CustomsClearanceViewTests(TestCase):
             power_hp_up_to=Decimal("150"),
             rub_per_hp=Decimal("64"),
         )
+        ExciseRate.objects.create(
+            rate_version=customs_version,
+            power_hp_over=Decimal("150"),
+            power_hp_up_to=Decimal("200"),
+            rub_per_hp=Decimal("613"),
+        )
 
         utilization = CalculatorDefinition.objects.create(
             slug="util-sbor",
@@ -103,6 +109,8 @@ class CustomsClearanceViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Калькулятор растаможки автомобилей")
+        self.assertContains(response, "Свыше 1,0 до 1,5 л")
+        self.assertContains(response, "0–160 л.с.")
 
     def test_valid_form_displays_total_and_breakdown(self) -> None:
         response = self.client.post(
@@ -112,9 +120,8 @@ class CustomsClearanceViewTests(TestCase):
                 "currency_code": "USD",
                 "powertrain": UtilizationRate.Powertrain.COMBUSTION,
                 "age_group": CustomsDutyRate.AgeGroup.THREE_TO_FIVE,
-                "engine_capacity": "1500",
-                "power_value": "150",
-                "power_unit": "hp",
+                "engine_capacity_range": "1001:1500",
+                "power_range": "0.00:117.68",
                 "personal_use_confirmed": "on",
             },
         )
@@ -132,13 +139,12 @@ class CustomsClearanceViewTests(TestCase):
                 "currency_code": "USD",
                 "powertrain": UtilizationRate.Powertrain.ELECTRIC,
                 "age_group": CustomsDutyRate.AgeGroup.THREE_TO_FIVE,
-                "power_value": "150",
-                "power_unit": "hp",
+                "power_range": "0.00:117.68",
                 "personal_use_confirmed": "on",
             },
         )
 
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "Укажите объём двигателя")
-        self.assertContains(response, "384 536 ₽")
+        self.assertContains(response, "490 168 ₽")
         self.assertContains(response, "Совокупный таможенный платёж")

@@ -80,31 +80,23 @@
                     </div>
 
                     <div class="customs-calc__field" id="customs-engine-field">
-                        <label for="{{ form.engine_capacity.id_for_label }}">
-                            {{ form.engine_capacity.label }}
+                        <label for="{{ form.engine_capacity_range.id_for_label }}">
+                            {{ form.engine_capacity_range.label }}
                         </label>
-                        {{ form.engine_capacity }}
-                        <small>{{ form.engine_capacity.help_text }}</small>
-                        {{ form.engine_capacity.errors }}
+                        {{ form.engine_capacity_range }}
+                        <small>{{ form.engine_capacity_range.help_text }}</small>
+                        {{ form.engine_capacity_range.errors }}
                     </div>
 
-                    <div class="customs-calc__power-row">
-                        <div class="customs-calc__field">
-                            <label for="{{ form.power_value.id_for_label }}">
-                                {{ form.power_value.label }}
-                            </label>
-                            {{ form.power_value }}
-                            <small id="customs-power-help">
-                                {{ form.power_value.help_text }}
-                            </small>
-                            {{ form.power_value.errors }}
-                        </div>
-                        <div class="customs-calc__field">
-                            <label for="{{ form.power_unit.id_for_label }}">
-                                {{ form.power_unit.label }}
-                            </label>
-                            {{ form.power_unit }}{{ form.power_unit.errors }}
-                        </div>
+                    <div class="customs-calc__field">
+                        <label for="{{ form.power_range.id_for_label }}">
+                            {{ form.power_range.label }}
+                        </label>
+                        {{ form.power_range }}
+                        <small id="customs-power-help">
+                            {{ form.power_range.help_text }}
+                        </small>
+                        {{ form.power_range.errors }}
                     </div>
 
                     <div class="customs-calc__confirm">
@@ -153,6 +145,16 @@
                             {% endif %}
                             <div><dt>Таможенный сбор</dt><dd>{{ formatted_clearance_fee }} ₽</dd></div>
                             <div><dt>Утилизационный сбор</dt><dd>{{ formatted_utilization_fee }} ₽</dd></div>
+                            {% if selected_capacity_label %}
+                                <div>
+                                    <dt>Диапазон объёма</dt>
+                                    <dd>{{ selected_capacity_label }}</dd>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <dt>Диапазон мощности</dt>
+                                <dd>{{ selected_power_label }}</dd>
+                            </div>
                             <div>
                                 <dt>Стоимость для расчёта</dt>
                                 <dd>{{ formatted_value_rub }} ₽<br>
@@ -199,6 +201,7 @@
         </div>
     </div>
 </main>
+{{ power_choices_by_powertrain|json_script:"customs-power-options" }}
 {% endblock %}
 
 {% block extra_js %}
