@@ -109,8 +109,8 @@ class CustomsClearanceViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Калькулятор растаможки автомобилей")
-        self.assertContains(response, "Свыше 1,0 до 1,5 л")
-        self.assertContains(response, "0–160 л.с.")
+        self.assertContains(response, "Точный объём двигателя, см³")
+        self.assertContains(response, "Точная мощность")
 
     def test_valid_form_displays_total_and_breakdown(self) -> None:
         response = self.client.post(
@@ -120,14 +120,17 @@ class CustomsClearanceViewTests(TestCase):
                 "currency_code": "USD",
                 "powertrain": UtilizationRate.Powertrain.COMBUSTION,
                 "age_group": CustomsDutyRate.AgeGroup.THREE_TO_FIVE,
-                "engine_capacity_range": "1001:1500",
-                "power_range": "0.00:117.68",
+                "calculation_date": "2026-09-20",
+                "engine_capacity": "1498",
+                "power_value": "150",
+                "power_unit": "hp",
                 "personal_use_confirmed": "on",
             },
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "265 124 ₽")
+        self.assertContains(response, "264 784 ₽")
+        self.assertContains(response, "1498 см³")
         self.assertContains(response, "Ввозная пошлина")
         self.assertContains(response, "Утилизационный сбор")
 
@@ -139,12 +142,14 @@ class CustomsClearanceViewTests(TestCase):
                 "currency_code": "USD",
                 "powertrain": UtilizationRate.Powertrain.ELECTRIC,
                 "age_group": CustomsDutyRate.AgeGroup.THREE_TO_FIVE,
-                "power_range": "0.00:117.68",
+                "calculation_date": "2026-09-20",
+                "power_value": "150",
+                "power_unit": "hp",
                 "personal_use_confirmed": "on",
             },
         )
 
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "Укажите объём двигателя")
-        self.assertContains(response, "490 168 ₽")
+        self.assertContains(response, "384 536 ₽")
         self.assertContains(response, "Совокупный таможенный платёж")

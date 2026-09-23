@@ -5,6 +5,7 @@ from typing import Any
 
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
+from django.utils import timezone
 
 from .forms import CustomsClearanceForm
 from .models import RateVersion, UtilizationRate
@@ -118,25 +119,24 @@ def utilization_fee(request: HttpRequest) -> HttpResponse:
 def customs_clearance(request: HttpRequest) -> HttpResponse:
     """Показывает форму и результат расчёта растаможки."""
     context: dict[str, Any] = {}
+    form = CustomsClearanceForm(request.POST or None)
+    calculation_date = timezone.localdate()
+    if form.is_bound and form.is_valid():
+        calculation_date = form.cleaned_data["calculation_date"]
+
     try:
-        rate_version = CustomsClearanceCalculator.get_rate_version()
-        utilization_rate_version = UtilizationFeeCalculator.get_rate_version()
+        rate_version = CustomsClearanceCalculator.get_rate_version(
+            calculation_date
+        )
+        UtilizationFeeCalculator.get_rate_version(calculation_date)
     except RateConfigurationError as error:
         rate_version = None
-        utilization_rate_version = None
         context["configuration_error"] = str(error)
 
-    form = CustomsClearanceForm(
-        request.POST or None,
-        utilization_rate_version=utilization_rate_version,
-    )
     context.update(
         {
             "form": form,
             "rate_version": rate_version,
-            "power_choices_by_powertrain": (
-                form.power_choices_by_powertrain
-            ),
         }
     )
 
@@ -156,6 +156,7 @@ def customs_clearance(request: HttpRequest) -> HttpResponse:
                     power_kw=form.cleaned_data["power_kw"],
                     power_hp=form.cleaned_data["power_hp"],
                 ),
+                calculation_date=calculation_date,
                 rate_version=rate_version,
             )
         except RateConfigurationError as error:
@@ -180,12 +181,14 @@ def customs_clearance(request: HttpRequest) -> HttpResponse:
                     "formatted_value_rub": _format_money(
                         result.customs_value_rub
                     ),
-                    "selected_capacity_label": form.selected_label(
-                        "engine_capacity_range"
+                    "calculation_date": calculation_date,
+                    "entered_engine_capacity": form.cleaned_data.get(
+                        "engine_capacity"
                     ),
-                    "selected_power_label": form.selected_label(
-                        "power_range"
-                    ),
+                    "entered_power_value": form.cleaned_data["power_value"],
+                    "entered_power_unit": dict(
+                        form.fields["power_unit"].choices
+                    )[form.cleaned_data["power_unit"]],
                 }
             )
 

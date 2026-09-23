@@ -54,9 +54,7 @@ class CustomsClearanceFormTests(TestCase):
             )
 
     def test_only_supported_currencies_are_available(self) -> None:
-        form = CustomsClearanceForm(
-            utilization_rate_version=self.rate_version,
-        )
+        form = CustomsClearanceForm()
 
         self.assertEqual(
             [code for code, _label in form.fields["currency_code"].choices],
@@ -70,14 +68,15 @@ class CustomsClearanceFormTests(TestCase):
                 "customs_value": "10000",
                 "currency_code": "USD",
                 "age_group": "3_to_5",
-                "power_range": "95.62:117.68",
+                "calculation_date": "2026-09-20",
+                "power_value": "150",
+                "power_unit": "hp",
                 "personal_use_confirmed": "on",
             },
-            utilization_rate_version=self.rate_version,
         )
 
         self.assertFalse(form.is_valid())
-        self.assertIn("engine_capacity_range", form.errors)
+        self.assertIn("engine_capacity", form.errors)
 
     def test_electric_ignores_engine_capacity(self) -> None:
         form = CustomsClearanceForm(
@@ -86,30 +85,57 @@ class CustomsClearanceFormTests(TestCase):
                 "customs_value": "10000",
                 "currency_code": "USD",
                 "age_group": "3_to_5",
-                "engine_capacity_range": "1001:2000",
-                "power_range": "95.62:117.68",
+                "calculation_date": "2026-09-20",
+                "engine_capacity": "1498",
+                "power_value": "150",
+                "power_unit": "hp",
                 "personal_use_confirmed": "on",
             },
-            utilization_rate_version=self.rate_version,
         )
 
         self.assertTrue(form.is_valid())
         self.assertIsNone(form.cleaned_data["engine_capacity"])
 
-    def test_ranges_use_upper_boundary_for_calculation(self) -> None:
+    def test_exact_values_are_used_for_calculation(self) -> None:
         form = CustomsClearanceForm(
             data={
                 "powertrain": UtilizationRate.Powertrain.COMBUSTION,
                 "customs_value": "10000",
                 "currency_code": "USD",
                 "age_group": "3_to_5",
-                "engine_capacity_range": "1001:2000",
-                "power_range": "95.62:117.68",
+                "calculation_date": "2026-09-20",
+                "engine_capacity": "1498",
+                "power_value": "150",
+                "power_unit": "hp",
                 "personal_use_confirmed": "on",
             },
-            utilization_rate_version=self.rate_version,
         )
 
         self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data["engine_capacity"], 2000)
-        self.assertEqual(form.cleaned_data["power_kw"], Decimal("117.68"))
+        self.assertEqual(form.cleaned_data["engine_capacity"], 1498)
+        self.assertEqual(form.cleaned_data["power_hp"], Decimal("150"))
+        self.assertEqual(
+            form.cleaned_data["power_kw"],
+            Decimal("110.32481250"),
+        )
+
+    def test_kw_are_kept_exact_for_utilization_and_excise(self) -> None:
+        form = CustomsClearanceForm(
+            data={
+                "powertrain": UtilizationRate.Powertrain.ELECTRIC,
+                "customs_value": "10000",
+                "currency_code": "USD",
+                "age_group": "3_to_5",
+                "calculation_date": "2026-09-20",
+                "power_value": "110",
+                "power_unit": "kw",
+                "personal_use_confirmed": "on",
+            },
+        )
+
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data["power_kw"], Decimal("110"))
+        self.assertEqual(
+            form.cleaned_data["power_hp"],
+            Decimal("146.6666666666666666666666667"),
+        )

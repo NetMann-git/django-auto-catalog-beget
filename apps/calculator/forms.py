@@ -1,5 +1,6 @@
 """Формы пользовательских калькуляторов."""
 
+from datetime import date
 from decimal import Decimal
 
 from django import forms
@@ -8,16 +9,9 @@ from django.utils import timezone
 from .models import (
     CurrencyRate,
     CustomsDutyRate,
-    RateVersion,
     UtilizationRate,
 )
 from .services import horsepower_to_kw
-from .utilization_forms import (
-    _capacity_label,
-    _power_label,
-    _token,
-    _unique_ranges,
-)
 
 
 class UtilizationFeeForm(forms.Form):
@@ -130,23 +124,35 @@ class CustomsClearanceForm(forms.Form):
         label="Возраст автомобиля",
         choices=CustomsDutyRate.AgeGroup.choices,
     )
-    engine_capacity_range = forms.ChoiceField(
-        label="Объём двигателя",
-        choices=(),
+    calculation_date = forms.DateField(
+        label="Дата расчёта",
+        initial=timezone.localdate,
+        widget=forms.DateInput(attrs={"type": "date"}),
+        help_text="Используются ставки и курсы, действующие на эту дату.",
+    )
+    engine_capacity = forms.IntegerField(
+        label="Точный объём двигателя, см³",
+        min_value=1,
+        max_value=20000,
         required=False,
         help_text=(
-            "Выберите диапазон по объёму из документов автомобиля. "
-            "Расчёт выполняется по верхней границе диапазона."
+            "Укажите рабочий объём из ЭПТС или документов автомобиля."
         ),
     )
-    power_range = forms.ChoiceField(
-        label="Мощность",
-        choices=(),
+    power_value = forms.DecimalField(
+        label="Точная мощность",
+        min_value=Decimal("0.01"),
+        max_value=Decimal("5000"),
+        max_digits=8,
+        decimal_places=2,
         help_text=(
-            "Выберите диапазон мощности. Для EV используется максимальная "
-            "30-минутная мощность из ЭПТС. Расчёт выполняется по верхней "
-            "границе диапазона."
+            "Для EV укажите максимальную 30-минутную мощность из ЭПТС."
         ),
+    )
+    power_unit = forms.ChoiceField(
+        label="Единица мощности",
+        choices=UtilizationFeeForm.POWER_UNIT_CHOICES,
+        initial=UtilizationFeeForm.POWER_UNIT_HORSEPOWER,
     )
     personal_use_confirmed = forms.BooleanField(
         label=(
@@ -159,18 +165,14 @@ class CustomsClearanceForm(forms.Form):
     def __init__(
         self,
         *args: object,
-        utilization_rate_version: RateVersion | None = None,
         **kwargs: object,
     ) -> None:
-        """Заполняет валюты и диапазоны из опубликованных ставок."""
+        """Заполняет список валют с курсами на выбранную дату."""
         super().__init__(*args, **kwargs)
-        self.power_choices_by_powertrain: dict[
-            str,
-            list[dict[str, str]],
-        ] = {}
+        rate_date = self._selected_calculation_date()
         available_codes = set(
             CurrencyRate.objects.filter(
-                effective_date__lte=timezone.localdate(),
+                effective_date__lte=rate_date,
             ).values_list("code", flat=True)
         )
         choices = [
@@ -182,101 +184,48 @@ class CustomsClearanceForm(forms.Form):
         if "USD" in available_codes:
             self.fields["currency_code"].initial = "USD"
 
-        if utilization_rate_version is None:
-            unavailable = [("", "Ставки временно недоступны")]
-            self.fields["engine_capacity_range"].choices = unavailable
-            self.fields["power_range"].choices = unavailable
-            return
-
-        capacities = list(
-            utilization_rate_version.utilization_rates.filter(
-                powertrain=UtilizationRate.Powertrain.COMBUSTION,
-                usage_mode=UtilizationRate.UsageMode.PERSONAL,
-            )
-            .order_by("engine_capacity_min", "engine_capacity_max")
-            .values_list("engine_capacity_min", "engine_capacity_max")
-        )
-        self.fields["engine_capacity_range"].choices = [
-            ("", "Выберите диапазон объёма"),
-            *[
-                (_token(lower, upper), _capacity_label(lower, upper))
-                for lower, upper in _unique_ranges(capacities)
-            ],
-        ]
-
-        for powertrain, _label in UtilizationRate.Powertrain.choices:
-            ranges = list(
-                utilization_rate_version.utilization_rates.filter(
-                    powertrain=powertrain,
-                    usage_mode=UtilizationRate.UsageMode.PERSONAL,
-                )
-                .order_by("power_kw_min", "power_kw_max")
-                .values_list("power_kw_min", "power_kw_max")
-            )
-            self.power_choices_by_powertrain[powertrain] = [
-                {
-                    "value": _token(lower, upper),
-                    "label": _power_label(lower, upper),
-                }
-                for lower, upper in _unique_ranges(ranges)
-            ]
-
-        selected = self._selected_powertrain()
-        selected_power_ranges = self.power_choices_by_powertrain.get(
-            selected,
-            [],
-        )
-        self.fields["power_range"].choices = [
-            ("", "Выберите диапазон мощности"),
-            *[
-                (item["value"], item["label"])
-                for item in selected_power_ranges
-            ],
-        ]
-
-    def _selected_powertrain(self) -> str:
+    def _selected_calculation_date(self) -> date:
+        """Возвращает корректную дату из POST или текущую дату."""
         if self.is_bound:
-            value = self.data.get(self.add_prefix("powertrain"))
-            if value:
-                return str(value)
-        return UtilizationRate.Powertrain.COMBUSTION
+            raw_date = self.data.get(self.add_prefix("calculation_date"))
+            try:
+                return date.fromisoformat(str(raw_date))
+            except (TypeError, ValueError):
+                pass
+        return timezone.localdate()
 
-    @staticmethod
-    def _representative(token: str, value_type: type) -> object | None:
-        lower_value, upper_value = token.split(":", maxsplit=1)
-        lower = value_type(lower_value) if lower_value else None
-        upper = value_type(upper_value) if upper_value else None
-        return upper if upper is not None else lower
+    def clean_calculation_date(self) -> date:
+        """Не разрешает расчёт по ещё не действующим ставкам."""
+        calculation_date = self.cleaned_data["calculation_date"]
+        if calculation_date > timezone.localdate():
+            raise forms.ValidationError(
+                "Дата расчёта не может быть позднее текущей даты."
+            )
+        return calculation_date
 
     def clean(self) -> dict[str, object]:
-        """Проверяет поля и добавляет мощность в кВт и л. с."""
+        """Проверяет точные параметры и приводит мощность к нужным единицам."""
         cleaned_data = super().clean()
         powertrain = cleaned_data.get("powertrain")
-        capacity_token = cleaned_data.get("engine_capacity_range")
+        engine_capacity = cleaned_data.get("engine_capacity")
         if (
             powertrain == UtilizationRate.Powertrain.COMBUSTION
-            and not capacity_token
+            and engine_capacity is None
         ):
             self.add_error(
-                "engine_capacity_range",
-                "Выберите диапазон объёма двигателя.",
+                "engine_capacity",
+                "Укажите точный объём двигателя.",
             )
-        elif powertrain == UtilizationRate.Powertrain.COMBUSTION:
-            cleaned_data["engine_capacity"] = self._representative(
-                str(capacity_token),
-                int,
-            )
-        else:
+        elif powertrain == UtilizationRate.Powertrain.ELECTRIC:
             cleaned_data["engine_capacity"] = None
 
-        power_token = cleaned_data.get("power_range")
-        if power_token:
-            power_kw = self._representative(str(power_token), Decimal)
-            if isinstance(power_kw, Decimal):
-                cleaned_data["power_kw"] = power_kw
-                cleaned_data["power_hp"] = power_kw / Decimal("0.75")
+        power_value = cleaned_data.get("power_value")
+        power_unit = cleaned_data.get("power_unit")
+        if isinstance(power_value, Decimal):
+            if power_unit == UtilizationFeeForm.POWER_UNIT_HORSEPOWER:
+                cleaned_data["power_hp"] = power_value
+                cleaned_data["power_kw"] = horsepower_to_kw(power_value)
+            else:
+                cleaned_data["power_kw"] = power_value
+                cleaned_data["power_hp"] = power_value / Decimal("0.75")
         return cleaned_data
-
-    def selected_label(self, field_name: str) -> str:
-        value = self.cleaned_data.get(field_name)
-        return dict(self.fields[field_name].choices).get(str(value), "")

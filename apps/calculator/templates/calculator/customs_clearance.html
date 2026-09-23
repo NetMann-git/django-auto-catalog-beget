@@ -80,23 +80,40 @@
                     </div>
 
                     <div class="customs-calc__field" id="customs-engine-field">
-                        <label for="{{ form.engine_capacity_range.id_for_label }}">
-                            {{ form.engine_capacity_range.label }}
+                        <label for="{{ form.engine_capacity.id_for_label }}">
+                            {{ form.engine_capacity.label }}
                         </label>
-                        {{ form.engine_capacity_range }}
-                        <small>{{ form.engine_capacity_range.help_text }}</small>
-                        {{ form.engine_capacity_range.errors }}
+                        {{ form.engine_capacity }}
+                        <small>{{ form.engine_capacity.help_text }}</small>
+                        {{ form.engine_capacity.errors }}
+                    </div>
+
+                    <div class="customs-calc__value-row">
+                        <div class="customs-calc__field">
+                            <label for="{{ form.power_value.id_for_label }}">
+                                {{ form.power_value.label }}
+                            </label>
+                            {{ form.power_value }}
+                            <small id="customs-power-help">
+                                {{ form.power_value.help_text }}
+                            </small>
+                            {{ form.power_value.errors }}
+                        </div>
+                        <div class="customs-calc__field">
+                            <label for="{{ form.power_unit.id_for_label }}">
+                                {{ form.power_unit.label }}
+                            </label>
+                            {{ form.power_unit }}{{ form.power_unit.errors }}
+                        </div>
                     </div>
 
                     <div class="customs-calc__field">
-                        <label for="{{ form.power_range.id_for_label }}">
-                            {{ form.power_range.label }}
+                        <label for="{{ form.calculation_date.id_for_label }}">
+                            {{ form.calculation_date.label }}
                         </label>
-                        {{ form.power_range }}
-                        <small id="customs-power-help">
-                            {{ form.power_range.help_text }}
-                        </small>
-                        {{ form.power_range.errors }}
+                        {{ form.calculation_date }}
+                        <small>{{ form.calculation_date.help_text }}</small>
+                        {{ form.calculation_date.errors }}
                     </div>
 
                     <div class="customs-calc__confirm">
@@ -134,26 +151,75 @@
                         <p class="customs-calc__result-label">Итого платежей</p>
                         <p class="customs-calc__amount">{{ formatted_total }} ₽</p>
                         <dl class="customs-calc__details">
-                            <div><dt>Ввозная пошлина</dt><dd>{{ formatted_duty }} ₽</dd></div>
+                            <div>
+                                <dt>Ввозная пошлина</dt>
+                                <dd>
+                                    {{ formatted_duty }} ₽
+                                    {% if result.duty_rate.fixed_eur_per_cc %}
+                                        <br><small>
+                                            {{ result.duty_rate.fixed_eur_per_cc|floatformat:"-2" }} €/см³
+                                        </small>
+                                    {% elif result.duty_rate %}
+                                        <br><small>
+                                            {{ result.duty_rate.value_percentage|floatformat:"-2" }}%,
+                                            но не менее
+                                            {{ result.duty_rate.minimum_eur_per_cc|floatformat:"-2" }} €/см³
+                                        </small>
+                                    {% elif result.aggregate_rate %}
+                                        <br><small>
+                                            {{ result.aggregate_rate.import_duty_percentage|floatformat:"-2" }}%
+                                        </small>
+                                    {% endif %}
+                                </dd>
+                            </div>
                             {% if result.aggregate_rate %}
-                                <div><dt>Акциз</dt><dd>{{ formatted_excise }} ₽</dd></div>
-                                <div><dt>НДС</dt><dd>{{ formatted_vat }} ₽</dd></div>
+                                <div>
+                                    <dt>Акциз</dt>
+                                    <dd>
+                                        {{ formatted_excise }} ₽<br>
+                                        <small>
+                                            {{ result.excise_rate.rub_per_hp|floatformat:"-2" }} ₽/л.с.
+                                        </small>
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt>НДС</dt>
+                                    <dd>
+                                        {{ formatted_vat }} ₽<br>
+                                        <small>
+                                            {{ result.aggregate_rate.vat_percentage|floatformat:"-2" }}%
+                                        </small>
+                                    </dd>
+                                </div>
                                 <div class="customs-calc__details-total">
                                     <dt>Совокупный таможенный платёж</dt>
                                     <dd>{{ formatted_aggregate_payment }} ₽</dd>
                                 </div>
                             {% endif %}
                             <div><dt>Таможенный сбор</dt><dd>{{ formatted_clearance_fee }} ₽</dd></div>
-                            <div><dt>Утилизационный сбор</dt><dd>{{ formatted_utilization_fee }} ₽</dd></div>
-                            {% if selected_capacity_label %}
+                            <div>
+                                <dt>Утилизационный сбор</dt>
+                                <dd>
+                                    {{ formatted_utilization_fee }} ₽<br>
+                                    <small>
+                                        коэффициент
+                                        {{ result.utilization_result.coefficient|floatformat:"-4" }}
+                                    </small>
+                                </dd>
+                            </div>
+                            {% if entered_engine_capacity %}
                                 <div>
-                                    <dt>Диапазон объёма</dt>
-                                    <dd>{{ selected_capacity_label }}</dd>
+                                    <dt>Объём двигателя</dt>
+                                    <dd>{{ entered_engine_capacity }} см³</dd>
                                 </div>
                             {% endif %}
                             <div>
-                                <dt>Диапазон мощности</dt>
-                                <dd>{{ selected_power_label }}</dd>
+                                <dt>Мощность</dt>
+                                <dd>{{ entered_power_value }} {{ entered_power_unit }}</dd>
+                            </div>
+                            <div>
+                                <dt>Дата расчёта</dt>
+                                <dd>{{ calculation_date|date:"d.m.Y" }}</dd>
                             </div>
                             <div>
                                 <dt>Стоимость для расчёта</dt>
@@ -201,7 +267,6 @@
         </div>
     </div>
 </main>
-{{ power_choices_by_powertrain|json_script:"customs-power-options" }}
 {% endblock %}
 
 {% block extra_js %}
