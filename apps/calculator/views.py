@@ -9,7 +9,7 @@ from django.utils import timezone
 
 from .exchange_rates import refresh_current_rates
 from .forms import CustomsClearanceForm
-from .models import RateVersion, UtilizationRate
+from .models import CurrencyRate, RateVersion, UtilizationRate
 from .services import (
     CustomsCalculationInput,
     CustomsClearanceCalculator,
@@ -126,6 +126,23 @@ def customs_clearance(request: HttpRequest) -> HttpResponse:
     if form.is_bound and form.is_valid():
         calculation_date = form.cleaned_data["calculation_date"]
 
+    currency_names = (
+        ("EUR", "Евро"),
+        ("USD", "Доллар США"),
+        ("CNY", "Китайский юань"),
+        ("KRW", "Южнокорейская вона"),
+    )
+    latest_rates: dict[str, CurrencyRate] = {}
+    for rate in CurrencyRate.objects.filter(
+        code__in=[code for code, _ in currency_names],
+        effective_date__lte=calculation_date,
+    ).order_by("code", "-effective_date", "-id"):
+        latest_rates.setdefault(rate.code, rate)
+    currency_informers = [
+        {"code": code, "name": name, "rate": latest_rates.get(code)}
+        for code, name in currency_names
+    ]
+
     try:
         rate_version = CustomsClearanceCalculator.get_rate_version(
             calculation_date
@@ -140,6 +157,8 @@ def customs_clearance(request: HttpRequest) -> HttpResponse:
             "form": form,
             "rate_version": rate_version,
             "exchange_rate_warning": not rates_updated,
+            "currency_informers": currency_informers,
+            "informers_date": calculation_date,
         }
     )
 

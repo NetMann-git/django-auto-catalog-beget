@@ -105,10 +105,15 @@ class CustomsClearanceViewTests(TestCase):
             power_kw_max=Decimal("117.68"),
             coefficient=Decimal("0.26"),
         )
-        for code, value in (("USD", "90"), ("EUR", "100")):
+        for code, value, nominal in (
+            ("USD", "90", 1),
+            ("EUR", "100", 1),
+            ("CNY", "12.5", 1),
+            ("KRW", "61", 1000),
+        ):
             CurrencyRate.objects.create(
                 code=code,
-                nominal=1,
+                nominal=nominal,
                 rate_to_rub=Decimal(value),
                 effective_date=date(2026, 9, 19),
             )
@@ -120,6 +125,22 @@ class CustomsClearanceViewTests(TestCase):
         self.assertContains(response, "Калькулятор растаможки автомобилей")
         self.assertContains(response, "Точный объём двигателя, см³")
         self.assertContains(response, "Точная мощность")
+        self.assertContains(response, "Южнокорейская вона")
+        self.assertContains(response, "за 1000 ед.")
+
+    def test_informers_use_latest_rate_before_calculation_date(self) -> None:
+        CurrencyRate.objects.create(
+            code="USD", nominal=1, rate_to_rub=Decimal("91"),
+            effective_date=date(2026, 9, 21),
+        )
+        response = self.client.get(reverse("calculator:customs_clearance"))
+
+        rates = {
+            item["code"]: item["rate"]
+            for item in response.context["currency_informers"]
+        }
+        self.assertEqual(rates["USD"].effective_date, date(2026, 9, 21))
+        self.assertEqual(rates["KRW"].effective_date, date(2026, 9, 19))
 
     def test_valid_form_displays_total_and_breakdown(self) -> None:
         response = self.client.post(
