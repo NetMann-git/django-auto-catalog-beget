@@ -7,6 +7,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 
+from .exchange_rates import refresh_current_rates
 from .forms import CustomsClearanceForm
 from .models import RateVersion, UtilizationRate
 from .services import (
@@ -119,6 +120,7 @@ def utilization_fee(request: HttpRequest) -> HttpResponse:
 def customs_clearance(request: HttpRequest) -> HttpResponse:
     """Показывает форму и результат расчёта растаможки."""
     context: dict[str, Any] = {}
+    rates_updated = refresh_current_rates()
     form = CustomsClearanceForm(request.POST or None)
     calculation_date = timezone.localdate()
     if form.is_bound and form.is_valid():
@@ -137,6 +139,7 @@ def customs_clearance(request: HttpRequest) -> HttpResponse:
         {
             "form": form,
             "rate_version": rate_version,
+            "exchange_rate_warning": not rates_updated,
         }
     )
 
@@ -182,6 +185,8 @@ def customs_clearance(request: HttpRequest) -> HttpResponse:
                         result.customs_value_rub
                     ),
                     "calculation_date": calculation_date,
+                    "currency_rate_date": result.currency_rate.effective_date,
+                    "eur_rate_date": result.eur_rate.effective_date,
                     "entered_engine_capacity": form.cleaned_data.get(
                         "engine_capacity"
                     ),

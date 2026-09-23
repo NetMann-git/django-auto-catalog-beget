@@ -26,6 +26,12 @@
                     Применяются ставки: {{ rate_version.name }}
                 </p>
             {% endif %}
+            {% if exchange_rate_warning %}
+                <p class="customs-calc__rate-version" role="status">
+                    ЦБ временно недоступен: расчёт использует последние
+                    сохранённые курсы. Проверьте даты курсов в результате.
+                </p>
+            {% endif %}
         </header>
 
         <div class="customs-calc__layout">
@@ -231,6 +237,12 @@
                                 <dd>{{ result.currency_rate.rate_to_rub }} ₽
                                     за {{ result.currency_rate.nominal }} ед.<br>
                                     <small>{{ result.currency_rate.effective_date|date:"d.m.Y" }}</small></dd>
+                            </div>
+                            <div>
+                                <dt>Курс EUR для пошлины</dt>
+                                <dd>{{ result.eur_rate.rate_to_rub }} ₽
+                                    за {{ result.eur_rate.nominal }} ед.<br>
+                                    <small>{{ eur_rate_date|date:"d.m.Y" }}</small></dd>
                             </div>
                         </dl>
                     </div>

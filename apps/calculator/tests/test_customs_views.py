@@ -2,6 +2,7 @@
 
 from datetime import date
 from decimal import Decimal
+from unittest.mock import patch
 
 from django.test import TestCase
 from django.urls import reverse
@@ -20,6 +21,14 @@ from apps.calculator.models import (
 
 class CustomsClearanceViewTests(TestCase):
     """Проверяет URL, форму и результат растаможки."""
+
+    def setUp(self) -> None:
+        """Отключает сетевые обращения в тестах представления."""
+        patcher = patch(
+            "apps.calculator.views.refresh_current_rates", return_value=True
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     @classmethod
     def setUpTestData(cls) -> None:
