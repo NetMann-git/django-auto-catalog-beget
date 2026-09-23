@@ -34,37 +34,6 @@
             {% endif %}
         </header>
 
-        <section class="customs-calc__currencies" aria-labelledby="customs-currencies-title">
-            <div class="customs-calc__currencies-heading">
-                <h2 id="customs-currencies-title">Курсы валют ЦБ РФ</h2>
-                <p>Для расчёта на {{ informers_date|date:"d.m.Y" }}.
-                    Указана дата фактически применяемого курса.</p>
-            </div>
-            <div class="customs-calc__currency-grid">
-                {% for item in currency_informers %}
-                    <div class="customs-calc__currency-card">
-                        <div class="customs-calc__currency-name">
-                            <strong>{{ item.code }}</strong>
-                            <span>{{ item.name }}</span>
-                        </div>
-                        {% if item.rate %}
-                            <p class="customs-calc__currency-value">
-                                {{ item.rate.rate_to_rub|floatformat:"-4" }} ₽
-                            </p>
-                            <p class="customs-calc__currency-meta">
-                                за {{ item.rate.nominal }} ед. ·
-                                {{ item.rate.effective_date|date:"d.m.Y" }}
-                            </p>
-                        {% else %}
-                            <p class="customs-calc__currency-meta">
-                                Курс на эту дату не загружен
-                            </p>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
-        </section>
-
         <div class="customs-calc__layout">
             <section class="customs-calc__card" aria-labelledby="customs-form-title">
                 <h2 class="customs-calc__subtitle" id="customs-form-title">
@@ -306,6 +275,36 @@
                            target="_blank" rel="noopener noreferrer">Курсы ЦБ РФ</a>
                     </div>
                 </div>
+                <section class="customs-calc__currencies"
+                         aria-labelledby="customs-currencies-title">
+                    <div class="customs-calc__currencies-heading">
+                        <h2 id="customs-currencies-title">Курсы валют ЦБ РФ</h2>
+                        <p>На {{ informers_date|date:"d.m.Y" }} · дата курса указана ниже</p>
+                    </div>
+                    <div class="customs-calc__currency-grid">
+                        {% for item in currency_informers %}
+                            <div class="customs-calc__currency-card">
+                                <div class="customs-calc__currency-name">
+                                    <strong>{{ item.code }}</strong>
+                                    <span>{{ item.name }}</span>
+                                </div>
+                                {% if item.rate %}
+                                    <p class="customs-calc__currency-value">
+                                        {{ item.rate.rate_to_rub|floatformat:"-4" }} ₽
+                                    </p>
+                                    <p class="customs-calc__currency-meta">
+                                        за {{ item.rate.nominal }} ед. ·
+                                        {{ item.rate.effective_date|date:"d.m.Y" }}
+                                    </p>
+                                {% else %}
+                                    <p class="customs-calc__currency-meta">
+                                        Курс на эту дату не загружен
+                                    </p>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
             </aside>
         </div>
     </div>
