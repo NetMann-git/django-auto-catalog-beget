@@ -25,8 +25,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     const section = clearBtnProduct.closest('.recently-viewed');
                     if (section) section.style.display = 'none';
                     // Обновляем счётчик
-                    const counter = document.getElementById('recently-viewed-count');
-                    if (counter) counter.textContent = '0';
+                    document.querySelectorAll('#recently-viewed-count, [data-recently-viewed-count]')
+                        .forEach(counter => { counter.textContent = '0'; });
                 }
             })
             .catch(error => console.error('Ошибка:', error));
@@ -57,8 +57,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (productsBlock) productsBlock.style.display = 'none';
                     if (emptyBlock) emptyBlock.style.display = 'block';
                     // Обновляем счётчик
-                    const counter = document.getElementById('recently-viewed-count');
-                    if (counter) counter.textContent = '0';
+                    document.querySelectorAll('#recently-viewed-count, [data-recently-viewed-count]')
+                        .forEach(counter => { counter.textContent = '0'; });
                 }
             })
             .catch(error => console.error('Ошибка:', error));

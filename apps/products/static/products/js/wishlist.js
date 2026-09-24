@@ -78,8 +78,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
 
-            const counter = document.getElementById('wishlist-count');
-            if (counter) counter.textContent = data.count;
+            document.querySelectorAll('#wishlist-count, [data-wishlist-count]')
+                .forEach(counter => { counter.textContent = data.count; });
         })
         .catch(error => console.error('Ошибка переключения избранного:', error));
     }
@@ -123,8 +123,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (wishlistProducts) wishlistProducts.style.display = 'none';
                 if (emptyWishlist) emptyWishlist.style.display = 'block';
 
-                const counter = document.getElementById('wishlist-count');
-                if (counter) counter.textContent = '0';
+                document.querySelectorAll('#wishlist-count, [data-wishlist-count]')
+                    .forEach(counter => { counter.textContent = '0'; });
             }
         })
         .catch(error => console.error('Ошибка очистки избранного:', error));

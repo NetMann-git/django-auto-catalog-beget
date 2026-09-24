@@ -2,16 +2,14 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     const comparisonButtons = document.querySelectorAll('.compare-btn[data-url^="/catalog/comparison/toggle/"]');
-    const comparisonCount = document.getElementById('comparison-count');
+    const comparisonCounts = document.querySelectorAll('#comparison-count, [data-comparison-count]');
     const emptyMessage = document.getElementById('empty-message');
     const tableWrapper = document.getElementById('comparison-table-wrapper');
     const backLink = document.querySelector('.comparison-back-link');
 
     function updateComparisonUI(productId, isAdded, count, message) {
         // Обновляем счётчик в шапке
-        if (comparisonCount) {
-            comparisonCount.textContent = count;
-        }
+        comparisonCounts.forEach(counter => { counter.textContent = count; });
 
         // Обновляем кнопку на карточке
         const btn = document.querySelector(`.compare-btn[data-product-id="${productId}"]`);

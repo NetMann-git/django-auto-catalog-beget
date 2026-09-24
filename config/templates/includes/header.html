@@ -16,9 +16,9 @@
             {% if request.resolver_match.namespace == 'catalog' or request.resolver_match.namespace == 'wishlist' or request.resolver_match.view_name == 'users:login' %}
             <a href="{% url 'home' %}" class="nav-link">Главная</a>
             <a href="{% url 'catalog:catalog' %}" class="nav-link{% if request.resolver_match.namespace == 'catalog' %} is-active{% endif %}">Каталог</a>
-            <a href="{% url 'catalog:comparison' %}" class="nav-link">Сравнение</a>
-            <a href="{% url 'wishlist:list' %}" class="nav-link">Избранное{% if wishlist_count %} <span class="badge-count" id="wishlist-count">{{ wishlist_count }}</span>{% endif %}</a>
-            <a href="{% url 'catalog:recently_viewed' %}" class="nav-link">История</a>
+            <a href="{% url 'catalog:comparison' %}" class="nav-link">Сравнение <span class="badge-count" id="comparison-count">{{ comparison_ids|length }}</span></a>
+            <a href="{% url 'wishlist:list' %}" class="nav-link">Избранное <span class="badge-count" id="wishlist-count">{{ wishlist_count }}</span></a>
+            <a href="{% url 'catalog:recently_viewed' %}" class="nav-link">История <span class="badge-count" id="recently-viewed-count">{{ recently_viewed_ids|length }}</span></a>
             <a href="{% url 'users:login' %}" class="nav-link">Войти</a>
             {% else %}
             <a href="{% url 'home' %}" class="nav-link is-active">Главная</a>
@@ -54,9 +54,9 @@
         {% if request.resolver_match.namespace == 'catalog' or request.resolver_match.namespace == 'wishlist' or request.resolver_match.view_name == 'users:login' %}
         <a href="{% url 'home' %}" class="nav-link">Главная</a>
         <a href="{% url 'catalog:catalog' %}" class="nav-link">Каталог</a>
-        <a href="{% url 'catalog:comparison' %}" class="nav-link">Сравнение</a>
-        <a href="{% url 'wishlist:list' %}" class="nav-link">Избранное</a>
-        <a href="{% url 'catalog:recently_viewed' %}" class="nav-link">История</a>
+        <a href="{% url 'catalog:comparison' %}" class="nav-link">Сравнение <span class="badge-count" data-comparison-count>{{ comparison_ids|length }}</span></a>
+        <a href="{% url 'wishlist:list' %}" class="nav-link">Избранное <span class="badge-count" data-wishlist-count>{{ wishlist_count }}</span></a>
+        <a href="{% url 'catalog:recently_viewed' %}" class="nav-link">История <span class="badge-count" data-recently-viewed-count>{{ recently_viewed_ids|length }}</span></a>
         <a href="{% url 'users:login' %}" class="nav-link">Войти</a>
         {% else %}
         <a href="{% url 'home' %}" class="nav-link">Главная</a>
