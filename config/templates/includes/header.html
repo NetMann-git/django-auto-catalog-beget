@@ -13,12 +13,21 @@
         </a> -->
 
         <nav class="main-nav" aria-label="Основная навигация">
+            {% if request.resolver_match.namespace == 'catalog' or request.resolver_match.namespace == 'wishlist' or request.resolver_match.view_name == 'users:login' %}
+            <a href="{% url 'home' %}" class="nav-link">Главная</a>
+            <a href="{% url 'catalog:catalog' %}" class="nav-link{% if request.resolver_match.namespace == 'catalog' %} is-active{% endif %}">Каталог</a>
+            <a href="{% url 'catalog:comparison' %}" class="nav-link">Сравнение</a>
+            <a href="{% url 'wishlist:list' %}" class="nav-link">Избранное{% if wishlist_count %} <span class="badge-count" id="wishlist-count">{{ wishlist_count }}</span>{% endif %}</a>
+            <a href="{% url 'catalog:recently_viewed' %}" class="nav-link">История</a>
+            <a href="{% url 'users:login' %}" class="nav-link">Войти</a>
+            {% else %}
             <a href="{% url 'home' %}" class="nav-link is-active">Главная</a>
             <a href="{% url 'catalog:catalog' %}" class="nav-link">Каталог</a>
             <a href="/#about" class="nav-link">О компании</a>
             <a href="/#process" class="nav-link">Как покупаем</a>
             <a href="/#inspection" class="nav-link">Осмотр</a>
             <a href="/#clients" class="nav-link">Клиенты</a>
+            {% endif %}
         </nav>
 
         <div class="header-actions">
@@ -27,11 +36,13 @@
                 <div id="search-results" class="search-results" style="display:none;"></div>
             </div>
 
+            {% if request.resolver_match.namespace != 'catalog' and request.resolver_match.namespace != 'wishlist' and request.resolver_match.view_name != 'users:login' %}
             <a href="{% url 'catalog:catalog' %}" class="btn btn-primary desktop-action">Подобрать авто</a>
 
             <a href="{% url 'wishlist:list' %}" class="nav-link" aria-label="Избранное">
                 Избранное{% if wishlist_count %} <span class="badge-count" id="wishlist-count">{{ wishlist_count }}</span>{% endif %}
             </a>
+            {% endif %}
 
             <button type="button" class="mobile-menu-toggle" aria-label="Открыть меню" aria-expanded="false" data-mobile-menu-toggle>
                 <span></span>
@@ -40,11 +51,20 @@
     </div>
 
     <nav class="mobile-nav" aria-label="Мобильная навигация" data-mobile-nav>
+        {% if request.resolver_match.namespace == 'catalog' or request.resolver_match.namespace == 'wishlist' or request.resolver_match.view_name == 'users:login' %}
+        <a href="{% url 'home' %}" class="nav-link">Главная</a>
+        <a href="{% url 'catalog:catalog' %}" class="nav-link">Каталог</a>
+        <a href="{% url 'catalog:comparison' %}" class="nav-link">Сравнение</a>
+        <a href="{% url 'wishlist:list' %}" class="nav-link">Избранное</a>
+        <a href="{% url 'catalog:recently_viewed' %}" class="nav-link">История</a>
+        <a href="{% url 'users:login' %}" class="nav-link">Войти</a>
+        {% else %}
         <a href="{% url 'home' %}" class="nav-link">Главная</a>
         <a href="{% url 'catalog:catalog' %}" class="nav-link">Каталог</a>
         <a href="/#about" class="nav-link">О компании</a>
         <a href="/#process" class="nav-link">Как покупаем</a>
         <a href="/#inspection" class="nav-link">Осмотр</a>
         <a href="/#clients" class="nav-link">Клиенты</a>
+        {% endif %}
     </nav>
 </header>
