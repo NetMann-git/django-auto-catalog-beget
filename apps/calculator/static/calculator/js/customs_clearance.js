@@ -1,4 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector(".customs-calc__form");
+    if (form) {
+        form.addEventListener("submit", () => {
+            // После входа в аккаунт Django меняет CSRF-cookie; форма могла
+            // остаться открытой со старым токеном.
+            const token = form.querySelector('[name="csrfmiddlewaretoken"]');
+            const currentToken = getCookie("csrftoken");
+            if (token && currentToken) {
+                token.value = currentToken;
+            }
+        });
+    }
+
     const powertrain = document.getElementById("id_powertrain");
     const engineField = document.getElementById("customs-engine-field");
     const engineInput = document.getElementById("id_engine_capacity");
