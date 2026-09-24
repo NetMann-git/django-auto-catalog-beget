@@ -1,5 +1,6 @@
 """Представления раздела калькуляторов."""
 
+from datetime import date
 from decimal import Decimal
 from typing import Any
 
@@ -120,11 +121,18 @@ def utilization_fee(request: HttpRequest) -> HttpResponse:
 def customs_clearance(request: HttpRequest) -> HttpResponse:
     """Показывает форму и результат расчёта растаможки."""
     context: dict[str, Any] = {}
-    rates_updated = refresh_current_rates()
     form = CustomsClearanceForm(request.POST or None)
     calculation_date = timezone.localdate()
-    if form.is_bound and form.is_valid():
-        calculation_date = form.cleaned_data["calculation_date"]
+    if request.method == "POST":
+        try:
+            posted_date = date.fromisoformat(
+                str(request.POST.get("calculation_date", ""))
+            )
+        except ValueError:
+            posted_date = None
+        if posted_date and posted_date <= timezone.localdate():
+            calculation_date = posted_date
+    rates_updated = refresh_current_rates(calculation_date)
 
     currency_names = (
         ("EUR", "Евро"),

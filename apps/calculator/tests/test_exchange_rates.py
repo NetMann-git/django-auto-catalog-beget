@@ -65,6 +65,23 @@ class ExchangeRateTests(TestCase):
         self.assertEqual(CurrencyRate.objects.get(code="KRW").nominal, 1000)
 
     @patch("apps.calculator.exchange_rates.urlopen")
+    def test_historical_weekend_uses_previous_official_date(
+        self, opener: object
+    ) -> None:
+        opener.return_value = _Response(
+            _xml().replace(b"23.09.2026", b"24.07.2026")
+        )
+
+        effective_date = update_exchange_rates(date(2026, 7, 25))
+
+        self.assertEqual(effective_date, date(2026, 7, 24))
+        self.assertEqual(
+            CurrencyRate.objects.get(code="USD").effective_date,
+            date(2026, 7, 24),
+        )
+        self.assertIn("date_req=25/07/2026", opener.call_args.args[0])
+
+    @patch("apps.calculator.exchange_rates.urlopen")
     def test_incomplete_response_does_not_change_database(
         self, opener: object
     ) -> None:

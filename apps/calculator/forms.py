@@ -7,7 +7,6 @@ from django import forms
 from django.utils import timezone
 
 from .models import (
-    CurrencyRate,
     CustomsDutyRate,
     UtilizationRate,
 )
@@ -103,10 +102,15 @@ class CustomsClearanceForm(forms.Form):
         "KRW": "Южнокорейская вона (KRW)",
     }
     ALLOWED_CURRENCIES = ("RUB", "USD", "EUR", "CNY", "KRW")
+    POWERTRAIN_CHOICES = (
+        (UtilizationRate.Powertrain.COMBUSTION, "ДВС или параллельный гибрид"),
+        (UtilizationRate.Powertrain.ELECTRIC,
+         "Электромобиль или последовательный гибрид"),
+    )
 
     powertrain = forms.ChoiceField(
         label="Тип силовой установки",
-        choices=UtilizationRate.Powertrain.choices,
+        choices=POWERTRAIN_CHOICES,
     )
 
     customs_value = forms.DecimalField(
@@ -167,32 +171,13 @@ class CustomsClearanceForm(forms.Form):
         *args: object,
         **kwargs: object,
     ) -> None:
-        """Заполняет список валют с курсами на выбранную дату."""
+        """Показывает все поддерживаемые валюты даже до загрузки курса."""
         super().__init__(*args, **kwargs)
-        rate_date = self._selected_calculation_date()
-        available_codes = set(
-            CurrencyRate.objects.filter(
-                effective_date__lte=rate_date,
-            ).values_list("code", flat=True)
-        )
-        choices = [
+        self.fields["currency_code"].choices = [
             (code, self.CURRENCY_LABELS.get(code, code))
             for code in self.ALLOWED_CURRENCIES
-            if code in available_codes
         ]
-        self.fields["currency_code"].choices = choices
-        if "USD" in available_codes:
-            self.fields["currency_code"].initial = "USD"
-
-    def _selected_calculation_date(self) -> date:
-        """Возвращает корректную дату из POST или текущую дату."""
-        if self.is_bound:
-            raw_date = self.data.get(self.add_prefix("calculation_date"))
-            try:
-                return date.fromisoformat(str(raw_date))
-            except (TypeError, ValueError):
-                pass
-        return timezone.localdate()
+        self.fields["currency_code"].initial = "USD"
 
     def clean_calculation_date(self) -> date:
         """Не разрешает расчёт по ещё не действующим ставкам."""

@@ -125,8 +125,68 @@ class CustomsClearanceViewTests(TestCase):
         self.assertContains(response, "Калькулятор растаможки автомобилей")
         self.assertContains(response, "Точный объём двигателя, см³")
         self.assertContains(response, "Точная мощность")
+        self.assertContains(response, "ДВС или параллельный гибрид")
         self.assertContains(response, "Южнокорейская вона")
         self.assertContains(response, "за 1000 ед.")
+
+    def test_historical_date_loads_cbr_rates_before_calculation(self) -> None:
+        """Расчёт за июль работает при курсах в БД только с сентября."""
+        def refresh(rate_date: date | None = None) -> bool:
+            if rate_date == date(2026, 7, 25):
+                for code, value in (("USD", "90"), ("EUR", "100")):
+                    CurrencyRate.objects.create(
+                        code=code, nominal=1, rate_to_rub=Decimal(value),
+                        effective_date=date(2026, 7, 24),
+                    )
+            return True
+
+        with patch(
+            "apps.calculator.views.refresh_current_rates",
+            side_effect=refresh,
+        ) as updater:
+            response = self.client.post(
+                reverse("calculator:customs_clearance"),
+                {
+                    "customs_value": "10000",
+                    "currency_code": "USD",
+                    "powertrain": UtilizationRate.Powertrain.COMBUSTION,
+                    "age_group": CustomsDutyRate.AgeGroup.THREE_TO_FIVE,
+                    "calculation_date": "2026-07-25",
+                    "engine_capacity": "1498",
+                    "power_value": "150",
+                    "power_unit": "hp",
+                    "personal_use_confirmed": "on",
+                },
+            )
+
+        updater.assert_called_once_with(date(2026, 7, 25))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "264 784 ₽")
+        self.assertContains(response, "24.07.2026")
+
+    def test_missing_historical_rates_show_error_and_currencies(self) -> None:
+        with patch(
+            "apps.calculator.views.refresh_current_rates",
+            return_value=False,
+        ):
+            response = self.client.post(
+                reverse("calculator:customs_clearance"),
+                {
+                    "customs_value": "10000",
+                    "currency_code": "USD",
+                    "powertrain": UtilizationRate.Powertrain.COMBUSTION,
+                    "age_group": CustomsDutyRate.AgeGroup.THREE_TO_FIVE,
+                    "calculation_date": "2026-07-25",
+                    "engine_capacity": "1498",
+                    "power_value": "150",
+                    "power_unit": "hp",
+                    "personal_use_confirmed": "on",
+                },
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Не загружен курс валюты USD")
+        self.assertContains(response, "Доллар США (USD)")
 
     def test_informers_use_latest_rate_before_calculation_date(self) -> None:
         CurrencyRate.objects.create(

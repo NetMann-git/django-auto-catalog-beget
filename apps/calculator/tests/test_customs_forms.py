@@ -61,6 +61,16 @@ class CustomsClearanceFormTests(TestCase):
             ["RUB", "USD", "EUR", "CNY", "KRW"],
         )
 
+    def test_historical_date_does_not_remove_currency_options(self) -> None:
+        form = CustomsClearanceForm(
+            data={"calculation_date": "2026-07-25", "currency_code": "USD"},
+        )
+
+        self.assertEqual(
+            [code for code, _ in form.fields["currency_code"].choices],
+            ["RUB", "USD", "EUR", "CNY", "KRW"],
+        )
+
     def test_combustion_requires_engine_capacity(self) -> None:
         form = CustomsClearanceForm(
             data={

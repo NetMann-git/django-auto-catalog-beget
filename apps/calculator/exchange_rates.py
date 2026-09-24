@@ -65,19 +65,19 @@ def update_exchange_rates(rate_date: date, *, timeout: int = 5) -> date:
     return effective_date
 
 
-def refresh_current_rates() -> bool:
-    """Пробует обновить курс раз в 6 часов; сбой не прерывает расчёт."""
-    today = timezone.localdate()
-    key = f"calculator:cbr:checked:{today.isoformat()}"
+def refresh_current_rates(rate_date: date | None = None) -> bool:
+    """Обновляет курс на дату с ограничением повторных сетевых запросов."""
+    requested_date = rate_date or timezone.localdate()
+    key = f"calculator:cbr:checked:{requested_date.isoformat()}"
     cached_result = cache.get(key)
     if cached_result is not None:
         return cached_result == "ok"
-    lock_key = f"calculator:cbr:lock:{today.isoformat()}"
+    lock_key = f"calculator:cbr:lock:{requested_date.isoformat()}"
     if not cache.add(lock_key, True, timeout=15):
         return False
     try:
         try:
-            update_exchange_rates(today)
+            update_exchange_rates(requested_date)
         except ExchangeRateError:
             LOGGER.warning("Не удалось обновить курсы ЦБ", exc_info=True)
             cache.set(key, "failed", timeout=900)
