@@ -77,6 +77,19 @@ body.sticky-header .site-header {
     font-weight: 600;
 }
 
+.site-header .header-logout-form {
+    margin: 0;
+}
+
+.site-header .header-logout-form button.nav-link {
+    display: block;
+    width: 100%;
+    border: 0;
+    cursor: pointer;
+    text-align: left;
+    white-space: nowrap;
+}
+
 .site-header .main-nav .nav-link:hover,
 .site-header .main-nav .nav-link:focus-visible,
 .site-header .main-nav .nav-link.is-active {
@@ -245,6 +258,10 @@ body.sticky-header .site-header {
     .mobile-nav .nav-link:hover {
         background: rgba(230,103,42,0.16);
         color: #fff;
+    }
+
+    .mobile-nav .header-logout-form button.nav-link {
+        font: inherit;
     }
 
     .header-actions {
