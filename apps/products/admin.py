@@ -176,11 +176,11 @@ class ProductAdmin(admin.ModelAdmin):
     def image_tag(self, obj):
         if obj.image:
             thumbnail = get_thumbnailer(obj.image).get_thumbnail({
-                'size': (50, 75),
+                'size': (80, 60),
                 'crop': True,
             })
             return format_html(
-                '<img src="{}" style="width:50px; height:75px; object-fit: cover;" />',
+                '<img src="{}" style="width:80px; height:60px; object-fit: cover;" />',
                 thumbnail.url
             )
         return format_html('<span style="color: #aaa;">Нет фото</span>')
