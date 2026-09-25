@@ -40,7 +40,7 @@
     display: block;
     position: relative;
     overflow: hidden;
-    aspect-ratio: 2 / 3;
+    aspect-ratio: 4 / 3;
     background: #f7f7f7;
 }
 .dress-image-link::after {

@@ -41,7 +41,7 @@
                 <tr>
                     <td>
                         {% if product.image %}
-                            <img src="{% thumbnail product.image 100x150 crop %}" alt="{{ product.title }}" class="product-thumb" loading="lazy">
+                            <img src="{% thumbnail product.image 120x90 crop %}" alt="{{ product.title }}" class="product-thumb" loading="lazy">
                         {% else %}
                             <span style="color: #ccc;">Нет фото</span>
                         {% endif %}

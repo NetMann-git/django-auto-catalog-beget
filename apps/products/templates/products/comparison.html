@@ -2,6 +2,7 @@
 
 {% extends "base.html" %}
 {% load static %}
+{% load thumbnail %}
 {% load comparison_filters %}
 
 {% block extra_css %}
@@ -86,7 +87,7 @@
                     {% for product in products %}
                         <td data-product-id="{{ product.id }}">
                             {% if product.image %}
-                                <img src="{{ product.image.small.url }}" alt="{{ product.title }}" width="80" height="120" loading="lazy">
+                                <img src="{% thumbnail product.image 120x90 crop %}" alt="{{ product.title }}" width="120" height="90" loading="lazy">
                             {% else %}
                                 —
                             {% endif %}

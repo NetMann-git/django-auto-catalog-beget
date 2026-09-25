@@ -48,8 +48,8 @@
         font-size: 13px;
     }
     .comparison-table td img {
-        max-width: 50px;
-        max-height: 80px;
+        width: 80px;
+        height: 60px;
     }
 
     /* История просмотров и избранное */

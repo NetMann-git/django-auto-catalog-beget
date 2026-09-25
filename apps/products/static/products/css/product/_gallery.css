@@ -136,8 +136,8 @@
 }
 
 .lightbox-thumb {
-    width: 70px;
-    height: 90px;
+    width: 90px;
+    height: 68px;
     object-fit: cover;
     cursor: pointer;
     border-radius: 6px;
@@ -188,7 +188,7 @@
 
 .gallery-thumb-vertical {
     width: 80px;
-    height: 110px;
+    height: 60px;
     object-fit: cover;
     cursor: pointer;
     flex-shrink: 0;

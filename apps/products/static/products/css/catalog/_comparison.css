@@ -43,8 +43,9 @@
 }
 
 .comparison-table td img {
-    max-width: 80px;
-    max-height: 120px;
+    width: 120px;
+    height: 90px;
+    max-width: 100%;
     border-radius: 6px;
     object-fit: cover;
 }
