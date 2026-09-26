@@ -2,7 +2,7 @@
 
 from decimal import Decimal, InvalidOperation
 
-from django.db.models import Q
+from django.db import connection
 from django.db.models.functions import Lower
 
 from apps.products.models import AttributeValue, Brand, ProductAttribute
@@ -142,7 +142,15 @@ class CatalogFilter:
                 ))
 
         if self.query:
-            queryset = queryset.filter(Q(title__icontains=self.query))
+            if connection.vendor == "sqlite" and not self.query.isascii():
+                # SQLite LIKE ignores case only for ASCII. Compare Unicode
+                # titles in Python, preserving the remaining queryset filters.
+                needle = self.query.casefold()
+                matching_ids = [pk for pk, title in queryset.values_list("pk", "title")
+                                if needle in title.casefold()]
+                queryset = queryset.filter(pk__in=matching_ids)
+            else:
+                queryset = queryset.filter(title__icontains=self.query)
 
         if self.sort == "price_asc":
             queryset = queryset.order_by("price", "pk")

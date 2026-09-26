@@ -111,6 +111,9 @@ class CatalogCarFilterTest(TestCase):
         ).pk
         self.assertEqual(self.filtered(fuel_type=str(fuel_id), q="АВТО 90"), [self.small])
 
+    def test_cyrillic_search_without_other_filters(self):
+        self.assertEqual(self.filtered(q="авто 90"), [self.small])
+
     def test_ruble_range_excludes_foreign_currency(self):
         self.large.currency = "USD"
         self.large.save(update_fields=["currency"])
