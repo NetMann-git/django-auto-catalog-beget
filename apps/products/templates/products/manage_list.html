@@ -10,6 +10,7 @@
 
 {% block content %}
 <div class="manage-container">
+    <a href="{% url 'users:manager_dashboard' %}" class="manage-back-link">← Вернуться в панель менеджера</a>
     <div class="manage-header">
         <h1>📦 Управление товарами</h1>
         <a href="{% url 'catalog:product_create' %}" class="btn-primary">+ Добавить товар</a>

@@ -10,6 +10,23 @@
     padding: 20px;
 }
 
+.manage-back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 16px;
+    border-radius: 6px;
+    background: #c0392b;
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.manage-back-link:hover,
+.manage-back-link:focus-visible {
+    background: #a93226;
+    color: #fff;
+}
+
 .manage-header {
     display: flex;
     justify-content: space-between;
