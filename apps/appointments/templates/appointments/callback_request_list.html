@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Заявки на обратный звонок{% endblock %}
+{% block title %}Обращения клиентов{% endblock %}
 
 {% block content %}
 <div class="container" style="padding-top: 30px; padding-bottom: 50px;">
     <div style="display:flex; justify-content:space-between; gap:20px; align-items:flex-start; flex-wrap:wrap; margin-bottom:20px;">
         <div>
-            <h1>Заявки на обратный звонок</h1>
+            <h1>Обращения клиентов</h1>
             <p style="color:#666;">Всего: {{ total }} · Новых: {{ new_count }}</p>
         </div>
         <a href="{% url 'users:manager_dashboard' %}" class="btn btn-primary">← Панель менеджера</a>
@@ -32,6 +32,9 @@
                         <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Дата</th>
                         <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Имя</th>
                         <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Телефон</th>
+                        <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Автомобиль</th>
+                        <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Город</th>
+                        <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Email и комментарий</th>
                         <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Статус</th>
                         <th style="text-align:left; padding:10px; border-bottom:2px solid #ddd;">Источник</th>
                     </tr>
@@ -42,6 +45,14 @@
                             <td style="padding:10px; border-bottom:1px solid #eee; white-space:nowrap;">{{ callback.created_at|date:"d.m.Y H:i" }}</td>
                             <td style="padding:10px; border-bottom:1px solid #eee;">{{ callback.name|default:"Без имени" }}</td>
                             <td style="padding:10px; border-bottom:1px solid #eee;"><a href="tel:{{ callback.phone }}">{{ callback.phone }}</a></td>
+                            <td style="padding:10px; border-bottom:1px solid #eee;">
+                                {% if callback.product %}<a href="{{ callback.product.get_absolute_url }}">{{ callback.product.title }}</a>{% else %}—{% endif %}
+                            </td>
+                            <td style="padding:10px; border-bottom:1px solid #eee;">{{ callback.city|default:"—" }}</td>
+                            <td style="padding:10px; border-bottom:1px solid #eee;">
+                                {% if callback.email %}<a href="mailto:{{ callback.email }}">{{ callback.email }}</a><br>{% endif %}
+                                {{ callback.comment|truncatechars:120|default:"—" }}
+                            </td>
                             <td style="padding:10px; border-bottom:1px solid #eee;">
                                 <form method="post" action="{% url 'appointments:callback_request_status_update' callback.pk %}" style="display:flex; gap:8px; align-items:center; margin:0;">
                                     {% csrf_token %}
@@ -54,7 +65,11 @@
                                     <button type="submit" class="btn btn-primary">Сохранить</button>
                                 </form>
                             </td>
-                            <td style="padding:10px; border-bottom:1px solid #eee;">{{ callback.source }}</td>
+                            <td style="padding:10px; border-bottom:1px solid #eee;">
+                                {% if callback.source == 'product_detail' %}Страница автомобиля
+                                {% elif callback.source == 'homepage' %}Главная
+                                {% else %}{{ callback.source }}{% endif %}
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>

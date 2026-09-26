@@ -3,13 +3,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.urls import reverse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_http_methods, require_POST
 from django.http import JsonResponse
 
 from apps.products.models import Product
 from apps.users.constants import ROLE_ADMIN, ROLE_MANAGER
 from apps.users.decorators import role_required
-from .forms import AppointmentForm, CallbackRequestForm
+from .forms import AppointmentForm, CallbackRequestForm, CarInquiryForm
 from .notifications import (
     send_email_notification,
     send_telegram_notification,
@@ -22,6 +22,47 @@ from django.template.loader import render_to_string
 
 from datetime import datetime, timedelta
 from .models import Appointment, CallbackRequest, WorkingHours
+
+
+@require_http_methods(['GET', 'POST'])
+def car_inquiry(request, product_id):
+    """Принимает запрос стоимости доставки выбранного автомобиля."""
+    product = get_object_or_404(Product, pk=product_id, is_active=True)
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    form = CarInquiryForm(request.POST if request.method == 'POST' else None)
+
+    if request.method == 'POST':
+        # Невидимое поле не мешает посетителю, но отсекает простых ботов.
+        if request.POST.get('website', '').strip():
+            if is_ajax:
+                return JsonResponse({'success': True})
+            return redirect(product.get_absolute_url())
+
+        if form.is_valid():
+            inquiry = form.save(commit=False)
+            inquiry.product = product
+            inquiry.source = 'product_detail'
+            inquiry.save()
+            send_email_notification(inquiry)
+            send_telegram_notification(inquiry)
+            send_max_notification(inquiry)
+
+            message = 'Заявка получена. Менеджер свяжется с вами.'
+            if is_ajax:
+                return JsonResponse({'success': True, 'message': message})
+            messages.success(request, message)
+            return redirect(product.get_absolute_url())
+
+    template = (
+        'appointments/_car_inquiry_form.html'
+        if is_ajax else 'appointments/car_inquiry_page.html'
+    )
+    return render(
+        request,
+        template,
+        {'form': form, 'product': product},
+        status=400 if request.method == 'POST' else 200,
+    )
 
 
 def get_available_slots(request, date):
@@ -211,7 +252,7 @@ def callback_request_list(request):
     status = request.GET.get("status", "").strip()
     valid_statuses = {value for value, _label in CallbackRequest.STATUS_CHOICES}
 
-    callbacks = CallbackRequest.objects.all()
+    callbacks = CallbackRequest.objects.select_related('product')
     if status in valid_statuses:
         callbacks = callbacks.filter(status=status)
     else:
@@ -249,4 +290,3 @@ def callback_request_status_update(request, pk):
         redirect_url = f"{redirect_url}?status={current_filter}"
 
     return redirect(redirect_url)
-

@@ -6,9 +6,11 @@ from unittest.mock import patch
 
 import requests
 
+from django.contrib.auth import get_user_model
 from django.core import mail
 from django.core.exceptions import ValidationError
-from django.test import TestCase, override_settings
+from django.test import Client, TestCase, override_settings
+from django.urls import reverse
 
 from apps.products.models import Product
 
@@ -183,6 +185,130 @@ class CallbackRequestTests(TestCase):
         self.assertTrue(response.json()['success'])
         self.assertEqual(CallbackRequest.objects.count(), 0)
 
+
+class CarInquiryTests(TestCase):
+    """Запрос расчёта сохраняет контакт и выбранный автомобиль."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.product = Product.objects.create(
+            title='Тестовый автомобиль',
+            slug='test-car-inquiry',
+            price=100000,
+        )
+
+    def setUp(self):
+        self.url = reverse('appointments:car_inquiry', args=[self.product.pk])
+
+    def test_form_is_available_without_javascript(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Тестовый автомобиль')
+        self.assertContains(response, 'Город доставки')
+
+    def test_product_page_has_inquiry_link(self):
+        response = self.client.get(self.product.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.url)
+        self.assertContains(response, 'Узнать стоимость под ключ')
+
+    @patch('apps.appointments.views.send_max_notification')
+    @patch('apps.appointments.views.send_telegram_notification')
+    @patch('apps.appointments.views.send_email_notification')
+    def test_ajax_submission_saves_car_and_contacts(self, email, telegram, max_message):
+        response = self.client.post(
+            self.url,
+            {
+                'name': 'Иван', 'phone': '+7 (999) 123-45-67',
+                'city': 'Ростов-на-Дону', 'email': 'ivan@example.com',
+                'comment': 'Нужен расчёт доставки',
+            },
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()['success'])
+        inquiry = CallbackRequest.objects.get(source='product_detail')
+        self.assertEqual(inquiry.product, self.product)
+        self.assertEqual(inquiry.city, 'Ростов-на-Дону')
+        self.assertEqual(inquiry.email, 'ivan@example.com')
+        self.assertEqual(inquiry.comment, 'Нужен расчёт доставки')
+        email.assert_called_once_with(inquiry)
+        telegram.assert_called_once_with(inquiry)
+        max_message.assert_called_once_with(inquiry)
+
+    def test_missing_city_or_short_phone_does_not_save(self):
+        response = self.client.post(
+            self.url,
+            {'name': 'Иван', 'phone': '123'},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertContains(response, 'Город доставки', status_code=400)
+        self.assertEqual(CallbackRequest.objects.count(), 0)
+
+    def test_honeypot_does_not_create_inquiry(self):
+        response = self.client.post(
+            self.url,
+            {'website': 'spam.example'},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(CallbackRequest.objects.count(), 0)
+
+    def test_unknown_product_does_not_accept_inquiry(self):
+        url = reverse('appointments:car_inquiry', args=[self.product.pk + 100])
+        self.assertEqual(self.client.post(url, {}).status_code, 404)
+
+    @patch('apps.appointments.views.send_max_notification')
+    @patch('apps.appointments.views.send_telegram_notification')
+    @patch('apps.appointments.views.send_email_notification')
+    def test_post_with_csrf_checks_and_without_javascript(self, *_notifications):
+        client = Client(enforce_csrf_checks=True)
+        response = client.get(self.url)
+        token = response.context['csrf_token']
+        response = client.post(self.url, {
+            'csrfmiddlewaretoken': str(token),
+            'name': 'Иван', 'phone': '+7 (999) 123-45-67',
+            'city': 'Ростов-на-Дону',
+        })
+        self.assertRedirects(
+            response, self.product.get_absolute_url(),
+            fetch_redirect_response=False,
+        )
+        self.assertEqual(CallbackRequest.objects.count(), 1)
+
+    @override_settings(
+        EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
+        DEFAULT_FROM_EMAIL='site@example.com',
+        MANAGER_EMAILS=['manager@example.com'],
+        SITE_URL='https://carstar-rnd.ru',
+    )
+    def test_manager_email_contains_car_link_and_contacts(self):
+        inquiry = CallbackRequest.objects.create(
+            name='Иван', phone='+79991234567', product=self.product,
+            city='Ростов-на-Дону', email='ivan@example.com',
+            source='product_detail',
+        )
+        self.assertTrue(send_email_notification(inquiry))
+        message = mail.outbox[-1]
+        self.assertIn('https://carstar-rnd.ru/catalog/test-car-inquiry/', message.body)
+        self.assertIn('Ростов-на-Дону', message.body)
+        self.assertIn('ivan@example.com', message.body)
+
+    def test_manager_sees_car_and_city_in_inquiry_list(self):
+        CallbackRequest.objects.create(
+            name='Иван', phone='+79991234567', product=self.product,
+            city='Ростов-на-Дону', source='product_detail',
+        )
+        user = get_user_model().objects.create_user(
+            username='car-inquiry-manager', password='test-pass',
+        )
+        user.profile.role = 'manager'
+        user.profile.save()
+        self.client.force_login(user)
+        response = self.client.get(reverse('appointments:callback_request_list'))
+        self.assertContains(response, self.product.get_absolute_url())
+        self.assertContains(response, 'Ростов-на-Дону')
 
 @override_settings(
     EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",

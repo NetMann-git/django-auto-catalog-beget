@@ -1,0 +1,20 @@
+<h2 id="car-inquiry-title">Узнать стоимость под ключ</h2>
+<p>Оставьте контакты — менеджер расскажет об автомобиле и вариантах доставки.</p>
+<p class="car-inquiry__product">Автомобиль: <strong>{{ product.title }}</strong></p>
+
+<form action="{% url 'appointments:car_inquiry' product.id %}" method="post" class="car-inquiry__form">
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="car-inquiry__field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
+            {{ field }}
+            {% for error in field.errors %}<span class="car-inquiry__error">{{ error }}</span>{% endfor %}
+        </div>
+    {% endfor %}
+    <div class="car-inquiry__honeypot" aria-hidden="true">
+        <label for="car-inquiry-website">Сайт</label>
+        <input type="text" name="website" id="car-inquiry-website" autocomplete="off" tabindex="-1">
+    </div>
+    <p class="car-inquiry__note">Менеджер свяжется с вами по указанному телефону.</p>
+    <button type="submit" class="car-inquiry__submit">Отправить запрос</button>
+</form>

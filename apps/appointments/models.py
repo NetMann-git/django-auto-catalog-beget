@@ -124,7 +124,7 @@ class WorkingHours(models.Model):
         return f'{self.get_day_of_week_display()}: {self.start_time} - {self.end_time}'
 
 class CallbackRequest(models.Model):
-    """Заявка на обратный звонок с главной страницы."""
+    """Обращение с главной страницы или страницы автомобиля."""
 
     STATUS_NEW = 'new'
     STATUS_PROCESSED = 'processed'
@@ -137,6 +137,17 @@ class CallbackRequest(models.Model):
 
     name = models.CharField(max_length=100, blank=True, verbose_name='Имя')
     phone = models.CharField(max_length=30, verbose_name='Телефон')
+    email = models.EmailField(blank=True, verbose_name='Электронная почта')
+    city = models.CharField(max_length=120, blank=True, verbose_name='Город доставки')
+    comment = models.TextField(blank=True, verbose_name='Комментарий')
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='callback_requests',
+        verbose_name='Автомобиль',
+    )
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
@@ -154,8 +165,8 @@ class CallbackRequest(models.Model):
 
     class Meta:
         ordering = ['-created_at']
-        verbose_name = 'Заявка на обратный звонок'
-        verbose_name_plural = 'Заявки на обратный звонок'
+        verbose_name = 'Обращение клиента'
+        verbose_name_plural = 'Обращения клиентов'
 
     def __str__(self):
         return f'{self.name or "Без имени"} — {self.phone}'

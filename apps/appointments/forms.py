@@ -67,3 +67,31 @@ class CallbackRequestForm(forms.ModelForm):
         if len(digits) > 15:
             raise forms.ValidationError('Номер телефона слишком длинный.')
         return phone
+
+
+class CarInquiryForm(CallbackRequestForm):
+    """Контакты для персонального расчёта доставки автомобиля."""
+
+    name = forms.CharField(max_length=100, label='Ваше имя')
+    city = forms.CharField(max_length=120, label='Город доставки')
+
+    class Meta:
+        model = CallbackRequest
+        fields = ('name', 'phone', 'city', 'email', 'comment')
+        widgets = {
+            'phone': forms.TextInput(attrs={
+                'autocomplete': 'tel',
+                'inputmode': 'tel',
+                'placeholder': '+7 (999) 123-45-67',
+            }),
+            'email': forms.EmailInput(attrs={'autocomplete': 'email'}),
+            'comment': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Ваши вопросы об автомобиле (необязательно)',
+            }),
+        }
+        labels = {
+            'phone': 'Телефон',
+            'email': 'Электронная почта (необязательно)',
+            'comment': 'Комментарий (необязательно)',
+        }

@@ -12,6 +12,25 @@ from django.utils import timezone
 logger = logging.getLogger(__name__)
 
 
+def _car_inquiry_details(callback_request) -> tuple[str, str]:
+    """Детали автомобиля для уведомления менеджеру, если он выбран."""
+    if callback_request.source != 'product_detail':
+        return '', ''
+    product = callback_request.product
+    product_title = product.title if product else 'Автомобиль удалён'
+    product_url = (
+        settings.SITE_URL.rstrip('/') + product.get_absolute_url()
+        if product else ''
+    )
+    details = (
+        f'Автомобиль: {product_title}\n'
+        f'Ссылка: {product_url}\n'
+        f'Город доставки: {callback_request.city}\n'
+        f'Email: {callback_request.email or "Не указан"}\n'
+    )
+    return details, product_url
+
+
 def send_email_notification(callback_request) -> bool:
     """Отправляет менеджеру уведомление о новой заявке на обратный звонок."""
     manager_emails = getattr(settings, "MANAGER_EMAILS", [])
@@ -25,26 +44,49 @@ def send_email_notification(callback_request) -> bool:
     name = callback_request.name.strip() if callback_request.name else "Без имени"
     phone = callback_request.phone.strip()
 
-    # В текущей модели CallbackRequest комментария пока нет. getattr сохраняет
-    # совместимость, если поле comment будет добавлено позже.
-    comment = getattr(callback_request, "comment", "") or ""
+    comment = callback_request.comment or ""
     comment = comment.strip() or "Не указан"
 
     created_at = timezone.localtime(callback_request.created_at)
     created_at_text = created_at.strftime("%d.%m.%Y %H:%M")
 
-    subject = f"Новая заявка на обратный звонок от {name}"
+    subject = (
+        f'Запрос стоимости автомобиля от {name}'
+        if callback_request.source == 'product_detail'
+        else f'Новая заявка на обратный звонок от {name}'
+    )
+    car_details, product_url = _car_inquiry_details(callback_request)
+    heading = (
+        'Получен запрос стоимости автомобиля'
+        if car_details else 'Получена новая заявка на обратный звонок'
+    )
+    html_details = ''
+    if car_details:
+        title = (
+            callback_request.product.title
+            if callback_request.product else 'Автомобиль удалён'
+        )
+        safe_url = escape(product_url, quote=True)
+        html_details = (
+            f'<p><strong>Автомобиль:</strong> {escape(title)}</p>'
+            f'<p><strong>Ссылка:</strong> '
+            f'<a href="{safe_url}">{escape(product_url)}</a></p>'
+            f'<p><strong>Город доставки:</strong> {escape(callback_request.city)}</p>'
+            f'<p><strong>Email:</strong> {escape(callback_request.email or "Не указан")}</p>'
+        )
     text_body = (
-        "Получена новая заявка на обратный звонок.\n\n"
+        f"{heading}.\n\n"
         f"Имя: {name}\n"
         f"Телефон: {phone}\n"
+        f"{car_details}"
         f"Комментарий: {comment}\n"
         f"Дата создания: {created_at_text}\n"
     )
     html_body = (
-        "<h2>Новая заявка на обратный звонок</h2>"
+        f"<h2>{heading}</h2>"
         f"<p><strong>Имя:</strong> {escape(name)}</p>"
         f"<p><strong>Телефон:</strong> {escape(phone)}</p>"
+        f"{html_details}"
         f"<p><strong>Комментарий:</strong><br>{escape(comment).replace(chr(10), '<br>')}</p>"
         f"<p><strong>Дата создания:</strong> {escape(created_at_text)}</p>"
     )
@@ -98,10 +140,14 @@ def send_telegram_notification(callback_request) -> bool:
     comment = getattr(callback_request, "comment", "") or ""
     comment = comment.strip() or "Не указан"
 
+    car_details, _ = _car_inquiry_details(callback_request)
+    extra = f'*Автомобиль и доставка:* {_escape_markdown_v2(car_details)}\n' if car_details else ''
+
     text = (
         "📞 *Новая заявка на звонок*\n"
         f"*Имя:* {_escape_markdown_v2(name)}\n"
         f"*Телефон:* {_escape_markdown_v2(phone)}\n"
+        f"{extra}"
         f"*Комментарий:* {_escape_markdown_v2(comment)}"
     )
 
@@ -150,10 +196,14 @@ def send_max_notification(callback_request) -> bool:
     comment = getattr(callback_request, "comment", "") or ""
     comment = comment.strip() or "Не указан"
 
+    car_details, _ = _car_inquiry_details(callback_request)
+    extra = f'Автомобиль и доставка: {car_details}' if car_details else ''
+
     text = (
         "📞 *Новая заявка на звонок*\n"
         f"*Имя:* {name}\n"
         f"*Телефон:* {phone}\n"
+        f"{extra}"
         f"*Комментарий:* {comment}"
     )
 

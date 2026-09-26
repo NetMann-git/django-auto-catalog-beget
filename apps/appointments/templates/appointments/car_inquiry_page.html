@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Запрос стоимости автомобиля{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'appointments/css/car_inquiry.css' %}">{% endblock %}
+
+{% block content %}
+<main class="car-inquiry__page">
+    <a href="{{ product.get_absolute_url }}">← Вернуться к автомобилю</a>
+    {% include 'appointments/_car_inquiry_form.html' %}
+</main>
+{% endblock %}

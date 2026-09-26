@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="{% static 'products/css/product/product.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/catalog/catalog.css' %}">
 <link rel="stylesheet" href="{% static 'reviews/css/reviews.css' %}">
+<link rel="stylesheet" href="{% static 'appointments/css/car_inquiry.css' %}">
 {% endblock extra_css %}
 
 {% block content %}
@@ -123,9 +124,9 @@
                 КНОПКИ ДЕЙСТВИЙ (размерный помощник и таблица размеров восстановлены)
             ======================================= -->
             <div class="dress-actions">
-                <button type="button" class="btn" id="open-appointment-modal" data-product-id="{{ product.id }}">
-                    📅 Записаться на тест-драйв
-                </button>
+                <a href="{% url 'appointments:car_inquiry' product.id %}" class="btn" id="open-car-inquiry-modal">
+                    Узнать стоимость под ключ
+                </a>
                 <button type="button" class="btn btn-outline" id="open-size-helper-modal">
                     📐 Подобрать размер
                 </button>
@@ -328,12 +329,21 @@
     </div>
 </div>
 
+<div id="car-inquiry-modal" class="car-inquiry__modal" role="dialog"
+     aria-modal="true" aria-labelledby="car-inquiry-title" hidden>
+    <div class="car-inquiry__dialog">
+        <button type="button" class="car-inquiry__close" aria-label="Закрыть форму">×</button>
+        <div id="car-inquiry-content" aria-live="polite"></div>
+    </div>
+</div>
+
 <!-- Подключаем скрипты галереи и лайтбоксов -->
 <script src="{% static 'products/js/product_gallery.js' %}"></script>
 <script src="{% static 'products/js/review_lightbox.js' %}"></script>
 <script src="{% static 'reviews/js/review_vote.js' %}"></script>
 <script src="{% static 'reviews/js/review_filters.js' %}"></script>
 <script src="{% static 'appointments/js/modal_window.js' %}"></script>
+<script src="{% static 'appointments/js/car_inquiry.js' %}"></script>
 <script src="{% static 'products/js/product_detail.js' %}"></script>
 
 {% endblock %}

@@ -6,6 +6,7 @@ from . import views
 app_name = 'appointments'
 
 urlpatterns = [
+    path('car-inquiry/<int:product_id>/', views.car_inquiry, name='car_inquiry'),
     path('form/', views.appointment_form, name='form'),
     path('form/<int:product_id>/', views.appointment_form, name='form_for_product'),
     path('submit/', views.appointment_submit, name='submit'),
