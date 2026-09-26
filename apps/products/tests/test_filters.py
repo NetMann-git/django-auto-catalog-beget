@@ -1,7 +1,9 @@
 from django.test import RequestFactory, TestCase
 
 from apps.products.filters import CatalogFilter
-from apps.products.models import Category, Product
+from apps.products.models import (
+    AttributeType, AttributeValue, Category, Product, ProductAttribute,
+)
 
 
 class CatalogFilterCategoryTest(TestCase):
@@ -45,3 +47,71 @@ class CatalogFilterCategoryTest(TestCase):
 
         self.assertIn(self.product_a, result)
         self.assertNotIn(self.product_b, result)
+
+
+class CatalogCarFilterTest(TestCase):
+    """Проверить числовые границы и совместное применение фильтров."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.small = Product.objects.create(
+            title="Авто 90", slug="auto-90", price=2000000, currency="RUB",
+        )
+        cls.large = Product.objects.create(
+            title="Авто 100", slug="auto-100", price=3000000, currency="RUB",
+        )
+        cls.unknown = Product.objects.create(
+            title="Без характеристик", slug="unknown", price=2500000,
+        )
+        for slug, small, large in (
+            ("year", "2021", "2022"),
+            ("mileage", "90000", "100000"),
+            ("engine_volume", "1,5", "2.0"),
+            ("power", "150", "200"),
+            ("engine_type", "Бензин", "Дизель"),
+        ):
+            kind = AttributeType.objects.create(name=slug, slug=slug)
+            for product, raw in ((cls.small, small), (cls.large, large)):
+                value, _ = AttributeValue.objects.get_or_create(
+                    attribute_type=kind, value=raw,
+                )
+                ProductAttribute.objects.create(
+                    product=product, attribute_type=kind, attribute_value=value,
+                )
+
+    def filtered(self, **params):
+        request = RequestFactory().get("/catalog/", params)
+        return list(CatalogFilter(request.GET).apply(Product.objects.all()))
+
+    def test_mileage_is_compared_numerically(self):
+        self.assertEqual(self.filtered(mileage_min="95000"), [self.large])
+
+    def test_all_numeric_ranges_and_year(self):
+        self.assertEqual(self.filtered(
+            year="2021", mileage_max="90000", engine_volume_min="1.5",
+            engine_volume_max="1.5", power_min="150", power_max="150",
+            price_max="2000000",
+        ), [self.small])
+
+    def test_invalid_range_returns_no_results(self):
+        request = RequestFactory().get("/catalog/", {
+            "mileage_min": "100000", "mileage_max": "90000",
+        })
+        selected = CatalogFilter(request.GET)
+        self.assertTrue(selected.errors)
+        self.assertFalse(selected.apply(Product.objects.all()).exists())
+
+    def test_blank_specs_stay_in_unfiltered_catalog(self):
+        self.assertIn(self.unknown, self.filtered())
+        self.assertNotIn(self.unknown, self.filtered(power_min="1"))
+
+    def test_fuel_filter_and_title_search(self):
+        fuel_id = AttributeValue.objects.get(
+            attribute_type__slug="engine_type", value="Бензин",
+        ).pk
+        self.assertEqual(self.filtered(fuel_type=str(fuel_id), q="АВТО 90"), [self.small])
+
+    def test_ruble_range_excludes_foreign_currency(self):
+        self.large.currency = "USD"
+        self.large.save(update_fields=["currency"])
+        self.assertNotIn(self.large, self.filtered(price_min="1"))

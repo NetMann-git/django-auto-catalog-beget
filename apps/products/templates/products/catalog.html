@@ -1,22 +1,22 @@
 <!-- apps/products/templates/products/catalog.html -->
 {% extends "base.html" %}
 
-{% load static %}
+{% load static catalog_query %}
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'products/css/catalog/catalog.css' %}">
     <link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
     <style>
-        /* Дополнительные стили для диапазонов */
-        .range-inputs {
+        /* Поля каталога изолированы внутри его формы. */
+        .catalog-filters .range-inputs {
             display: flex;
             gap: 8px;
         }
-        .range-inputs input {
+        .catalog-filters .range-inputs input {
             width: 50%;
             padding: 6px 8px;
         }
-        .filter-label {
+        .catalog-filters .filter-label {
             margin-top: 12px;
             display: block;
             font-weight: 600;
@@ -28,6 +28,8 @@
             padding: 6px 8px;
             margin-bottom: 4px;
         }
+        .catalog-filter-errors { color: #a02222; }
+        .catalog-filter-reset { text-align: center; color: #444; }
     </style>
 {% endblock %}
 
@@ -61,94 +63,61 @@
                     <button type="submit">Найти</button>
                 </div>
 
-                <!-- Категория (тип кузова) -->
-                <label class="filter-label">Тип кузова</label>
-                <select name="category" onchange="this.form.submit()">
-                    <option value="">Все типы</option>
-                    {% for category in categories %}
-                        <option value="{{ category.pk }}" {% if selected_category|stringformat:"s" == category.pk|stringformat:"s" %}selected{% endif %}>
-                            {{ category.title }}
-                        </option>
-                    {% endfor %}
-                </select>
-
-                <!-- Бренд -->
-                <label class="filter-label">Бренд</label>
-                <select name="brand" onchange="this.form.submit()">
-                    <option value="">Все бренды</option>
+                <label class="filter-label" for="catalog-brand">Марка</label>
+                <select id="catalog-brand" name="brand">
+                    <option value="">Все марки</option>
                     {% for brand in brands %}
-                        <option value="{{ brand.pk }}" {% if selected_brand|stringformat:"s" == brand.pk|stringformat:"s" %}selected{% endif %}>
-                            {{ brand.name }}
-                        </option>
+                        <option value="{{ brand.pk }}" {% if selected_brand|stringformat:"s" == brand.pk|stringformat:"s" %}selected{% endif %}>{{ brand.name }}</option>
                     {% endfor %}
                 </select>
 
-                <!-- Год выпуска -->
-                <label class="filter-label">Год выпуска</label>
+                <label class="filter-label" for="catalog-year">Год выпуска</label>
+                <select id="catalog-year" name="year">
+                    <option value="">Любой год</option>
+                    {% for year in catalog_years %}
+                        <option value="{{ year }}" {% if selected_year|stringformat:"s" == year|stringformat:"s" %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                </select>
+
+                <label class="filter-label">Цена, ₽</label>
                 <div class="range-inputs">
-                    <input type="number" name="year_min" placeholder="от" value="{{ selected_year_min }}">
-                    <input type="number" name="year_max" placeholder="до" value="{{ selected_year_max }}">
+                    <input type="number" min="0" name="price_min" placeholder="от" aria-label="Цена от, ₽" value="{{ selected_price_min }}">
+                    <input type="number" min="0" name="price_max" placeholder="до" aria-label="Цена до, ₽" value="{{ selected_price_max }}">
                 </div>
 
-                <!-- Пробег -->
-                <label class="filter-label">Пробег (км)</label>
+                <label class="filter-label">Пробег, км</label>
                 <div class="range-inputs">
-                    <input type="number" name="mileage_min" placeholder="от" value="{{ selected_mileage_min }}">
-                    <input type="number" name="mileage_max" placeholder="до" value="{{ selected_mileage_max }}">
+                    <input type="number" min="0" name="mileage_min" placeholder="от" aria-label="Пробег от, км" value="{{ selected_mileage_min }}">
+                    <input type="number" min="0" name="mileage_max" placeholder="до" aria-label="Пробег до, км" value="{{ selected_mileage_max }}">
                 </div>
 
-                <!-- Коробка передач -->
-                <label class="filter-label">Коробка передач</label>
-                <select name="transmission" onchange="this.form.submit()">
-                    <option value="">Любая</option>
-                    {% for value in transmissions %}
-                        <option value="{{ value }}" {% if selected_transmission == value %}selected{% endif %}>
-                            {{ value }}
-                        </option>
-                    {% endfor %}
-                </select>
-
-                <!-- Привод -->
-                <label class="filter-label">Привод</label>
-                <select name="drive" onchange="this.form.submit()">
-                    <option value="">Любой</option>
-                    {% for value in drives %}
-                        <option value="{{ value }}" {% if selected_drive == value %}selected{% endif %}>
-                            {{ value }}
-                        </option>
-                    {% endfor %}
-                </select>
-
-                <!-- Состояние -->
-                <label class="filter-label">Состояние</label>
-                <select name="condition" onchange="this.form.submit()">
-                    <option value="">Любое</option>
-                    {% for value in conditions %}
-                        <option value="{{ value }}" {% if selected_condition == value %}selected{% endif %}>
-                            {{ value }}
-                        </option>
-                    {% endfor %}
-                </select>
-
-                <!-- Цена -->
-                <label class="filter-label">Цена (₽)</label>
+                <label class="filter-label">Объём двигателя, л</label>
                 <div class="range-inputs">
-                    <input type="number" name="price_min" placeholder="от" value="{{ selected_price_min }}">
-                    <input type="number" name="price_max" placeholder="до" value="{{ selected_price_max }}">
+                    <input type="number" min="0" step="any" name="engine_volume_min" placeholder="от" aria-label="Объём двигателя от, л" value="{{ selected_engine_volume_min }}">
+                    <input type="number" min="0" step="any" name="engine_volume_max" placeholder="до" aria-label="Объём двигателя до, л" value="{{ selected_engine_volume_max }}">
                 </div>
 
-                <!-- Наличие -->
-                <label class="filter-label">Наличие</label>
-                <select name="availability" onchange="this.form.submit()">
-                    <option value="">Все</option>
-                    {% for value, label in availabilities %}
-                        <option value="{{ value }}" {% if selected_availability == value %}selected{% endif %}>
-                            {{ label }}
-                        </option>
+                <label class="filter-label">Мощность, л.с.</label>
+                <div class="range-inputs">
+                    <input type="number" min="0" name="power_min" placeholder="от" aria-label="Мощность от, л.с." value="{{ selected_power_min }}">
+                    <input type="number" min="0" name="power_max" placeholder="до" aria-label="Мощность до, л.с." value="{{ selected_power_max }}">
+                </div>
+
+                <label class="filter-label" for="catalog-fuel">Тип топлива</label>
+                <select id="catalog-fuel" name="fuel_type">
+                    <option value="">Любой тип</option>
+                    {% for value in fuel_values %}
+                        <option value="{{ value.pk }}" {% if selected_fuel_type|stringformat:"s" == value.pk|stringformat:"s" %}selected{% endif %}>{{ value.value }}</option>
                     {% endfor %}
                 </select>
+                {% if filter_errors %}
+                    <div class="catalog-filter-errors" role="alert">
+                        {% for error in filter_errors %}<p>{{ error }}</p>{% endfor %}
+                    </div>
+                {% endif %}
 
-                <button type="submit" class="btn">Применить</button>
+                <button type="submit" class="btn">Показать автомобили</button>
+                <a class="catalog-filter-reset" href="?">Сбросить</a>
 
             </form>
 
@@ -168,7 +137,7 @@
                         Найдено автомобилей: {{ page_obj.paginator.count }}
                     </p>
 
-                    {% if selected_silhouette or selected_collection or selected_color or selected_price_min or selected_price_max or selected_category or selected_brand or selected_year_min or selected_year_max or selected_mileage_min or selected_mileage_max or selected_transmission or selected_drive or selected_condition or selected_availability %}
+                    {% if search_query or selected_brand or selected_year or selected_fuel_type or selected_price_min or selected_price_max or selected_mileage_min or selected_mileage_max or selected_engine_volume_min or selected_engine_volume_max or selected_power_min or selected_power_max %}
                         <a href="?" class="clear-filters">✕ Очистить все</a>
                     {% endif %}
 
@@ -177,46 +146,19 @@
                 <!-- Сортировка -->
                 <form method="get">
 
-                    <!-- Скрытые поля для сохранения всех фильтров при смене сортировки -->
-                    {% if selected_category %}
-                        <input type="hidden" name="category" value="{{ selected_category }}">
-                    {% endif %}
-                    {% if selected_brand %}
-                        <input type="hidden" name="brand" value="{{ selected_brand }}">
-                    {% endif %}
-                    {% if selected_year_min %}
-                        <input type="hidden" name="year_min" value="{{ selected_year_min }}">
-                    {% endif %}
-                    {% if selected_year_max %}
-                        <input type="hidden" name="year_max" value="{{ selected_year_max }}">
-                    {% endif %}
-                    {% if selected_mileage_min %}
-                        <input type="hidden" name="mileage_min" value="{{ selected_mileage_min }}">
-                    {% endif %}
-                    {% if selected_mileage_max %}
-                        <input type="hidden" name="mileage_max" value="{{ selected_mileage_max }}">
-                    {% endif %}
-                    {% if selected_transmission %}
-                        <input type="hidden" name="transmission" value="{{ selected_transmission }}">
-                    {% endif %}
-                    {% if selected_drive %}
-                        <input type="hidden" name="drive" value="{{ selected_drive }}">
-                    {% endif %}
-                    {% if selected_condition %}
-                        <input type="hidden" name="condition" value="{{ selected_condition }}">
-                    {% endif %}
-                    {% if selected_availability %}
-                        <input type="hidden" name="availability" value="{{ selected_availability }}">
-                    {% endif %}
-                    {% if selected_price_min %}
-                        <input type="hidden" name="price_min" value="{{ selected_price_min }}">
-                    {% endif %}
-                    {% if selected_price_max %}
-                        <input type="hidden" name="price_max" value="{{ selected_price_max }}">
-                    {% endif %}
-                    {% if search_query %}
-                        <input type="hidden" name="q" value="{{ search_query }}">
-                    {% endif %}
+                    <!-- Сохранить выбранные условия при смене сортировки. -->
+                    {% if selected_brand %}<input type="hidden" name="brand" value="{{ selected_brand }}">{% endif %}
+                    {% if selected_year %}<input type="hidden" name="year" value="{{ selected_year }}">{% endif %}
+                    {% if selected_fuel_type %}<input type="hidden" name="fuel_type" value="{{ selected_fuel_type }}">{% endif %}
+                    {% if selected_price_min %}<input type="hidden" name="price_min" value="{{ selected_price_min }}">{% endif %}
+                    {% if selected_price_max %}<input type="hidden" name="price_max" value="{{ selected_price_max }}">{% endif %}
+                    {% if selected_mileage_min %}<input type="hidden" name="mileage_min" value="{{ selected_mileage_min }}">{% endif %}
+                    {% if selected_mileage_max %}<input type="hidden" name="mileage_max" value="{{ selected_mileage_max }}">{% endif %}
+                    {% if selected_engine_volume_min %}<input type="hidden" name="engine_volume_min" value="{{ selected_engine_volume_min }}">{% endif %}
+                    {% if selected_engine_volume_max %}<input type="hidden" name="engine_volume_max" value="{{ selected_engine_volume_max }}">{% endif %}
+                    {% if selected_power_min %}<input type="hidden" name="power_min" value="{{ selected_power_min }}">{% endif %}
+                    {% if selected_power_max %}<input type="hidden" name="power_max" value="{{ selected_power_max }}">{% endif %}
+                    {% if search_query %}<input type="hidden" name="q" value="{{ search_query }}">{% endif %}
 
                     <select name="sort" onchange="this.form.submit()">
                         <option value="">По умолчанию</option>
@@ -231,69 +173,16 @@
 
             </div>
 
-            <!-- Активные фильтры (чипсы) -->
+            <!-- Отдельные условия можно снять без сброса остальных. -->
             <div class="active-filters">
-
-                {% if selected_category %}
-                    <a class="filter-chip" href="?{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if selected_year_min %}year_min={{ selected_year_min }}&{% endif %}{% if selected_year_max %}year_max={{ selected_year_max }}&{% endif %}{% if selected_mileage_min %}mileage_min={{ selected_mileage_min }}&{% endif %}{% if selected_mileage_max %}mileage_max={{ selected_mileage_max }}&{% endif %}{% if selected_transmission %}transmission={{ selected_transmission }}&{% endif %}{% if selected_drive %}drive={{ selected_drive }}&{% endif %}{% if selected_condition %}condition={{ selected_condition }}&{% endif %}{% if selected_availability %}availability={{ selected_availability }}&{% endif %}{% if selected_price_min %}price_min={{ selected_price_min }}&{% endif %}{% if selected_price_max %}price_max={{ selected_price_max }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}{% endif %}{% if search_query %}q={{ search_query }}{% endif %}">
-                        Тип кузова: {{ selected_category }} ✕
-                    </a>
-                {% endif %}
-
-                {% if selected_brand %}
-                    <a class="filter-chip" href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_year_min %}year_min={{ selected_year_min }}&{% endif %}{% if selected_year_max %}year_max={{ selected_year_max }}&{% endif %}{% if selected_mileage_min %}mileage_min={{ selected_mileage_min }}&{% endif %}{% if selected_mileage_max %}mileage_max={{ selected_mileage_max }}&{% endif %}{% if selected_transmission %}transmission={{ selected_transmission }}&{% endif %}{% if selected_drive %}drive={{ selected_drive }}&{% endif %}{% if selected_condition %}condition={{ selected_condition }}&{% endif %}{% if selected_availability %}availability={{ selected_availability }}&{% endif %}{% if selected_price_min %}price_min={{ selected_price_min }}&{% endif %}{% if selected_price_max %}price_max={{ selected_price_max }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}{% endif %}{% if search_query %}q={{ search_query }}{% endif %}">
-                        Бренд: {{ selected_brand_name }} ✕
-                    </a>
-                {% endif %}
-
-                {% if selected_year_min or selected_year_max %}
-                    <a class="filter-chip" href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if selected_mileage_min %}mileage_min={{ selected_mileage_min }}&{% endif %}{% if selected_mileage_max %}mileage_max={{ selected_mileage_max }}&{% endif %}{% if selected_transmission %}transmission={{ selected_transmission }}&{% endif %}{% if selected_drive %}drive={{ selected_drive }}&{% endif %}{% if selected_condition %}condition={{ selected_condition }}&{% endif %}{% if selected_availability %}availability={{ selected_availability }}&{% endif %}{% if selected_price_min %}price_min={{ selected_price_min }}&{% endif %}{% if selected_price_max %}price_max={{ selected_price_max }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}{% endif %}{% if search_query %}q={{ search_query }}{% endif %}">
-                        Год: {% if selected_year_min %}от {{ selected_year_min }}{% endif %}{% if selected_year_max %} до {{ selected_year_max }}{% endif %} ✕
-                    </a>
-                {% endif %}
-
-                {% if selected_mileage_min or selected_mileage_max %}
-                    <a class="filter-chip" href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if selected_year_min %}year_min={{ selected_year_min }}&{% endif %}{% if selected_year_max %}year_max={{ selected_year_max }}&{% endif %}{% if selected_transmission %}transmission={{ selected_transmission }}&{% endif %}{% if selected_drive %}drive={{ selected_drive }}&{% endif %}{% if selected_condition %}condition={{ selected_condition }}&{% endif %}{% if selected_availability %}availability={{ selected_availability }}&{% endif %}{% if selected_price_min %}price_min={{ selected_price_min }}&{% endif %}{% if selected_price_max %}price_max={{ selected_price_max }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}{% endif %}{% if search_query %}q={{ search_query }}{% endif %}">
-                        Пробег: {% if selected_mileage_min %}от {{ selected_mileage_min }}{% endif %}{% if selected_mileage_max %} до {{ selected_mileage_max }}{% endif %} км ✕
-                    </a>
-                {% endif %}
-
-                {% if selected_transmission %}
-                    <a class="filter-chip" href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if selected_year_min %}year_min={{ selected_year_min }}&{% endif %}{% if selected_year_max %}year_max={{ selected_year_max }}&{% endif %}{% if selected_mileage_min %}mileage_min={{ selected_mileage_min }}&{% endif %}{% if selected_mileage_max %}mileage_max={{ selected_mileage_max }}&{% endif %}{% if selected_drive %}drive={{ selected_drive }}&{% endif %}{% if selected_condition %}condition={{ selected_condition }}&{% endif %}{% if selected_availability %}availability={{ selected_availability }}&{% endif %}{% if selected_price_min %}price_min={{ selected_price_min }}&{% endif %}{% if selected_price_max %}price_max={{ selected_price_max }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}{% endif %}{% if search_query %}q={{ search_query }}{% endif %}">
-                        Коробка: {{ selected_transmission }} ✕
-                    </a>
-                {% endif %}
-
-                {% if selected_drive %}
-                    <a class="filter-chip" href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if selected_year_min %}year_min={{ selected_year_min }}&{% endif %}{% if selected_year_max %}year_max={{ selected_year_max }}&{% endif %}{% if selected_mileage_min %}mileage_min={{ selected_mileage_min }}&{% endif %}{% if selected_mileage_max %}mileage_max={{ selected_mileage_max }}&{% endif %}{% if selected_transmission %}transmission={{ selected_transmission }}&{% endif %}{% if selected_condition %}condition={{ selected_condition }}&{% endif %}{% if selected_availability %}availability={{ selected_availability }}&{% endif %}{% if selected_price_min %}price_min={{ selected_price_min }}&{% endif %}{% if selected_price_max %}price_max={{ selected_price_max }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}{% endif %}{% if search_query %}q={{ search_query }}{% endif %}">
-                        Привод: {{ selected_drive }} ✕
-                    </a>
-                {% endif %}
-
-                {% if selected_condition %}
-                    <a class="filter-chip" href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if selected_year_min %}year_min={{ selected_year_min }}&{% endif %}{% if selected_year_max %}year_max={{ selected_year_max }}&{% endif %}{% if selected_mileage_min %}mileage_min={{ selected_mileage_min }}&{% endif %}{% if selected_mileage_max %}mileage_max={{ selected_mileage_max }}&{% endif %}{% if selected_transmission %}transmission={{ selected_transmission }}&{% endif %}{% if selected_drive %}drive={{ selected_drive }}&{% endif %}{% if selected_availability %}availability={{ selected_availability }}&{% endif %}{% if selected_price_min %}price_min={{ selected_price_min }}&{% endif %}{% if selected_price_max %}price_max={{ selected_price_max }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}{% endif %}{% if search_query %}q={{ search_query }}{% endif %}">
-                        Состояние: {{ selected_condition }} ✕
-                    </a>
-                {% endif %}
-
-                {% if selected_price_min or selected_price_max %}
-                    <a class="filter-chip" href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if selected_year_min %}year_min={{ selected_year_min }}&{% endif %}{% if selected_year_max %}year_max={{ selected_year_max }}&{% endif %}{% if selected_mileage_min %}mileage_min={{ selected_mileage_min }}&{% endif %}{% if selected_mileage_max %}mileage_max={{ selected_mileage_max }}&{% endif %}{% if selected_transmission %}transmission={{ selected_transmission }}&{% endif %}{% if selected_drive %}drive={{ selected_drive }}&{% endif %}{% if selected_condition %}condition={{ selected_condition }}&{% endif %}{% if selected_availability %}availability={{ selected_availability }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}{% endif %}{% if search_query %}q={{ search_query }}{% endif %}">
-                        Цена: {% if selected_price_min %}от {{ selected_price_min }}{% endif %}{% if selected_price_max %} до {{ selected_price_max }}{% endif %} ₽ ✕
-                    </a>
-                {% endif %}
-
-                {% if selected_availability %}
-                    <a class="filter-chip" href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if selected_year_min %}year_min={{ selected_year_min }}&{% endif %}{% if selected_year_max %}year_max={{ selected_year_max }}&{% endif %}{% if selected_mileage_min %}mileage_min={{ selected_mileage_min }}&{% endif %}{% if selected_mileage_max %}mileage_max={{ selected_mileage_max }}&{% endif %}{% if selected_transmission %}transmission={{ selected_transmission }}&{% endif %}{% if selected_drive %}drive={{ selected_drive }}&{% endif %}{% if selected_condition %}condition={{ selected_condition }}&{% endif %}{% if selected_price_min %}price_min={{ selected_price_min }}&{% endif %}{% if selected_price_max %}price_max={{ selected_price_max }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}{% endif %}{% if search_query %}q={{ search_query }}{% endif %}">
-                        Наличие: {{ selected_availability_label }} ✕
-                    </a>
-                {% endif %}
-
-                {% if search_query %}
-                    <a class="filter-chip" href="?{% if selected_category %}category={{ selected_category }}&{% endif %}{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if selected_year_min %}year_min={{ selected_year_min }}&{% endif %}{% if selected_year_max %}year_max={{ selected_year_max }}&{% endif %}{% if selected_mileage_min %}mileage_min={{ selected_mileage_min }}&{% endif %}{% if selected_mileage_max %}mileage_max={{ selected_mileage_max }}&{% endif %}{% if selected_transmission %}transmission={{ selected_transmission }}&{% endif %}{% if selected_drive %}drive={{ selected_drive }}&{% endif %}{% if selected_condition %}condition={{ selected_condition }}&{% endif %}{% if selected_availability %}availability={{ selected_availability }}&{% endif %}{% if selected_price_min %}price_min={{ selected_price_min }}&{% endif %}{% if selected_price_max %}price_max={{ selected_price_max }}&{% endif %}{% if selected_sort %}sort={{ selected_sort }}{% endif %}">
-                        Поиск: "{{ search_query }}" ✕
-                    </a>
-                {% endif %}
-
+                {% if search_query %}<a class="filter-chip" href="{% catalog_without 'q' %}">Поиск: {{ search_query }} ✕</a>{% endif %}
+                {% if selected_brand %}<a class="filter-chip" href="{% catalog_without 'brand' %}">Марка: {{ selected_brand_name|default:selected_brand }} ✕</a>{% endif %}
+                {% if selected_year %}<a class="filter-chip" href="{% catalog_without 'year' %}">Год: {{ selected_year }} ✕</a>{% endif %}
+                {% if selected_price_min or selected_price_max %}<a class="filter-chip" href="{% catalog_without 'price_min' 'price_max' %}">Цена: {{ selected_price_min|default:'0' }}–{{ selected_price_max|default:'∞' }} ₽ ✕</a>{% endif %}
+                {% if selected_mileage_min or selected_mileage_max %}<a class="filter-chip" href="{% catalog_without 'mileage_min' 'mileage_max' %}">Пробег: {{ selected_mileage_min|default:'0' }}–{{ selected_mileage_max|default:'∞' }} км ✕</a>{% endif %}
+                {% if selected_engine_volume_min or selected_engine_volume_max %}<a class="filter-chip" href="{% catalog_without 'engine_volume_min' 'engine_volume_max' %}">Объём: {{ selected_engine_volume_min|default:'0' }}–{{ selected_engine_volume_max|default:'∞' }} л ✕</a>{% endif %}
+                {% if selected_power_min or selected_power_max %}<a class="filter-chip" href="{% catalog_without 'power_min' 'power_max' %}">Мощность: {{ selected_power_min|default:'0' }}–{{ selected_power_max|default:'∞' }} л.с. ✕</a>{% endif %}
+                {% if selected_fuel_type %}<a class="filter-chip" href="{% catalog_without 'fuel_type' %}">Топливо: {{ selected_fuel_name|default:selected_fuel_type }} ✕</a>{% endif %}
             </div>
 
             <!-- Карточки товаров -->

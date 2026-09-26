@@ -28,31 +28,30 @@ class CatalogContextBuilder:
         context.update(filters.context())
         context.update(pagination.context())
 
-        # Добавляем списки для фильтров-атрибутов
-        from apps.products.models import AttributeType, AttributeValue
+        # Списки ограничены значениями опубликованных автомобилей.
+        from apps.products.models import AttributeValue, ProductAttribute
+        from apps.products.filters import FUEL_SLUGS, parse_number
 
-        # Уникальные значения для коробки передач
-        transmission_values = AttributeValue.objects.filter(
-            attribute_type__slug='transmission'
-        ).values_list('value', flat=True).distinct().order_by('value')
-        context['transmissions'] = transmission_values
+        active_attributes = ProductAttribute.objects.filter(
+            product__is_active=True,
+        )
+        years = AttributeValue.objects.filter(
+            product_attributes__in=active_attributes.filter(
+                attribute_type__slug="year",
+            ),
+        ).values_list("value", flat=True).distinct()
+        context["catalog_years"] = sorted(
+            {int(number) for value in years
+             if (number := parse_number(value)) is not None
+             and number == int(number)},
+            reverse=True,
+        )
+        context["fuel_values"] = AttributeValue.objects.filter(
+            product_attributes__in=active_attributes.filter(
+                attribute_type__slug__in=FUEL_SLUGS,
+            ),
+        ).distinct().order_by("value")
 
-        # Уникальные значения для привода
-        drive_values = AttributeValue.objects.filter(
-            attribute_type__slug='drive'
-        ).values_list('value', flat=True).distinct().order_by('value')
-        context['drives'] = drive_values
-
-        # Уникальные значения для состояния
-        condition_values = AttributeValue.objects.filter(
-            attribute_type__slug='condition'
-        ).values_list('value', flat=True).distinct().order_by('value')
-        context['conditions'] = condition_values
-
-        # Для года и пробега можно вычислить минимальное/максимальное значение
-        # (но пока оставляем как диапазон)       
-        
-        
         # 5. Избранное (wishlist)
         if request.user.is_authenticated:
             wishlist_ids = list(request.user.favorites.values_list("product_id", flat=True))

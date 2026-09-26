@@ -1,158 +1,201 @@
-# apps/products/filters.py
-"""
-Фильтры каталога (адаптировано под автомобили).
-"""
+"""Проверка и применение параметров фильтра каталога автомобилей."""
+
+from decimal import Decimal, InvalidOperation
+
 from django.db.models import Q
 from django.db.models.functions import Lower
-from apps.products.models import Product
-from apps.products.constants import AVAILABILITY_CHOICES
+
+from apps.products.models import AttributeValue, Brand, ProductAttribute
+
+
+NUMERIC_ATTRIBUTES = {
+    "mileage": "mileage",
+    "engine_volume": "engine_volume",
+    "power": "power",
+}
+FUEL_SLUGS = ("engine_type", "fuel_type")
+
+
+def parse_number(value):
+    """Разобрать число из справочника без приведения некорректных строк к нулю."""
+    if value is None:
+        return None
+    try:
+        number = Decimal(str(value).replace("\u00a0", "").replace(" ", "").replace(",", "."))
+    except InvalidOperation:
+        return None
+    return number if number.is_finite() and number >= 0 else None
+
 
 class CatalogFilter:
-    """
-    Хранит выбранные пользователем параметры фильтрации.
-    """
+    """Читает параметры GET и возвращает отфильтрованный queryset."""
 
     def __init__(self, request_get):
         self.query = request_get.get("q", "").strip()
-        self.category = request_get.get("category")
-        self.brand = request_get.get("brand")
-        self.price_min = request_get.get("price_min")
-        self.price_max = request_get.get("price_max")
-        self.sort = request_get.get("sort")
-        self.availability = request_get.get("availability")
+        self.category = request_get.get("category", "")
+        self.brand = request_get.get("brand", "")
+        self.year = request_get.get("year", "")
+        self.year_min = request_get.get("year_min", "")
+        self.year_max = request_get.get("year_max", "")
+        self.fuel_type = request_get.get("fuel_type", "")
+        self.sort = request_get.get("sort", "")
+        self.availability = request_get.get("availability", "")
+        self.transmission = request_get.get("transmission", "")
+        self.drive = request_get.get("drive", "")
+        self.condition = request_get.get("condition", "")
+        self.price_min = request_get.get("price_min", "")
+        self.price_max = request_get.get("price_max", "")
+        self.mileage_min = request_get.get("mileage_min", "")
+        self.mileage_max = request_get.get("mileage_max", "")
+        self.engine_volume_min = request_get.get("engine_volume_min", "")
+        self.engine_volume_max = request_get.get("engine_volume_max", "")
+        self.power_min = request_get.get("power_min", "")
+        self.power_max = request_get.get("power_max", "")
+        self.errors = []
+        self.ranges = {}
+        for field in ("price", "mileage", "engine_volume", "power"):
+            lower_raw = getattr(self, f"{field}_min")
+            upper_raw = getattr(self, f"{field}_max")
+            lower = parse_number(lower_raw) if lower_raw else None
+            upper = parse_number(upper_raw) if upper_raw else None
+            if ((lower_raw and lower is None) or (upper_raw and upper is None)
+                    or (lower is not None and upper is not None and lower > upper)):
+                self.errors.append(f"Проверьте диапазон: {self._labels[field]}.")
+            self.ranges[field] = (lower, upper)
 
-        # Диапазоны
-        self.year_min = request_get.get("year_min")
-        self.year_max = request_get.get("year_max")
-        self.mileage_min = request_get.get("mileage_min")
-        self.mileage_max = request_get.get("mileage_max")
+    _labels = {
+        "price": "цена", "mileage": "пробег",
+        "engine_volume": "объём двигателя", "power": "мощность",
+    }
 
-        # Выбор из списка
-        self.transmission = request_get.get("transmission")
-        self.drive = request_get.get("drive")
-        self.condition = request_get.get("condition")
+    @staticmethod
+    def _attribute_products(slug, value_ids):
+        """Подзапрос по значению характеристики исключает дубликаты карточек."""
+        return ProductAttribute.objects.filter(
+            attribute_type__slug=slug,
+            attribute_value_id__in=value_ids,
+        ).values("product_id")
+
+    def _numeric_products(self, slug, lower, upper):
+        """Сравнивать справочные значения как Decimal, затем искать их товары."""
+        values = AttributeValue.objects.filter(
+            attribute_type__slug=slug,
+        ).values_list("id", "value")
+        matching = []
+        for pk, raw_value in values:
+            number = parse_number(raw_value)
+            if (number is not None
+                    and (lower is None or number >= lower)
+                    and (upper is None or number <= upper)):
+                matching.append(pk)
+        return self._attribute_products(slug, matching)
 
     def apply(self, queryset):
-        # Фильтр по категории (тип кузова)
+        """Применить фильтры без текстовых сравнений числовых характеристик."""
+        if self.errors:
+            return queryset.none()
         if self.category:
-            queryset = queryset.filter(category_id=self.category)
-
-        # Фильтр по бренду
+            queryset = queryset.filter(category_id=self.category) if self.category.isdigit() else queryset.none()
         if self.brand:
-            queryset = queryset.filter(brand_id=self.brand)
-
-        # Фильтр по наличию
+            queryset = queryset.filter(brand_id=self.brand) if self.brand.isdigit() else queryset.none()
         if self.availability:
             queryset = queryset.filter(availability_status=self.availability)
+        for key in ("transmission", "drive", "condition"):
+            value = getattr(self, key)
+            if value:
+                queryset = queryset.filter(pk__in=ProductAttribute.objects.filter(
+                    attribute_type__slug=key,
+                    attribute_value__value=value,
+                ).values("product_id"))
+        if self.year:
+            queryset = queryset.filter(pk__in=self._attribute_products(
+                "year", AttributeValue.objects.filter(
+                    attribute_type__slug="year", value=self.year,
+                ).values("pk"),
+            ))
+        if self.year_min or self.year_max:
+            lower = parse_number(self.year_min) if self.year_min else None
+            upper = parse_number(self.year_max) if self.year_max else None
+            if (self.year_min and lower is None) or (self.year_max and upper is None):
+                return queryset.none()
+            queryset = queryset.filter(pk__in=self._numeric_products(
+                "year", lower, upper,
+            ))
+        if self.fuel_type:
+            queryset = queryset.filter(pk__in=ProductAttribute.objects.filter(
+                attribute_type__slug__in=FUEL_SLUGS,
+                attribute_value_id=self.fuel_type,
+            ).values("product_id")) if self.fuel_type.isdigit() else queryset.none()
 
-        # Цена
-        if self.price_min:
-            queryset = queryset.filter(price__gte=self.price_min)
-        if self.price_max:
-            queryset = queryset.filter(price__lte=self.price_max)
+        for field, (lower, upper) in self.ranges.items():
+            if lower is None and upper is None:
+                continue
+            if field == "price":
+                queryset = queryset.filter(currency="RUB")
+                if lower is not None:
+                    queryset = queryset.filter(price__gte=lower)
+                if upper is not None:
+                    queryset = queryset.filter(price__lte=upper)
+            else:
+                queryset = queryset.filter(pk__in=self._numeric_products(
+                    NUMERIC_ATTRIBUTES[field], lower, upper,
+                ))
 
-        # --- Фильтры по атрибутам через поле `attributes` ---
-        # Год выпуска (диапазон)
-        if self.year_min:
-            queryset = queryset.filter(
-                attributes__attribute_type__slug='year',
-                attributes__attribute_value__value__gte=self.year_min
-            )
-        if self.year_max:
-            queryset = queryset.filter(
-                attributes__attribute_type__slug='year',
-                attributes__attribute_value__value__lte=self.year_max
-            )
-
-        # Пробег (диапазон)
-        if self.mileage_min:
-            queryset = queryset.filter(
-                attributes__attribute_type__slug='mileage',
-                attributes__attribute_value__value__gte=self.mileage_min
-            )
-        if self.mileage_max:
-            queryset = queryset.filter(
-                attributes__attribute_type__slug='mileage',
-                attributes__attribute_value__value__lte=self.mileage_max
-            )
-
-        # Коробка передач
-        if self.transmission:
-            queryset = queryset.filter(
-                attributes__attribute_type__slug='transmission',
-                attributes__attribute_value__value=self.transmission
-            )
-
-        # Привод
-        if self.drive:
-            queryset = queryset.filter(
-                attributes__attribute_type__slug='drive',
-                attributes__attribute_value__value=self.drive
-            )
-
-        # Состояние (новый / с пробегом)
-        if self.condition:
-            queryset = queryset.filter(
-                attributes__attribute_type__slug='condition',
-                attributes__attribute_value__value=self.condition
-            )
-
-        # Поиск (регистронезависимый)
         if self.query:
-            query = self.query.casefold()
-            ids = []
-            for product in queryset:
-                if (query in (product.title or "").casefold() or
-                    query in (product.description or "").casefold()):
-                    ids.append(product.id)
-            queryset = queryset.filter(id__in=ids)
+            queryset = queryset.filter(Q(title__icontains=self.query))
 
-        # Сортировка
         if self.sort == "price_asc":
-            queryset = queryset.order_by("price")
+            queryset = queryset.order_by("price", "pk")
         elif self.sort == "price_desc":
-            queryset = queryset.order_by("-price")
+            queryset = queryset.order_by("-price", "pk")
         elif self.sort == "title_asc":
-            queryset = queryset.order_by(Lower("title"))
+            queryset = queryset.order_by(Lower("title"), "pk")
         elif self.sort == "title_desc":
-            queryset = queryset.order_by(Lower("title").desc())
+            queryset = queryset.order_by(Lower("title").desc(), "pk")
         elif self.sort == "year_desc":
-            # Сортировка по году (новые сначала)
-            queryset = queryset.order_by("-attributes__attribute_value__value")
-            # Примечание: может дать неоднозначный результат, если товар имеет несколько атрибутов года.
-            # Для точности лучше использовать аннотации, но для демо-целей допустимо.
-
+            # Год приводится к числу при подборе значения, чтобы не сортировать текст.
+            year_values = AttributeValue.objects.filter(
+                attribute_type__slug="year",
+            ).values_list("id", "value")
+            from django.db.models import Case, IntegerField, Value, When
+            years = {pk: int(number) for pk, value in year_values
+                     if (number := parse_number(value)) is not None
+                     and number == int(number)}
+            if years:
+                from django.db.models import OuterRef, Subquery
+                year_ids = ProductAttribute.objects.filter(
+                    product_id=OuterRef("pk"),
+                    attribute_type__slug="year",
+                ).values("attribute_value_id")[:1]
+                queryset = queryset.annotate(_year_id=Subquery(year_ids)).annotate(
+                    _catalog_year=Case(
+                        *(When(_year_id=pk, then=Value(year)) for pk, year in years.items()),
+                        default=Value(0), output_field=IntegerField(),
+                    )
+                ).order_by("-_catalog_year", "pk")
         return queryset
 
-    def get_brand_name(self):
-        if self.brand:
-            from apps.products.models import Brand
-            try:
-                return Brand.objects.get(pk=self.brand).name
-            except Brand.DoesNotExist:
-                return None
-        return None
-
     def context(self):
-        """
-        Возвращает выбранные значения фильтров для шаблона.
-        """
-        return {
+        """Сохранить введённые значения после отправки формы."""
+        result = {
             "search_query": self.query,
-            "selected_category": self.category,
             "selected_brand": self.brand,
-            "selected_brand_name": self.get_brand_name(),
+            "selected_brand_name": (
+                Brand.objects.filter(pk=self.brand).values_list("name", flat=True).first()
+                if self.brand.isdigit() else None
+            ),
+            "selected_category": self.category,
+            "selected_year": self.year,
+            "selected_fuel_type": self.fuel_type,
+            "selected_fuel_name": (
+                AttributeValue.objects.filter(pk=self.fuel_type)
+                .values_list("value", flat=True).first()
+                if self.fuel_type.isdigit() else None
+            ),
             "selected_sort": self.sort,
-            "selected_availability": self.availability,
-            "selected_availability_label": dict(AVAILABILITY_CHOICES).get(self.availability, self.availability),
-            "selected_price_min": self.price_min or "",
-            "selected_price_max": self.price_max or "",
-            # Новые
-            "selected_year_min": self.year_min or "",
-            "selected_year_max": self.year_max or "",
-            "selected_mileage_min": self.mileage_min or "",
-            "selected_mileage_max": self.mileage_max or "",
-            "selected_transmission": self.transmission,
-            "selected_drive": self.drive,
-            "selected_condition": self.condition,
+            "filter_errors": self.errors,
         }
+        for field in self.ranges:
+            result[f"selected_{field}_min"] = getattr(self, f"{field}_min")
+            result[f"selected_{field}_max"] = getattr(self, f"{field}_max")
+        return result
