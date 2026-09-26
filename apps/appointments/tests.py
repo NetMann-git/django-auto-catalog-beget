@@ -2,7 +2,7 @@
 
 import json
 from datetime import date, time
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import requests
 
@@ -364,6 +364,33 @@ class CallbackEmailNotificationTests(TestCase):
     TELEGRAM_MANAGER_CHAT_ID="123456789",
 )
 class CallbackTelegramNotificationTests(TestCase):
+    @override_settings(TELEGRAM_MANAGER_CHAT_ID="111, 222, 111")
+    @patch("apps.appointments.notifications.requests.post")
+    def test_sends_to_each_unique_chat(self, mocked_post):
+        callback = CallbackRequest.objects.create(
+            name="Иван", phone="+79991234567",
+        )
+
+        self.assertTrue(send_telegram_notification(callback))
+        self.assertEqual(
+            [call.kwargs["data"]["chat_id"] for call in mocked_post.call_args_list],
+            ["111", "222"],
+        )
+
+    @override_settings(TELEGRAM_MANAGER_CHAT_ID="111,222")
+    @patch("apps.appointments.notifications.requests.post")
+    def test_failure_for_first_chat_does_not_block_second(self, mocked_post):
+        mocked_post.side_effect = [
+            requests.ConnectTimeout("unavailable"),
+            Mock(status_code=200),
+        ]
+        callback = CallbackRequest.objects.create(
+            name="Иван", phone="+79991234567",
+        )
+
+        self.assertTrue(send_telegram_notification(callback))
+        self.assertEqual(mocked_post.call_count, 2)
+
     @patch("apps.appointments.notifications.requests.post")
     def test_send_telegram_notification(self, mocked_post):
         mocked_post.return_value.raise_for_status.return_value = None

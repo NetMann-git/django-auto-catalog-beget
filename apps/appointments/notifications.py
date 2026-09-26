@@ -123,11 +123,17 @@ def _escape_markdown_v2(value) -> str:
 
 
 def send_telegram_notification(callback_request) -> bool:
-    """Отправляет менеджеру Telegram-уведомление о новой заявке."""
+    """Отправляет уведомление каждому чату из списка, разделённого запятыми."""
     bot_token = getattr(settings, "TELEGRAM_BOT_TOKEN", "").strip()
-    chat_id = str(getattr(settings, "TELEGRAM_MANAGER_CHAT_ID", "")).strip()
+    chat_ids = list(dict.fromkeys(
+        chat_id.strip()
+        for chat_id in str(
+            getattr(settings, "TELEGRAM_MANAGER_CHAT_ID", "")
+        ).split(",")
+        if chat_id.strip()
+    ))
 
-    if not bot_token or not chat_id:
+    if not bot_token or not chat_ids:
         logger.warning(
             "Telegram-уведомление о заявке #%s не отправлено: "
             "TELEGRAM_BOT_TOKEN или TELEGRAM_MANAGER_CHAT_ID не настроены",
@@ -153,29 +159,42 @@ def send_telegram_notification(callback_request) -> bool:
 
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
 
-    try:
-        response = requests.post(
-            url,
-            data={
-                "chat_id": chat_id,
-                "text": text,
-                "parse_mode": "MarkdownV2",
-            },
-            timeout=10,
-        )
-        response.raise_for_status()
-    except requests.RequestException:
-        logger.exception(
-            "Ошибка отправки Telegram-уведомления о заявке #%s",
-            callback_request.pk,
-        )
-        return False
+    sent = False
+    for position, chat_id in enumerate(chat_ids, start=1):
+        response = None
+        try:
+            response = requests.post(
+                url,
+                data={
+                    "chat_id": chat_id,
+                    "text": text,
+                    "parse_mode": "MarkdownV2",
+                },
+                timeout=10,
+            )
+            response.raise_for_status()
+        except requests.RequestException as error:
+            status = response.status_code if response is not None else "нет ответа"
+            logger.warning(
+                "Telegram: заявка #%s не доставлена получателю %s/%s "
+                "(%s, HTTP %s)",
+                callback_request.pk,
+                position,
+                len(chat_ids),
+                type(error).__name__,
+                status,
+            )
+            continue
 
-    logger.info(
-        "Telegram-уведомление о заявке #%s отправлено менеджеру",
-        callback_request.pk,
-    )
-    return True
+        sent = True
+        logger.info(
+            "Telegram: заявка #%s доставлена получателю %s/%s",
+            callback_request.pk,
+            position,
+            len(chat_ids),
+        )
+
+    return sent
 
 
 def send_max_notification(callback_request) -> bool:
