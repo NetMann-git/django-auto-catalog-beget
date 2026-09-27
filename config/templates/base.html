@@ -57,6 +57,9 @@
         {% endif %}
     {% endblock %}
     {% block extra_css %}{% endblock %}
+    {% if request.resolver_match.url_name != 'catalog' and request.resolver_match.url_name != 'home' %}
+        <link rel="stylesheet" href="{% static 'products/css/catalog/_catalog-car-card.css' %}">
+    {% endif %}
     <link rel="stylesheet" href="{% static 'css/cookie-preferences.css' %}">
     <link rel="stylesheet" href="{% static 'css/scroll-to-top.css' %}">
 </head>

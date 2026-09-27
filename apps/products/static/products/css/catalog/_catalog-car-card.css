@@ -1,0 +1,115 @@
+/* Consistent car cards on internal pages; homepage uses its own layout. */
+.product-card {
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgb(0 0 0 / 8%);
+}
+
+.product-card:hover {
+    box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
+}
+
+/* The detail label sits on the image, so keep it small and readable. */
+.product-card .card-image-btn.btn-primary {
+    padding: 7px 14px;
+    border: 1px solid rgb(255 255 255 / 65%);
+    border-radius: 20px;
+    background: rgb(18 32 48 / 72%);
+    color: #fff;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.product-card .card-image-btn.btn-primary:hover,
+.product-card .card-image-link:hover .card-image-btn.btn-primary,
+.product-card .card-image-link:focus-visible .card-image-btn.btn-primary {
+    border-color: #fff;
+    background: rgb(18 32 48 / 86%);
+    color: #fff;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 22%);
+}
+
+.product-card .card-image-link:focus-visible .card-image-btn {
+    opacity: 1;
+}
+
+.product-card .card-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 16px;
+}
+
+.product-card .card-title {
+    font-size: 17px;
+    line-height: 1.35;
+}
+
+.product-card .card-badges {
+    top: 10px;
+    left: 10px;
+    gap: 5px;
+}
+
+.product-card .card-badges .badge {
+    padding: 4px 9px;
+    font-size: 11px;
+    line-height: 1.3;
+    letter-spacing: 0;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 15%);
+}
+
+.product-card .card-badges .badge-salon-choice {
+    color: #272000;
+}
+
+.product-card .card-availability {
+    margin: 6px 0 10px;
+}
+
+.product-card .availability-badge {
+    font-size: 11px;
+}
+
+.product-card .card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.product-card .card-actions .wishlist-btn,
+.product-card .card-actions .action-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 42px;
+    padding: 7px 8px;
+    border: 1px solid #c9d4e1;
+    border-radius: 7px;
+    background: #f2f5f9;
+    color: #21364d;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.25;
+    white-space: normal;
+}
+
+.product-card .card-actions .wishlist-btn:hover,
+.product-card .card-actions .action-btn:hover {
+    background: #e3ebf6;
+    border-color: #849bb8;
+    color: #14263b;
+}
+
+.product-card .card-actions .wishlist-btn.active,
+.product-card .card-actions .action-btn.active {
+    border-color: #173c99;
+    background: #2258de;
+    color: #fff;
+}
+
+.product-card .card-actions .wishlist-btn:focus-visible,
+.product-card .card-actions .action-btn:focus-visible {
+    outline: 3px solid #f0a500;
+    outline-offset: 2px;
+}

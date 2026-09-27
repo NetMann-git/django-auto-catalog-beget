@@ -1,7 +1,6 @@
 // static/products/js/comparison.js
 
 document.addEventListener('DOMContentLoaded', function() {
-    const comparisonButtons = document.querySelectorAll('.compare-btn[data-url^="/catalog/comparison/toggle/"]');
     const comparisonCounts = document.querySelectorAll('#comparison-count, [data-comparison-count]');
     const emptyMessage = document.getElementById('empty-message');
     const tableWrapper = document.getElementById('comparison-table-wrapper');
@@ -12,16 +11,12 @@ document.addEventListener('DOMContentLoaded', function() {
         comparisonCounts.forEach(counter => { counter.textContent = count; });
 
         // Обновляем кнопку на карточке
-        const btn = document.querySelector(`.compare-btn[data-product-id="${productId}"]`);
-        if (btn) {
-            if (isAdded) {
-                btn.classList.add('active');
-                btn.textContent = 'Убрать из сравнения';
-            } else {
-                btn.classList.remove('active');
-                btn.textContent = 'Сравнить';
-            }
-        }
+        document.querySelectorAll('.compare-btn[data-product-id="' + productId + '"]')
+            .forEach(btn => {
+                btn.classList.toggle('active', isAdded);
+                const label = btn.querySelector('span');
+                if (label) label.textContent = isAdded ? 'Убрать' : 'Сравнить';
+            });
 
         // Если мы на странице сравнения — обновляем её
         if (window.location.pathname === '/catalog/comparison/') {
@@ -58,30 +53,30 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => div.remove(), 3000);
     }
 
-    comparisonButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const url = this.dataset.url;
-            const productId = this.dataset.productId;
+    document.addEventListener('click', function(e) {
+        const button = e.target.closest('.compare-btn[data-url]');
+        if (!button || !button.dataset.url.startsWith('/catalog/comparison/toggle/')) return;
+        e.preventDefault();
+        const url = button.dataset.url;
+        const productId = button.dataset.productId;
 
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken'),
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    showMessage(data.message || 'Ошибка');
-                    return;
-                }
-                updateComparisonUI(productId, data.is_added, data.count, data.message);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                showMessage(data.message || 'Ошибка');
+                return;
+            }
+            updateComparisonUI(productId, data.is_added, data.count, data.message);
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
     });
 });
