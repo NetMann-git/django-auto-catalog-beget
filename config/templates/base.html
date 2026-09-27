@@ -24,6 +24,7 @@
     {% endif %}
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="{% static 'home/images/favicon.ico' %}" sizes="32x32" type="image/x-icon">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="{% if page and page.seo_title %}{{ page.seo_title }}{% else %}Подберем АВТО — автомобили из Кореи и Китая{% endif %}">
     <meta property="og:description" content="{% if page and page.search_description %}{{ page.search_description }}{% else %}Подбор, выкуп и доставка автомобилей из Южной Кореи и Китая под ключ.{% endif %}">
