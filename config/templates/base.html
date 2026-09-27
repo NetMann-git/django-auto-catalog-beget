@@ -4,6 +4,7 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8" />
+    <link rel="icon" type="image/x-icon" href="{% static 'home/images/favicon.ico' %}">
     <title>
         {% block title %}
             {% if page %}
@@ -57,6 +58,7 @@
     {% endblock %}
     {% block extra_css %}{% endblock %}
     <link rel="stylesheet" href="{% static 'css/cookie-preferences.css' %}">
+    <link rel="stylesheet" href="{% static 'css/scroll-to-top.css' %}">
 </head>
 
 <body class="sticky-header {% block body_class %}{% endblock %}{% block body_theme_class %} {{ current_theme }}-theme{% endblock %}">
@@ -103,6 +105,8 @@
 
     {% include 'includes/cookie_preferences.html' %}
     <script src="{% static 'js/cookie_preferences.js' %}" defer></script>
+    <button type="button" class="scroll-to-top" aria-label="Наверх" title="Наверх" hidden>↑</button>
+    <script src="{% static 'js/scroll-to-top.js' %}" defer></script>
 
     <div id="appointment-modal" class="modal" style="display:none;">
         <div class="modal-content">
