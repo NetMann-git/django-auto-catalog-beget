@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'products/css/manage.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="form-container">
+    <h1>{{ title }}</h1>
+    <p><strong>{{ name }}</strong></p>
+    <p>Если характеристика используется в карточках автомобилей, удалить её не получится.</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn-save">Подтвердить удаление</button>
+        <a href="{% url return_url return_id %}" class="btn-cancel">Отмена</a>
+    </form>
+</main>
+{% endblock %}

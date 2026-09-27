@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Редактирование значения характеристики{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'products/css/manage.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="form-container">
+    <h1>Значение: {{ attribute_type.name }}</h1>
+    <p><a href="{% url 'catalog:attribute_type_edit' attribute_type.pk %}">← К типу характеристики</a></p>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}{{ field.errors }}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn-save">Сохранить значение</button>
+    </form>
+</main>
+{% endblock %}

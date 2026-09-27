@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if attribute_type %}Редактирование типа{% else %}Новый тип характеристики{% endif %}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'products/css/manage.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="form-container">
+    <h1>{% if attribute_type %}{{ attribute_type.name }}{% else %}Новый тип характеристики{% endif %}</h1>
+    <p><a href="{% url 'catalog:attribute_type_list_manage' %}">← К типам характеристик</a></p>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<div class="help-text">{{ field.help_text }}</div>{% endif %}
+            {{ field.errors }}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn-save">Сохранить тип</button>
+    </form>
+
+    {% if attribute_type %}
+    <p>Код: <strong>{{ attribute_type.slug }}</strong>. Код используется в фильтрах и после создания не меняется.</p>
+    <h2>Значения</h2>
+    <p>Изменение значения обновит его у всех автомобилей, где оно выбрано.</p>
+    {% if values %}
+    <table class="product-table">
+        <thead><tr><th>Значение</th><th>Порядок</th><th>Действия</th></tr></thead>
+        <tbody>
+            {% for item in values %}
+            <tr>
+                <td>{{ item.value }}</td>
+                <td>{{ item.sort_order }}</td>
+                <td>
+                    <a href="{% url 'catalog:attribute_value_edit' attribute_type.pk item.pk %}">Изменить</a>
+                    <a href="{% url 'catalog:attribute_value_delete' attribute_type.pk item.pk %}">Удалить</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}<p>Значений пока нет.</p>{% endif %}
+
+    <h3>Добавить значение</h3>
+    <form method="post" action="{% url 'catalog:attribute_value_create' attribute_type.pk %}">
+        {% csrf_token %}
+        {% for field in value_form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}{{ field.errors }}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn-save">Добавить значение</button>
+    </form>
+    {% endif %}
+</main>
+{% endblock %}

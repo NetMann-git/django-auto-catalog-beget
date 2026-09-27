@@ -1,6 +1,7 @@
 # apps/products/urls.py
 from django.urls import path
 from . import views
+from . import attribute_management
 
 app_name = "catalog"
 
@@ -18,6 +19,20 @@ urlpatterns = [
     
     # Управление товарами (менеджер) - ДОБАВИТЬ ЭТОТ БЛОК
     path("manage/", views.product_list_manage, name="product_list_manage"),
+    path("manage/attribute-types/", attribute_management.attribute_type_list_manage,
+         name="attribute_type_list_manage"),
+    path("manage/attribute-types/create/", attribute_management.attribute_type_create,
+         name="attribute_type_create"),
+    path("manage/attribute-types/<int:type_id>/edit/",
+         attribute_management.attribute_type_edit, name="attribute_type_edit"),
+    path("manage/attribute-types/<int:type_id>/delete/",
+         attribute_management.attribute_type_delete, name="attribute_type_delete"),
+    path("manage/attribute-types/<int:type_id>/values/create/",
+         attribute_management.attribute_value_create, name="attribute_value_create"),
+    path("manage/attribute-types/<int:type_id>/values/<int:value_id>/edit/",
+         attribute_management.attribute_value_edit, name="attribute_value_edit"),
+    path("manage/attribute-types/<int:type_id>/values/<int:value_id>/delete/",
+         attribute_management.attribute_value_delete, name="attribute_value_delete"),
     path("manage/brands/", views.brand_list_manage, name="brand_list_manage"),
     path("manage/brands/create/", views.brand_create, name="brand_create"),
     path("manage/brands/<int:brand_id>/edit/", views.brand_edit, name="brand_edit"),
