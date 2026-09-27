@@ -120,19 +120,12 @@
                 </span>
             </div>
 
-            <!-- =======================================
-                КНОПКИ ДЕЙСТВИЙ (размерный помощник и таблица размеров восстановлены)
-            ======================================= -->
+            <!-- Заявки по выбранному автомобилю. -->
             <div class="dress-actions">
-                <a href="{% url 'appointments:car_inquiry' product.id %}" class="btn" id="open-car-inquiry-modal">
+                <a href="{% url 'appointments:car_inquiry' product.id %}" class="btn car-inquiry__trigger" id="open-car-inquiry-modal">
                     Узнать стоимость под ключ
                 </a>
-                <button type="button" class="btn btn-outline" id="open-size-helper-modal">
-                    📐 Подобрать размер
-                </button>
-                <button type="button" class="btn btn-outline" id="open-size-table-modal">
-                    📊 Таблица размеров
-                </button>
+                <a href="{% url 'appointments:car_inquiry' product.id %}?type=order" class="btn btn-outline car-inquiry__trigger">Заказать это авто</a>
                 <a href="/catalog/" class="btn-outline">← Вернуться в каталог</a>
             </div>
 
@@ -308,27 +301,6 @@
     <div id="review-lightbox-thumbs" class="lightbox-thumbs"></div>
 </div>
 
-<!-- =======================================
-    МОДАЛЬНЫЕ ОКНА – РАЗМЕРЫ
-======================================= -->
-<div id="size-table-modal" class="modal" style="display:none;">
-    <div class="modal-content">
-        <span class="modal-close" data-modal="size-table-modal">&times;</span>
-        <div id="size-table-modal-body">
-            <div class="modal-loader">Загрузка...</div>
-        </div>
-    </div>
-</div>
-
-<div id="size-helper-modal" class="modal" style="display:none;">
-    <div class="modal-content">
-        <span class="modal-close" data-modal="size-helper-modal">&times;</span>
-        <div id="size-helper-modal-body">
-            <div class="modal-loader">Загрузка...</div>
-        </div>
-    </div>
-</div>
-
 <div id="car-inquiry-modal" class="car-inquiry__modal" role="dialog"
      aria-modal="true" aria-labelledby="car-inquiry-title" hidden>
     <div class="car-inquiry__dialog">
@@ -344,6 +316,5 @@
 <script src="{% static 'reviews/js/review_filters.js' %}"></script>
 <script src="{% static 'appointments/js/modal_window.js' %}"></script>
 <script src="{% static 'appointments/js/car_inquiry.js' %}"></script>
-<script src="{% static 'products/js/product_detail.js' %}"></script>
 
 {% endblock %}

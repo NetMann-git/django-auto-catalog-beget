@@ -26,8 +26,9 @@ from .models import Appointment, CallbackRequest, WorkingHours
 
 @require_http_methods(['GET', 'POST'])
 def car_inquiry(request, product_id):
-    """Принимает запрос стоимости доставки выбранного автомобиля."""
+    """Принимает запрос цены или заявку на покупку выбранного автомобиля."""
     product = get_object_or_404(Product, pk=product_id, is_active=True)
+    is_order = request.GET.get('type') == 'order'
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
     form = CarInquiryForm(request.POST if request.method == 'POST' else None)
 
@@ -41,7 +42,7 @@ def car_inquiry(request, product_id):
         if form.is_valid():
             inquiry = form.save(commit=False)
             inquiry.product = product
-            inquiry.source = 'product_detail'
+            inquiry.source = 'product_order' if is_order else 'product_detail'
             inquiry.save()
             send_email_notification(inquiry)
             send_telegram_notification(inquiry)
@@ -60,7 +61,7 @@ def car_inquiry(request, product_id):
     return render(
         request,
         template,
-        {'form': form, 'product': product},
+        {'form': form, 'product': product, 'is_order': is_order},
         status=400 if request.method == 'POST' else 200,
     )
 

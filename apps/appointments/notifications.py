@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 def _car_inquiry_details(callback_request) -> tuple[str, str]:
     """Детали автомобиля для уведомления менеджеру, если он выбран."""
-    if callback_request.source != 'product_detail':
+    if callback_request.source not in ('product_detail', 'product_order'):
         return '', ''
     product = callback_request.product
     product_title = product.title if product else 'Автомобиль удалён'
@@ -50,14 +50,17 @@ def send_email_notification(callback_request) -> bool:
     created_at = timezone.localtime(callback_request.created_at)
     created_at_text = created_at.strftime("%d.%m.%Y %H:%M")
 
-    subject = (
-        f'Запрос стоимости автомобиля от {name}'
-        if callback_request.source == 'product_detail'
-        else f'Новая заявка на обратный звонок от {name}'
-    )
+    if callback_request.source == 'product_order':
+        subject = f'Заявка на покупку автомобиля от {name}'
+    elif callback_request.source == 'product_detail':
+        subject = f'Запрос стоимости автомобиля от {name}'
+    else:
+        subject = f'Новая заявка на обратный звонок от {name}'
     car_details, product_url = _car_inquiry_details(callback_request)
     heading = (
-        'Получен запрос стоимости автомобиля'
+        'Получена заявка на покупку автомобиля'
+        if callback_request.source == 'product_order'
+        else 'Получен запрос стоимости автомобиля'
         if car_details else 'Получена новая заявка на обратный звонок'
     )
     html_details = ''
@@ -149,8 +152,13 @@ def send_telegram_notification(callback_request) -> bool:
     car_details, _ = _car_inquiry_details(callback_request)
     extra = f'*Автомобиль и доставка:* {_escape_markdown_v2(car_details)}\n' if car_details else ''
 
+    title = (
+        "🚗 *Заявка на покупку автомобиля*\n"
+        if callback_request.source == 'product_order'
+        else "📞 *Новая заявка на звонок*\n"
+    )
     text = (
-        "📞 *Новая заявка на звонок*\n"
+        title +
         f"*Имя:* {_escape_markdown_v2(name)}\n"
         f"*Телефон:* {_escape_markdown_v2(phone)}\n"
         f"{extra}"
@@ -218,8 +226,13 @@ def send_max_notification(callback_request) -> bool:
     car_details, _ = _car_inquiry_details(callback_request)
     extra = f'Автомобиль и доставка: {car_details}' if car_details else ''
 
+    title = (
+        "🚗 *Заявка на покупку автомобиля*\n"
+        if callback_request.source == 'product_order'
+        else "📞 *Новая заявка на звонок*\n"
+    )
     text = (
-        "📞 *Новая заявка на звонок*\n"
+        title +
         f"*Имя:* {name}\n"
         f"*Телефон:* {phone}\n"
         f"{extra}"

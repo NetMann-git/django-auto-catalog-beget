@@ -1,36 +1,43 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const trigger = document.getElementById('open-car-inquiry-modal');
+    const triggers = document.querySelectorAll('.car-inquiry__trigger');
     const modal = document.getElementById('car-inquiry-modal');
     const content = document.getElementById('car-inquiry-content');
-    if (!trigger || !modal || !content) return;
+    if (!triggers.length || !modal || !content) return;
 
     const closeButton = modal.querySelector('.car-inquiry__close');
     const headers = { 'X-Requested-With': 'XMLHttpRequest' };
+    let activeTrigger = null;
 
     function close() {
         modal.hidden = true;
         document.body.style.overflow = '';
-        trigger.focus();
+        activeTrigger?.focus();
     }
 
-    trigger.addEventListener('click', async (event) => {
-        event.preventDefault();
-        modal.hidden = false;
-        document.body.style.overflow = 'hidden';
-        content.textContent = 'Загружаем форму…';
-        closeButton.focus();
-        try {
-            const response = await fetch(trigger.href, { headers });
-            if (!response.ok) throw new Error('Не удалось загрузить форму');
-            content.innerHTML = await response.text();
-            content.querySelector('input:not([type="hidden"])')?.focus();
-        } catch (error) {
-            content.textContent = 'Форма временно недоступна. Попробуйте открыть её отдельно.';
-            const link = document.createElement('a');
-            link.href = trigger.href;
-            link.textContent = 'Открыть форму';
-            content.append(link);
-        }
+    triggers.forEach((trigger) => {
+        trigger.addEventListener('click', async (event) => {
+            event.preventDefault();
+            activeTrigger = trigger;
+            modal.hidden = false;
+            document.body.style.overflow = 'hidden';
+            content.textContent = 'Загружаем форму…';
+            closeButton.focus();
+            try {
+                const response = await fetch(trigger.href, { headers });
+                if (!response.ok) throw new Error('Не удалось загрузить форму');
+                const html = await response.text();
+                if (activeTrigger !== trigger) return;
+                content.innerHTML = html;
+                content.querySelector('input:not([type="hidden"])')?.focus();
+            } catch (error) {
+                if (activeTrigger !== trigger) return;
+                content.textContent = 'Форма временно недоступна. Попробуйте открыть её отдельно.';
+                const link = document.createElement('a');
+                link.href = trigger.href;
+                link.textContent = 'Открыть форму';
+                content.append(link);
+            }
+        });
     });
 
     closeButton.addEventListener('click', close);

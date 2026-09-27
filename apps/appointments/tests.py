@@ -211,6 +211,50 @@ class CarInquiryTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.url)
         self.assertContains(response, 'Узнать стоимость под ключ')
+        self.assertContains(response, 'Заказать это авто')
+        self.assertNotContains(response, 'Подобрать размер')
+        self.assertNotContains(response, 'Таблица размеров')
+
+    def test_order_form_has_own_heading_and_preserves_action(self):
+        response = self.client.get(
+            self.url + '?type=order',
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+        self.assertContains(response, 'Заказать это авто')
+        self.assertContains(response, 'Заявка не бронирует автомобиль')
+        self.assertContains(response, f'action="{self.url}?type=order"')
+
+    def test_order_form_opens_without_javascript(self):
+        response = self.client.get(self.url + '?type=order')
+        self.assertContains(response, 'Заказать это авто')
+        self.assertContains(response, f'action="{self.url}?type=order"')
+
+    @patch('apps.appointments.views.send_max_notification')
+    @patch('apps.appointments.views.send_telegram_notification')
+    @patch('apps.appointments.views.send_email_notification')
+    def test_order_submission_notifies_managers_with_product(
+        self, email, telegram, max_message,
+    ):
+        response = self.client.post(
+            self.url + '?type=order',
+            {'name': 'Иван', 'phone': '+79991234567', 'city': 'Ростов-на-Дону'},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+        self.assertEqual(response.status_code, 200)
+        inquiry = CallbackRequest.objects.get(source='product_order')
+        self.assertEqual(inquiry.product, self.product)
+        email.assert_called_once_with(inquiry)
+        telegram.assert_called_once_with(inquiry)
+        max_message.assert_called_once_with(inquiry)
+
+    def test_invalid_order_form_keeps_its_kind(self):
+        response = self.client.post(
+            self.url + '?type=order', {'name': 'Иван', 'phone': '123'},
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest',
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertContains(response, f'action="{self.url}?type=order"', status_code=400)
+        self.assertFalse(CallbackRequest.objects.exists())
 
     @patch('apps.appointments.views.send_max_notification')
     @patch('apps.appointments.views.send_telegram_notification')
@@ -294,6 +338,22 @@ class CarInquiryTests(TestCase):
         self.assertIn('https://carstar-rnd.ru/catalog/test-car-inquiry/', message.body)
         self.assertIn('Ростов-на-Дону', message.body)
         self.assertIn('ivan@example.com', message.body)
+
+    @override_settings(
+        EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
+        DEFAULT_FROM_EMAIL='site@example.com',
+        MANAGER_EMAILS=['manager@example.com'],
+        SITE_URL='https://carstar-rnd.ru',
+    )
+    def test_order_email_has_order_subject_and_car_link(self):
+        inquiry = CallbackRequest.objects.create(
+            name='Иван', phone='+79991234567', product=self.product,
+            city='Ростов-на-Дону', source='product_order',
+        )
+        self.assertTrue(send_email_notification(inquiry))
+        message = mail.outbox[-1]
+        self.assertIn('Заявка на покупку автомобиля', message.subject)
+        self.assertIn(self.product.get_absolute_url(), message.body)
 
     def test_manager_sees_car_and_city_in_inquiry_list(self):
         CallbackRequest.objects.create(
