@@ -302,10 +302,16 @@
 </div>
 
 <div id="car-inquiry-modal" class="car-inquiry__modal" role="dialog"
-     aria-modal="true" aria-labelledby="car-inquiry-title" hidden>
+     aria-modal="true" aria-labelledby="car-inquiry-title"{% if not car_order_success %} hidden{% endif %}>
     <div class="car-inquiry__dialog">
         <button type="button" class="car-inquiry__close" aria-label="Закрыть форму">×</button>
-        <div id="car-inquiry-content" aria-live="polite"></div>
+        <div id="car-inquiry-content" aria-live="polite">
+            {% if car_order_success %}
+                <h2 id="car-inquiry-title">Спасибо!</h2>
+                <p>Заявка получена. Менеджер свяжется с вами.</p>
+                <a href="{{ product.get_absolute_url }}">Вернуться к автомобилю</a>
+            {% endif %}
+        </div>
     </div>
 </div>
 

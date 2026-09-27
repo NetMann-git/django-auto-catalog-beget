@@ -232,6 +232,25 @@ class CarInquiryTests(TestCase):
     @patch('apps.appointments.views.send_max_notification')
     @patch('apps.appointments.views.send_telegram_notification')
     @patch('apps.appointments.views.send_email_notification')
+    def test_order_without_ajax_opens_success_modal_once(self, *_notifications):
+        response = self.client.post(
+            self.url + '?type=order',
+            {'name': 'Иван', 'phone': '+79991234567', 'city': 'Ростов-на-Дону'},
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Спасибо!')
+        self.assertContains(response, 'Заявка получена. Менеджер свяжется с вами.')
+        self.assertNotContains(response, 'aria-labelledby="car-inquiry-title" hidden')
+        self.assertEqual(CallbackRequest.objects.filter(source='product_order').count(), 1)
+
+        refreshed = self.client.get(self.product.get_absolute_url())
+        self.assertContains(refreshed, 'aria-labelledby="car-inquiry-title" hidden')
+        self.assertNotContains(refreshed, '<h2 id="car-inquiry-title">Спасибо!</h2>')
+
+    @patch('apps.appointments.views.send_max_notification')
+    @patch('apps.appointments.views.send_telegram_notification')
+    @patch('apps.appointments.views.send_email_notification')
     def test_order_submission_notifies_managers_with_product(
         self, email, telegram, max_message,
     ):

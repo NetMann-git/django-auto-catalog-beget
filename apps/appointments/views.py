@@ -51,6 +51,9 @@ def car_inquiry(request, product_id):
             message = 'Заявка получена. Менеджер свяжется с вами.'
             if is_ajax:
                 return JsonResponse({'success': True, 'message': message})
+            if is_order:
+                request.session['car_order_success_product_id'] = product.pk
+                return redirect(product.get_absolute_url())
             messages.success(request, message)
             return redirect(product.get_absolute_url())
 
