@@ -1,5 +1,5 @@
 <!-- config/templates/base.html -->
-{% load static %}
+{% load static catalog_contacts %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -24,7 +24,6 @@
     {% endif %}
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="{% static 'home/images/favicon.ico' %}" sizes="32x32" type="image/x-icon">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="{% if page and page.seo_title %}{{ page.seo_title }}{% else %}Подберем АВТО — автомобили из Кореи и Китая{% endif %}">
     <meta property="og:description" content="{% if page and page.search_description %}{{ page.search_description }}{% else %}Подбор, выкуп и доставка автомобилей из Южной Кореи и Китая под ключ.{% endif %}">
@@ -49,6 +48,11 @@
         <link rel="stylesheet" href="{% static 'search/css/search.css' %}">
         <link rel="stylesheet" href="{% static 'css/modal.css' %}">
         <link rel="stylesheet" href="{% static 'css/header.css' %}">
+        {% if request.resolver_match.namespace == 'catalog' %}
+            <link rel="stylesheet" href="{% static 'home/css/v78/font-awesome.min.css' %}">
+            <link rel="stylesheet" href="{% static 'home/css/home-contacts.css' %}">
+            <link rel="stylesheet" href="{% static 'css/catalog-contacts.css' %}">
+        {% endif %}
     {% endblock %}
     {% block extra_css %}{% endblock %}
 </head>
@@ -85,6 +89,10 @@
         {% endif %}
 
         {% block content %}{% endblock %}
+
+        {% if request.resolver_match.namespace == 'catalog' %}
+            {% catalog_contacts %}
+        {% endif %}
 
         {% block site_footer %}
             {% include 'includes/footer.html' %}

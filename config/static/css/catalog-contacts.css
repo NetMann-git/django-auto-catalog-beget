@@ -1,0 +1,4 @@
+/* Match the home contact section's dark background without changing other pages. */
+body .home-contacts {
+    background-color: #2b2b2b;
+}
