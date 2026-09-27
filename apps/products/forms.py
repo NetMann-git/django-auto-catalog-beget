@@ -1,8 +1,8 @@
 # apps/products/forms.py
 from django import forms
 from django.utils.safestring import mark_safe
-from django.utils.text import slugify
 from .models import Product, ProductGalleryImage, Badge, Brand
+from .manager_slugs import AutoSlugMixin
 
 
 class ImagePreviewWidget(forms.ClearableFileInput):
@@ -23,9 +23,15 @@ class ImagePreviewWidget(forms.ClearableFileInput):
         return html
 
 
-class ProductForm(forms.ModelForm):
+class ProductForm(AutoSlugMixin, forms.ModelForm):
     """Форма для создания и редактирования товара."""
     
+    slug_source = "title"
+    slug = forms.SlugField(
+        required=False, label="URL (slug)",
+        help_text="Заполняется латиницей автоматически. Можно изменить до сохранения.",
+    )
+
     # Поле для бейджей - чекбоксы
     badges = forms.ModelMultipleChoiceField(
         queryset=Badge.objects.all(),
@@ -46,12 +52,14 @@ class ProductForm(forms.ModelForm):
             'title': forms.TextInput(attrs={
                 'class': 'form-control', 
                 'placeholder': 'Название товара',
-                'id': 'id_title'
+                'id': 'id_title',
+                'data-slug-source': 'true'
             }),
             'slug': forms.TextInput(attrs={
                 'class': 'form-control', 
                 'placeholder': 'url-адрес (автозаполнение)',
-                'id': 'id_slug'
+                'id': 'id_slug',
+                'data-slug-target': 'true'
             }),
             'category': forms.Select(attrs={'class': 'form-control'}),
             'brand': forms.Select(attrs={'class': 'form-control'}),
@@ -73,6 +81,9 @@ class ProductForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
             self.fields['badges'].initial = self.instance.badges.all()
+            self.fields['slug'].required = True
+        self.fields['slug'].widget.attrs['class'] = 'form-control'
+        self.fields['slug'].widget.attrs['data-slug-target'] = 'true'
     
     def save(self, commit=True):
         product = super().save(commit=False)
@@ -82,18 +93,16 @@ class ProductForm(forms.ModelForm):
             product.badges.set(self.cleaned_data['badges'])
         return product
     
-    def clean_slug(self):
-        slug = self.cleaned_data.get('slug')
-        title = self.cleaned_data.get('title')
-        
-        if not slug and title:
-            slug = slugify(title)
-        
-        return slug
 
 
-class BrandForm(forms.ModelForm):
+class BrandForm(AutoSlugMixin, forms.ModelForm):
     """Форма управления брендом для менеджера."""
+
+    slug_source = "name"
+    slug = forms.SlugField(
+        required=False, label="URL (slug)",
+        help_text="Заполняется латиницей автоматически. Можно изменить до сохранения.",
+    )
 
     class Meta:
         model = Brand
@@ -102,7 +111,9 @@ class BrandForm(forms.ModelForm):
             "meta_title", "meta_description",
         ]
         widgets = {
-            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "name": forms.TextInput(attrs={
+                "class": "form-control", "data-slug-source": "true",
+            }),
             "slug": forms.TextInput(attrs={"class": "form-control"}),
             "logo": ImagePreviewWidget(attrs={"class": "form-control"}),
             "description": forms.Textarea(attrs={"class": "form-control", "rows": 5}),
@@ -112,12 +123,13 @@ class BrandForm(forms.ModelForm):
             "meta_description": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
         }
 
-    def clean_slug(self):
-        slug = self.cleaned_data.get("slug")
-        name = self.cleaned_data.get("name")
-        if not slug and name:
-            slug = slugify(name)
-        return slug
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields["slug"].required = True
+        self.fields["slug"].widget.attrs.update({
+            "class": "form-control", "data-slug-target": "true",
+        })
 
 
 # ДОБАВИТЬ ЭТУ ФОРМУ

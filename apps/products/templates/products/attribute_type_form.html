@@ -6,6 +6,11 @@
 <link rel="stylesheet" href="{% static 'products/css/manage.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+{{ block.super }}
+{% if not attribute_type %}<script src="{% static 'products/js/manager_slug.js' %}"></script>{% endif %}
+{% endblock %}
+
 {% block content %}
 <main class="form-container">
     <h1>{% if attribute_type %}{{ attribute_type.name }}{% else %}Новый тип характеристики{% endif %}</h1>

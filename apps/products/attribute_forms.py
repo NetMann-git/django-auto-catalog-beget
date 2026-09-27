@@ -2,28 +2,37 @@
 
 from django import forms
 
+from .manager_slugs import AutoSlugMixin
 from .models import AttributeType, AttributeValue
 
 
-class AttributeTypeForm(forms.ModelForm):
+class AttributeTypeForm(AutoSlugMixin, forms.ModelForm):
     """Создание типа; используемый фильтрами slug нельзя менять позднее."""
+
+    slug_source = "name"
+    slug = forms.SlugField(
+        required=False, label="Код (slug)",
+        help_text="Автоматически из названия. После сохранения изменить нельзя.",
+    )
 
     class Meta:
         model = AttributeType
         fields = ("name", "slug", "data_type")
         widgets = {
-            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "name": forms.TextInput(attrs={
+                "class": "form-control", "data-slug-source": "true",
+            }),
             "slug": forms.TextInput(attrs={"class": "form-control"}),
             "data_type": forms.Select(attrs={"class": "form-control"}),
         }
-        help_texts = {
-            "slug": "Латинские буквы, цифры и дефис. После создания код нельзя изменить.",
-        }
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance.pk:
             self.fields.pop("slug")
+        else:
+            self.fields["slug"].widget.attrs.update({
+                "class": "form-control", "data-slug-target": "true",
+            })
 
 
 class AttributeValueForm(forms.ModelForm):

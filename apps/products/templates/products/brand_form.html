@@ -5,6 +5,11 @@
 <link rel="stylesheet" type="text/css" href="{% static 'products/css/manage.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+{{ block.super }}
+{% if not brand %}<script src="{% static 'products/js/manager_slug.js' %}"></script>{% endif %}
+{% endblock %}
+
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
