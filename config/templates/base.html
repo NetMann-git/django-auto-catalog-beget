@@ -56,6 +56,7 @@
         {% endif %}
     {% endblock %}
     {% block extra_css %}{% endblock %}
+    <link rel="stylesheet" href="{% static 'css/cookie-preferences.css' %}">
 </head>
 
 <body class="sticky-header {% block body_class %}{% endblock %}{% block body_theme_class %} {{ current_theme }}-theme{% endblock %}">
@@ -99,6 +100,9 @@
             {% include 'includes/footer.html' %}
         {% endblock %}
     {% endblock %}
+
+    {% include 'includes/cookie_preferences.html' %}
+    <script src="{% static 'js/cookie_preferences.js' %}" defer></script>
 
     <div id="appointment-modal" class="modal" style="display:none;">
         <div class="modal-content">
