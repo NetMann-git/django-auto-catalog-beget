@@ -5,7 +5,7 @@
     --header-text: #ffffff;
     --header-muted: rgba(255, 255, 255, 0.72);
     --header-accent: #e6672a;
-    --header-height: 72px;
+    --header-height: 90px;
 }
 
 .site-header {
@@ -29,7 +29,7 @@ body.sticky-header .site-header {
     width: min(100% - 32px, 1200px);
     min-height: var(--header-height);
     margin: 0 auto;
-    padding: 8px 0;
+    padding: 10px 0;
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
@@ -38,8 +38,8 @@ body.sticky-header .site-header {
 
 .site-header .logo img {
     display: block;
-    width: 56px;
-    height: 56px;
+    width: 70px;
+    height: 70px;
     object-fit: contain;
 }
 
