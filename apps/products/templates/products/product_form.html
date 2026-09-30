@@ -63,11 +63,12 @@
             </div>
             
             <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
-                <h4>Добавить изображение</h4>
+                <h4>Добавить фотографии</h4>
                 <form method="post" enctype="multipart/form-data" action="{% url 'catalog:gallery_add' product.id %}" style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
                     {% csrf_token %}
                     <div style="flex: 2;">
-                        <input type="file" name="image" id="id_gallery_image" class="form-control" required>
+                        <input type="file" name="image" id="id_gallery_image" class="form-control" accept="image/*" multiple required>
+                        <small>Можно выбрать несколько фотографий. Описание будет общим для всех выбранных файлов.</small>
                     </div>
                     <div style="flex: 1;">
                         <input type="text" name="alt" id="id_alt" class="form-control" placeholder="Описание (необязательно)">
