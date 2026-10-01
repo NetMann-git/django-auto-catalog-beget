@@ -1,0 +1,49 @@
+/* Scoped product page presentation. Existing interaction hooks are retained. */
+.car-detail { max-width: 1280px; margin: 0 auto; padding: 28px 24px 56px; color: #202b3b; }
+.car-detail *, .car-detail *::before, .car-detail *::after { box-sizing: border-box; }
+.car-detail > .breadcrumbs { display: flex; flex-wrap: wrap; gap: 8px; font-size: 13px; line-height: 1.6; margin-bottom: 24px; }
+.car-detail > .breadcrumbs span { margin: 0; }
+.car-detail > .dress-detail { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 28px; margin: 0; align-items: start; }
+.car-detail .dress-photo, .car-detail .dress-info { min-width: 0; width: 100%; }
+.car-detail .dress-info { padding: 28px; background: #fff; border: 1px solid #e3e7ed; border-radius: 20px; box-shadow: 0 12px 36px rgba(28, 43, 65, .05); }
+.car-detail .dress-info h1 { font-size: clamp(25px, 2.5vw, 36px); line-height: 1.18; letter-spacing: -.7px; margin: 0 0 12px; overflow-wrap: anywhere; }
+.car-detail .product-brand { font-size: 14px; color: #657184; margin: 0 0 16px; }
+.car-detail .product-brand a { color: #a92f25; font-weight: 600; }
+.car-detail .product-badges { gap: 6px; margin: 12px 0; }
+.car-detail .product-badges .badge { font-size: 12px; line-height: 1.4; padding: 5px 9px; border-radius: 6px; }
+.car-detail__tools { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 24px; }
+.car-detail__tools .compare-btn, .car-detail__tools .wishlist-btn { position: static; display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: auto; height: auto; min-height: 38px; padding: 8px 12px; margin: 0; border: 1px solid #dce1e8; border-radius: 9px; background: #f7f8fa; color: #344155; font: inherit; font-size: 13px; cursor: pointer; box-shadow: none; }
+.car-detail__tools button:hover { background: #edf0f4; border-color: #aeb8c6; }
+.car-detail__tools button.active { background: #fff0ed; border-color: #dfb0a8; color: #932a20; }
+.car-detail .dress-info .price-block { padding: 20px 0 14px; border-top: 1px solid #edf0f4; margin: 0; }
+.car-detail .dress-info .price-label { color: #657184; font-size: 13px; margin-bottom: 7px; }
+.car-detail .dress-info .price { color: #182435; font-size: clamp(26px, 3vw, 38px); line-height: 1.15; font-weight: 750; letter-spacing: -.7px; font-variant-numeric: tabular-nums; }
+.car-detail .product-availability { margin: 0 0 22px; }
+.car-detail .availability-status { font-size: 12px; padding: 5px 10px; border-radius: 6px; }
+.car-detail .dress-actions { display: grid; gap: 10px; margin: 0; }
+.car-detail .dress-actions .btn, .car-detail .dress-actions .btn-outline { width: 100%; min-height: 46px; padding: 12px 16px; border-radius: 10px; font-size: 14px; line-height: 1.4; border: 1px solid #b3382b; background: #b3382b; color: #fff; box-shadow: none; transform: none; }
+.car-detail .dress-actions .btn:hover { background: #942a20; border-color: #942a20; }
+.car-detail .dress-actions .btn-outline { background: #fff; color: #9f3025; border-color: #dfb5ae; }
+.car-detail .dress-actions .btn-outline:hover { background: #fff3f0; color: #85251c; border-color: #bb6e62; }
+.car-detail .car-detail__back { padding: 8px; color: #59677a; text-align: center; font-size: 13px; text-decoration: none; }
+.car-detail .car-detail__back:hover { color: #202b3b; text-decoration: underline; }
+.car-detail .main-image-wrapper { overflow: hidden; border-radius: 16px; background: #f1f3f6; }
+.car-detail .main-image { aspect-ratio: 4 / 3; object-fit: cover; max-height: none; border-radius: 16px; }
+.car-detail .gallery-counter { font-size: 12px; color: #647184; margin-top: 12px; }
+.car-detail .dress-image-placeholder { display: grid; place-items: center; min-height: 260px; color: #657184; }
+.car-detail__information { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; margin-top: 32px; align-items: start; }
+.car-detail__information > :only-child { grid-column: 1 / -1; }
+.car-detail__information .dress-specs, .car-detail__information .description-block { min-width: 0; margin: 0; padding: 26px; border: 1px solid #e3e7ed; border-radius: 16px; background: #fff; }
+.car-detail__information h2 { margin: 0 0 20px; font-size: 21px; letter-spacing: -.3px; }
+.car-detail__information .spec-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; padding: 12px 0; font-size: 14px; line-height: 1.5; border-bottom: 1px solid #edf0f4; }
+.car-detail__information .spec-row:last-child { border-bottom: 0; padding-bottom: 0; }
+.car-detail__information .spec-row span { color: #677386; }
+.car-detail__information .spec-row strong { text-align: right; font-weight: 600; color: #243146; overflow-wrap: anywhere; }
+.car-detail__information .description { font-size: 15px; line-height: 1.8; color: #455267; overflow-wrap: anywhere; }
+.car-detail__information .description p:first-child { margin-top: 0; }
+.car-detail > .recently-viewed, .car-detail > .similar_products, .car-detail > .reviews-section { margin-top: 48px; padding-top: 28px; border-top: 1px solid #e5e9ee; }
+.car-detail .similar-title, .car-detail > .reviews-section > h2, .car-detail .recently-viewed-header h2 { font-size: 24px; letter-spacing: -.4px; }
+.car-detail a:focus-visible, .car-detail button:focus-visible { outline: 3px solid #467db4; outline-offset: 3px; }
+@media (max-width: 960px) { .car-detail > .dress-detail { grid-template-columns: minmax(0, 1fr); } .car-detail__information { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 600px) { .car-detail { padding: 18px 16px 36px; } .car-detail .dress-info { padding: 20px; border-radius: 16px; } .car-detail__information .dress-specs, .car-detail__information .description-block { padding: 20px; } .car-detail__information { margin-top: 24px; gap: 16px; } .car-detail .recently-viewed-header .btn-clear-history { position: static; transform: none; } .car-detail .recently-viewed-header { gap: 12px; } }
+@media (prefers-reduced-motion: reduce) { .car-detail .dress-actions a { transition: none; } }
