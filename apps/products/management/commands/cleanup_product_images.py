@@ -4,7 +4,7 @@ import os
 from pathlib import PurePosixPath
 
 from django.core.files.storage import default_storage
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from easy_thumbnails.models import Thumbnail
 
 from apps.products.image_cleanup import delete_unused_image, referenced_files
@@ -60,10 +60,23 @@ class Command(BaseCommand):
             self.stdout.write('Файлы не удалены. Для удаления добавьте --delete.')
             return
         deleted = 0
+        failed = 0
         for name in candidates:
             # Recheck current references before deleting each file.
-            if default_storage.exists(name) and delete_unused_image(
-                ProductGalleryImage(), name,
-            ):
-                deleted += 1
-        self.stdout.write(self.style.SUCCESS(f'Удалено файлов: {deleted}.'))
+            try:
+                if default_storage.exists(name) and delete_unused_image(
+                    ProductGalleryImage(), name,
+                ):
+                    deleted += 1
+            except OSError as error:
+                failed += 1
+                self.stderr.write(self.style.ERROR(
+                    f'Не удалось удалить {name}: {error}',
+                ))
+        self.stdout.write(f'Удалено файлов: {deleted}. Ошибок: {failed}.')
+        if failed:
+            raise CommandError(
+                'Часть файлов недоступна. Проверьте атрибут «Только чтение», '
+                'права на файлы и открытые приложения. После устранения '
+                'причины повторите команду.',
+            )

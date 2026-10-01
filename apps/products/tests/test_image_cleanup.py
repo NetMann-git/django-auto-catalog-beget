@@ -2,12 +2,13 @@
 
 from io import BytesIO, StringIO
 from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
 from PIL import Image
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.management import call_command
+from django.core.management import call_command, CommandError
 from django.db import transaction
 from django.test import TestCase
 from easy_thumbnails.files import get_thumbnailer
@@ -178,3 +179,26 @@ class ImageCleanupTests(TestCase):
             self.assertFalse(default_storage.exists(name))
         self.assertTrue(default_storage.exists(photo.image.name))
         self.assertTrue(thumbnail.storage.exists(thumbnail.name))
+
+    def test_cleanup_continues_after_permission_error(self) -> None:
+        from apps.products.image_cleanup import delete_unused_image
+
+        blocked = default_storage.save('products/blocked.jfif', ContentFile(b'old'))
+        removable = default_storage.save('products/removable.jfif', ContentFile(b'old'))
+
+        def delete_with_lock(instance, name, using='default'):
+            if name == blocked:
+                raise PermissionError('WinError 5: access denied')
+            return delete_unused_image(instance, name, using)
+
+        errors = StringIO()
+        with patch(
+            'apps.products.management.commands.cleanup_product_images.delete_unused_image',
+            side_effect=delete_with_lock,
+        ):
+            with self.assertRaises(CommandError):
+                call_command('cleanup_product_images', delete=True,
+                             stdout=StringIO(), stderr=errors)
+        self.assertIn(blocked, errors.getvalue())
+        self.assertTrue(default_storage.exists(blocked))
+        self.assertFalse(default_storage.exists(removable))
