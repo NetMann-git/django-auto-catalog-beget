@@ -84,3 +84,49 @@ class ImageCleanupTests(TestCase):
         self.assertFalse(default_storage.exists(orphan))
         self.assertTrue(default_storage.exists(live_name))
         self.assertTrue(default_storage.exists(outside))
+
+    def set_main_photo(self, name: str) -> str:
+        """Save a real main image and return its storage name."""
+        content = BytesIO()
+        Image.new('RGB', (20, 20)).save(content, format='PNG')
+        self.product.image = SimpleUploadedFile(
+            name, content.getvalue(), 'image/png',
+        )
+        self.product.save(update_fields=['image'])
+        return self.product.image.name
+
+    def test_replacing_main_photo_removes_old_file_and_thumbnail(self) -> None:
+        old = self.set_main_photo('old.png')
+        thumbnail = get_thumbnailer(self.product.image).get_thumbnail(
+            {'size': (10, 10)},
+        )
+        with self.captureOnCommitCallbacks(execute=True):
+            new = self.set_main_photo('new.png')
+            self.assertTrue(default_storage.exists(old))
+        self.assertFalse(default_storage.exists(old))
+        self.assertFalse(thumbnail.storage.exists(thumbnail.name))
+        self.assertEqual(self.product.image.name, new)
+        self.assertTrue(default_storage.exists(new))
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.image.name, new)
+
+    def test_clearing_main_photo_removes_old_file(self) -> None:
+        old = self.set_main_photo('clear.png')
+        with self.captureOnCommitCallbacks(execute=True):
+            self.product.image = ''
+            self.product.save(update_fields=['image'])
+        self.assertFalse(default_storage.exists(old))
+
+    def test_rolled_back_clear_preserves_main_photo(self) -> None:
+        old = self.set_main_photo('rollback.png')
+        with self.captureOnCommitCallbacks(execute=True):
+            try:
+                with transaction.atomic():
+                    self.product.image = ''
+                    self.product.save(update_fields=['image'])
+                    raise ValueError('rollback')
+            except ValueError:
+                pass
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.image.name, old)
+        self.assertTrue(default_storage.exists(old))

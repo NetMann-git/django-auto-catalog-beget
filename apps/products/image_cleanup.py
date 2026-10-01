@@ -26,6 +26,9 @@ def delete_unused_image(instance, name: str, using: str = 'default') -> bool:
     """Delete an image and its registered thumbnails unless still referenced."""
     if not name or name in referenced_files(using):
         return False
+    # FieldFile.delete also clears the field on its instance. Use a detached
+    # instance so deleting an old file never clears the newly assigned image.
+    instance = type(instance)()
     image = ThumbnailerFieldFile(
         instance, instance._meta.get_field('image'), name,
     )
