@@ -19,7 +19,7 @@ from django.db.models import Max, Q
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .forms import ProductForm, GalleryImageForm, BrandForm
-from .product_attribute_forms import ProductAttributeForm
+from .attribute_formsets import ManagerAttributeFormSet
 
 from .models import Product, ProductGalleryImage, AttributeType, AttributeValue, ProductAttribute
 
@@ -589,27 +589,23 @@ def product_attributes(request, product_id):
     """Управление характеристиками товара."""
     
     product = get_object_or_404(Product, id=product_id)
-    instance = ProductAttribute(product=product)
-    if request.method == 'POST':
-        type_id = request.POST.get('attribute_type', '')
-        if type_id.isdecimal():
-            instance = product.attributes.filter(
-                attribute_type_id=type_id,
-            ).first() or instance
-    form = ProductAttributeForm(
+    formset = ManagerAttributeFormSet(
         request.POST if request.method == 'POST' else None,
-        instance=instance,
+        instance=product,
+        queryset=product.attributes.select_related(
+            'attribute_type', 'attribute_value',
+        ),
+        prefix='attributes',
     )
-    if request.method == 'POST' and form.is_valid():
-        form.save()
-        messages.success(request, 'Характеристика сохранена.')
+    if request.method == 'POST' and formset.is_valid():
+        with transaction.atomic():
+            formset.save()
+            transaction.on_commit(CatalogCache.clear_catalog)
+        messages.success(request, 'Характеристики сохранены.')
         return redirect('catalog:product_attributes', product_id=product.id)
     return render(request, 'products/product_attributes.html', {
         'product': product,
-        'product_attributes': product.attributes.select_related(
-            'attribute_type', 'attribute_value',
-        ),
-        'form': form,
+        'formset': formset,
     })
 
 

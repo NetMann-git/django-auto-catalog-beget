@@ -110,7 +110,12 @@ class TypedAttributeTests(TestCase):
 
         for raw in ('123', '456'):
             request = RequestFactory().post('/', {
-                'attribute_type': str(self.number.pk), 'free_value': raw,
+                'attributes-TOTAL_FORMS': '1',
+                'attributes-INITIAL_FORMS': str(self.product.attributes.count()),
+                'attributes-0-id': str(self.product.attributes.first().pk)
+                if self.product.attributes.exists() else '',
+                'attributes-0-attribute_type': str(self.number.pk),
+                'attributes-0-free_value': raw,
             })
             request.user = SimpleNamespace(is_authenticated=True, is_superuser=True)
             request.session = {}

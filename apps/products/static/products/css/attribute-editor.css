@@ -1,0 +1,12 @@
+.attribute-editor { max-width: 1200px; }
+.attribute-editor__scroll { overflow-x: auto; }
+.attribute-editor .attributes-table { min-width: 800px; }
+.attribute-editor .attributes-table td { vertical-align: top; }
+.attribute-editor select,
+.attribute-editor input:not([type="checkbox"]):not([type="hidden"]) {
+    width: 100%; min-width: 110px; padding: 8px;
+    border: 1px solid #b8c0c8; border-radius: 5px; box-sizing: border-box;
+}
+.attribute-editor input[name$="-sort_order"] { max-width: 100px; }
+.attribute-editor .errorlist { color: #a01818; padding-left: 18px; }
+.attribute-editor [hidden] { display: none !important; }
