@@ -25,7 +25,7 @@ class Command(BaseCommand):
             source__name__in=references,
         ).values_list('name', flat=True))
         candidates = []
-        extensions = {'.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif',
+        extensions = {'.jpg', '.jpeg', '.jfif', '.png', '.webp', '.gif', '.avif',
                       '.bmp', '.tif', '.tiff', '.heic', '.heif', '.ico'}
 
         def scan(directory: str) -> None:

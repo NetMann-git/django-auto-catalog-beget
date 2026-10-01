@@ -28,13 +28,13 @@ class ImageCleanupTests(TestCase):
             title='Автомобиль', slug='cleanup-car', price=1000000,
         )
 
-    def photo(self) -> ProductGalleryImage:
+    def photo(self, name: str = 'photo.png', image_format: str = 'PNG') -> ProductGalleryImage:
         """Create a real gallery image in temporary storage."""
         content = BytesIO()
-        Image.new('RGB', (20, 20)).save(content, format='PNG')
+        Image.new('RGB', (20, 20)).save(content, format=image_format)
         return ProductGalleryImage.objects.create(
             product=self.product,
-            image=SimpleUploadedFile('photo.png', content.getvalue(), 'image/png'),
+            image=SimpleUploadedFile(name, content.getvalue(), Image.MIME[image_format]),
         )
 
     def test_committed_gallery_deletion_removes_original_and_thumbnail(self) -> None:
@@ -85,12 +85,12 @@ class ImageCleanupTests(TestCase):
         self.assertTrue(default_storage.exists(live_name))
         self.assertTrue(default_storage.exists(outside))
 
-    def set_main_photo(self, name: str) -> str:
+    def set_main_photo(self, name: str, image_format: str = 'PNG') -> str:
         """Save a real main image and return its storage name."""
         content = BytesIO()
-        Image.new('RGB', (20, 20)).save(content, format='PNG')
+        Image.new('RGB', (20, 20)).save(content, format=image_format)
         self.product.image = SimpleUploadedFile(
-            name, content.getvalue(), 'image/png',
+            name, content.getvalue(), Image.MIME[image_format],
         )
         self.product.save(update_fields=['image'])
         return self.product.image.name
@@ -130,3 +130,51 @@ class ImageCleanupTests(TestCase):
         self.product.refresh_from_db()
         self.assertEqual(self.product.image.name, old)
         self.assertTrue(default_storage.exists(old))
+
+    def test_jfif_main_replacement_and_clear(self) -> None:
+        old = self.set_main_photo('old.jfif', 'JPEG')
+        thumbnail = get_thumbnailer(self.product.image).get_thumbnail(
+            {'size': (10, 10)},
+        )
+        with self.captureOnCommitCallbacks(execute=True):
+            new = self.set_main_photo('new.JFIF', 'JPEG')
+        self.assertFalse(default_storage.exists(old))
+        self.assertFalse(thumbnail.storage.exists(thumbnail.name))
+        self.assertTrue(default_storage.exists(new))
+        with self.captureOnCommitCallbacks(execute=True):
+            self.product.image = ''
+            self.product.save(update_fields=['image'])
+        self.assertFalse(default_storage.exists(new))
+
+    def test_jfif_gallery_and_product_deletion(self) -> None:
+        photo = self.photo('gallery.jfif', 'JPEG')
+        name = photo.image.name
+        thumbnail = get_thumbnailer(photo.image).get_thumbnail({'size': (10, 10)})
+        with self.captureOnCommitCallbacks(execute=True):
+            photo.delete()
+        self.assertFalse(default_storage.exists(name))
+        self.assertFalse(thumbnail.storage.exists(thumbnail.name))
+        main = self.set_main_photo('main.jfif', 'JPEG')
+        gallery = self.photo('another.JFIF', 'JPEG').image.name
+        with self.captureOnCommitCallbacks(execute=True):
+            self.product.delete()
+        self.assertFalse(default_storage.exists(main))
+        self.assertFalse(default_storage.exists(gallery))
+
+    def test_cleanup_finds_jfif_and_preserves_used_images(self) -> None:
+        photo = self.photo('used.jfif', 'JPEG')
+        thumbnail = get_thumbnailer(photo.image).get_thumbnail({'size': (10, 10)})
+        content = BytesIO()
+        Image.new('RGB', (20, 20)).save(content, format='JPEG')
+        orphans = [default_storage.save(name, ContentFile(content.getvalue()))
+                   for name in ('products/old.jfif', 'products/gallery/old.JFIF')]
+        output = StringIO()
+        call_command('cleanup_product_images', stdout=output)
+        for name in orphans:
+            self.assertIn(name, output.getvalue())
+            self.assertTrue(default_storage.exists(name))
+        call_command('cleanup_product_images', delete=True, stdout=StringIO())
+        for name in orphans:
+            self.assertFalse(default_storage.exists(name))
+        self.assertTrue(default_storage.exists(photo.image.name))
+        self.assertTrue(thumbnail.storage.exists(thumbnail.name))
