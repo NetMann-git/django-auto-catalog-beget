@@ -6,13 +6,15 @@ from django.contrib import admin
 from django.urls import include, path
 
 from apps.home.views import home
-from apps.home.legal_views import public_offer
+from apps.home.legal_views import public_offer, privacy_policy, personal_data_consent
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('smart_selects/', include('smart_selects.urls')),  # ДОБАВИТЬ ЭТУ СТРОКУ
     path('', home, name='home'),
     path('terms/', public_offer, name='public_offer'),
+    path('privacy/', privacy_policy, name='privacy_policy'),
+    path('consent/', personal_data_consent, name='personal_data_consent'),
     path('catalog/', include('apps.products.urls')),
     path('wishlist/', include('apps.wishlist.urls')),
     path('reviews/', include('apps.reviews.urls')),
