@@ -39,13 +39,15 @@
                                                                         {% for brand in featured_brands|slice:":24" %}
                                                                               {% if brand.logo %}
                                                                         <div class="sppb-col-sm-2">
-                                                                              <img alt="{{ brand.name }}"
+                                                                              <a class="home-brand-link" href="{% url 'catalog:catalog' %}?brand={{ brand.pk }}" aria-label="Автомобили {{ brand.name }} в каталоге" style="display:block;">
+<img alt="{{ brand.name }}"
                                                                                    class="sppb-img-responsive sppb-addon-clients-image"
                                                                                    height="75"
                                                                                    loading="lazy"
                                                                                    src="{{ brand.logo.url }}"
                                                                                    width="100"
                                                                                    decoding="async">
+</a>
                                                                         </div>
                                                                               {% endif %}
                                                                         {% endfor %}
@@ -141,12 +143,14 @@
                  {% for brand in featured_brands|slice:":12" %}
                   {% if brand.logo %}
                    <div class="sppb-col-sm-3 sppb-col-md-3 sppb-col-lg-3" style="flex:0 0 25%;max-width:25%;width:25%;">
-                    <img alt="{{ brand.name }}"
+                    <a class="home-brand-link" href="{% url 'catalog:catalog' %}?brand={{ brand.pk }}" aria-label="Автомобили {{ brand.name }} в каталоге" style="display:block;">
+<img alt="{{ brand.name }}"
                          class="sppb-img-responsive sppb-addon-clients-image"
                          decoding="async"
                          loading="lazy"
                          src="{{ brand.logo.url }}"
                          style="width:70px;height:52px;object-fit:contain;margin:0 auto 16px;"/>
+</a>
                    </div>
                   {% endif %}
                  {% endfor %}
@@ -158,12 +162,14 @@
                   {% if brand.logo %}
                    <div class="sppb-col-xs-6"
                         style="flex:0 0 50%;max-width:50%;width:50%;">
-                    <img alt="{{ brand.name }}"
+                    <a class="home-brand-link" href="{% url 'catalog:catalog' %}?brand={{ brand.pk }}" aria-label="Автомобили {{ brand.name }} в каталоге" style="display:block;">
+<img alt="{{ brand.name }}"
                          class="sppb-img-responsive sppb-addon-clients-image"
                          decoding="async"
                          loading="lazy"
                          src="{{ brand.logo.url }}"
                          style="width:64px;height:48px;object-fit:contain;margin:0 auto 16px;"/>
+</a>
                    </div>
                   {% endif %}
                  {% endfor %}
