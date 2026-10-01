@@ -1,5 +1,6 @@
 <!-- apps/appointments/templates/appointments/appointment_form.html -->
 {% extends "base.html" %}
+{% load price_format l10n %}
 {% load static %}
 
 {% block title %}Запись на примерку{% endblock %}
@@ -12,7 +13,7 @@
             <p class="appointment-product">
                 Платье: <strong>{{ product.title }}</strong>
                 {% if product.price %}
-                    — {{ product.price }} {{ product.currency }}
+                    — {{ product.price|price_format }} {{ product.currency }}
                 {% endif %}
             </p>
         {% endif %}

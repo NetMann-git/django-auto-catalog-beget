@@ -5,6 +5,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (!searchInput) return;
 
+    const priceFormatter = new Intl.NumberFormat('ru-RU', {maximumFractionDigits: 2});
+    const formatPrice = value => {
+        const number = Number(value);
+        return Number.isFinite(number) ? priceFormatter.format(number) : '';
+    };
+
     let debounceTimer;
 
     // Показываем популярные запросы при фокусе (если поле пустое)
@@ -62,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="search-item-content">
                             <div class="search-item-title">${highlightText(item.title, query)}</div>
                             <div class="search-item-meta">
-                                ${item.price ? `<span class="price">${item.price} ${item.currency}</span>` : ''}
+                                ${item.price ? `<span class="price">${formatPrice(item.price)} ${item.currency}</span>` : ''}
                                 ${item.category ? `<span class="category">${item.category}</span>` : ''}
                             </div>
                             ${item.badges && item.badges.length ? `<div class="search-item-badges">${item.badges.map(b => `<span class="badge badge-${b.slug}">${b.title}</span>`).join('')}</div>` : ''}
@@ -78,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="search-item-content">
                             <div class="search-item-title">${highlightText(item.title, query)}</div>
                             <div class="search-item-meta">
-                                ${item.price ? `<span class="price">${item.price} ${item.currency}</span>` : ''}
+                                ${item.price ? `<span class="price">${formatPrice(item.price)} ${item.currency}</span>` : ''}
                                 <span class="search-item-type">Характеристика</span>
                             </div>
                         </div>

@@ -1,3 +1,4 @@
+{% load price_format l10n %}
 <!-- apps/products/templates/products/_product_card.html -->
 
 {% load static %}
@@ -59,8 +60,8 @@
         </div>
 
         <div class="card-price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-            <span class="current-price" itemprop="price" content="{{ product.price }}">
-                {{ product.price|floatformat:0 }} ₽
+            <span class="current-price" itemprop="price" content="{{ product.price|unlocalize }}">
+                {{ product.price|price_format }} ₽
             </span>
             <meta itemprop="priceCurrency" content="RUB">
         </div>

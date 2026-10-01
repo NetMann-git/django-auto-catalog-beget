@@ -5,6 +5,7 @@ from django.utils.html import format_html
 from easy_thumbnails.files import get_thumbnailer
 from .product_attribute_forms import ProductAttributeForm
 from .cache import CatalogCache
+from .templatetags.price_format import price_format
 
 from .models import (
     Product,
@@ -105,12 +106,17 @@ class ProductAdmin(admin.ModelAdmin):
         "title",
         "article",
         "category",
-        "price",
+        "formatted_price",
         "availability_status",
         "is_featured",
         "is_active",
         "image_tag",
     )
+    @admin.display(description="Цена", ordering="price")
+    def formatted_price(self, obj):
+        """Display grouped prices while retaining numeric sorting."""
+        return price_format(obj.price)
+
     list_filter = (
         "category",
         "brand",

@@ -1,5 +1,6 @@
 <!-- apps/products/templates/products/manage_list.html -->
 {% extends 'base.html' %}
+{% load price_format l10n %}
 {% load static %}
 {% load thumbnail %}
 {% block extra_css %}
@@ -53,7 +54,7 @@
                         </a>
                     </td>
                     <td>{{ product.article|default:"—" }}</td>
-                    <td>{{ product.price }} {{ product.currency }}</td>
+                    <td>{{ product.price|price_format }} {{ product.currency }}</td>
                     <td>{{ product.category.name|default:"—" }}</td>
                     <td>
                         <span class="status-badge status-{% if product.is_active %}active{% else %}inactive{% endif %}">

@@ -1,3 +1,4 @@
+{% load price_format l10n %}
 <!-- apps/appointments/templates/appointments/_appointment_form_ajax.html -->
 {% load static %}
 
@@ -7,7 +8,7 @@
         <p class="appointment-product">
             Платье: <strong>{{ product.title }}</strong>
             {% if product.price %}
-                — {{ product.price }} {{ product.currency }}
+                — {{ product.price|price_format }} {{ product.currency }}
             {% endif %}
         </p>
     {% endif %}

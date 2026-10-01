@@ -1,6 +1,7 @@
 <!-- apps/products/templates/products/comparison.html -->
 
 {% extends "base.html" %}
+{% load price_format l10n %}
 {% load static %}
 {% load thumbnail %}
 {% load comparison_filters %}
@@ -57,7 +58,7 @@
                 <tr>
                     <td>Цена</td>
                     {% for product in products %}
-                        <td data-product-id="{{ product.id }}">{{ product.price }} {{ product.currency }}</td>
+                        <td data-product-id="{{ product.id }}">{{ product.price|price_format }} {{ product.currency }}</td>
                     {% endfor %}
                 </tr>
                 <tr>
