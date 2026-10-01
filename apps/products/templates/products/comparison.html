@@ -7,62 +7,75 @@
 {% load comparison_filters %}
 
 {% block extra_css %}
+    {{ block.super }}
     <link rel="stylesheet" href="{% static 'products/css/catalog/catalog.css' %}">
     <link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
+    <link rel="stylesheet" href="{% static 'wishlist/css/wishlist-page.css' %}">
+    <link rel="stylesheet" href="{% static 'products/css/comparison-page.css' %}">
 {% endblock %}
 
-{% block title %}Сравнение товаров{% endblock %}
+{% block title %}Сравнение автомобилей{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container wishlist-page comparison-page">
 
     <!-- Хлебные крошки -->
-    <nav class="breadcrumbs">
+    <nav class="breadcrumbs" aria-label="Хлебные крошки">
         <a href="/">Главная</a>
         <span>/</span>
         <a href="/catalog/">Каталог</a>
         <span>/</span>
-        <span>Сравнение товаров</span>
+        <span>Сравнение автомобилей</span>
     </nav>
 
-    <h1>Сравнение товаров</h1>
-
-    <!-- Сообщение о пустом списке -->
-    <div id="empty-message" style="text-align: center; padding: 60px 20px; {% if products %}display:none;{% endif %}">
-        <p style="font-size: 18px; color: #888; margin-bottom: 20px;">
-            У вас пока нет товаров для сравнения.
-        </p>
-        <a href="{% url 'catalog:catalog' %}" class="btn" style="display: inline-block; padding: 12px 30px; background: #c0392b; color: white; text-decoration: none; border-radius: 6px;">
-            Перейти в каталог
-        </a>
+    <header class="wishlist-page__header">
+        <div>
+            <p class="wishlist-page__eyebrow">Выбирайте по важным деталям</p>
+            <h1>Сравнение автомобилей <span class="wishlist-page__count" data-comparison-count>{{ products|length }}</span></h1>
+            <p class="wishlist-page__intro">Сопоставьте цены и характеристики. Откройте карточку автомобиля, чтобы узнать подробности.</p>
+        </div>
+        <a class="wishlist-page__catalog" href="{% url 'catalog:catalog' %}">Продолжить выбор →</a>
+    </header>
+    <div class="wishlist-page__empty" id="empty-message" {% if products %}style="display:none;"{% endif %}>
+        <div class="wishlist-page__empty-icon" aria-hidden="true">⇄</div>
+        <h2>Какие автомобили сравним?</h2>
+        <p>Нажмите «Сравнить» на карточках интересующих автомобилей — здесь появится таблица их характеристик.</p>
+        <a class="wishlist-page__catalog wishlist-page__catalog--primary" href="{% url 'catalog:catalog' %}">Перейти в каталог</a>
     </div>
 
     <!-- Таблица сравнения -->
     <div id="comparison-table-wrapper" {% if not products %}style="display:none;"{% endif %}>
+        <p class="comparison-page__hint" id="comparison-scroll-hint">Если таблица не помещается на экране, прокрутите её по горизонтали →</p>
+        <div class="comparison-page__scroll" role="region" aria-label="Таблица сравнения автомобилей" aria-describedby="comparison-scroll-hint" tabindex="0">
         <table class="comparison-table" id="comparison-table">
             <thead>
                 <tr>
-                    <th>Характеристика</th>
+                    <th scope="col">Автомобиль</th>
                     {% for product in products %}
-                        <th data-product-id="{{ product.id }}">
-                            <a href="{{ product.get_absolute_url }}">{{ product.title }}</a>
+                        <th scope="col" data-product-id="{{ product.id }}">
+                            <a class="comparison-page__car" href="{{ product.get_absolute_url }}">
+                                {% if product.image %}
+                                <img src="{% thumbnail product.image 400x300 crop %}" alt="{{ product.title }}" width="400" height="300" loading="lazy">
+                                {% else %}<span class="comparison-page__placeholder">Нет фото</span>{% endif %}
+                                <span>{{ product.title }}</span>
+                            </a>
                             <button class="compare-btn remove-btn"
                                     data-product-id="{{ product.id }}"
                                     data-url="{% url 'catalog:toggle_comparison_ajax' product.id %}"
-                                    type="button">✕</button>
+                                    type="button" aria-label="Убрать {{ product.title }} из сравнения" title="Убрать из сравнения">✕</button>
                         </th>
                     {% endfor %}
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>Цена</td>
+                    <th scope="row">Цена</th>
                     {% for product in products %}
-                        <td data-product-id="{{ product.id }}">{{ product.price|price_format }} {{ product.currency }}</td>
+                        <td data-product-id="{{ product.id }}"><strong class="comparison-page__price">{{ product.price|price_format }} {% if product.currency == "RUB" %}₽{% else %}{{ product.currency }}{% endif %}</strong></td>
                     {% endfor %}
                 </tr>
                 <tr>
-                    <td>Наличие</td>
+                    <th scope="row">Наличие</th>
                     {% for product in products %}
                         <td data-product-id="{{ product.id }}">
                             <span class="availability-status availability-{{ product.availability_status }}">
@@ -72,33 +85,21 @@
                     {% endfor %}
                 </tr>
                 <tr>
-                    <td>Категория</td>
+                    <th scope="row">Категория</th>
                     {% for product in products %}
                         <td data-product-id="{{ product.id }}">{{ product.category.title|default:"—" }}</td>
                     {% endfor %}
                 </tr>
                 <tr>
-                    <td>Артикул</td>
+                    <th scope="row">Артикул</th>
                     {% for product in products %}
                         <td data-product-id="{{ product.id }}">{{ product.article|default:"—" }}</td>
-                    {% endfor %}
-                </tr>
-                <tr>
-                    <td>Изображение</td>
-                    {% for product in products %}
-                        <td data-product-id="{{ product.id }}">
-                            {% if product.image %}
-                                <img src="{% thumbnail product.image 120x90 crop %}" alt="{{ product.title }}" width="120" height="90" loading="lazy">
-                            {% else %}
-                                —
-                            {% endif %}
-                        </td>
                     {% endfor %}
                 </tr>
                 <!-- Динамические характеристики -->
                 {% for row in attributes_rows %}
                     <tr>
-                        <td>{{ row.name }}</td>
+                        <th scope="row">{{ row.name }}</th>
                         {% for product in products %}
                             <td data-product-id="{{ product.id }}">{{ row|get_item:product.id }}</td>
                         {% endfor %}
@@ -106,7 +107,8 @@
                 {% endfor %}
             </tbody>
         </table>
-        <a href="{% url 'catalog:catalog' %}" class="btn comparison-back-link">Вернуться в каталог</a>
+        </div>
+        <a href="{% url 'catalog:catalog' %}" class="wishlist-page__catalog comparison-back-link">Вернуться в каталог</a>
     </div>
 
     {% include "recommendations/_recommended_block.html" with recommended_products=recommended_products %}
