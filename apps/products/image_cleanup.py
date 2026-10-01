@@ -22,7 +22,9 @@ def referenced_files(using: str = 'default') -> set[str]:
     return names
 
 
-def delete_unused_image(instance, name: str, using: str = 'default') -> bool:
+def delete_unused_image(
+    instance, name: str, using: str = 'default', field_name: str = 'image',
+) -> bool:
     """Delete an image and its registered thumbnails unless still referenced."""
     if not name or name in referenced_files(using):
         return False
@@ -30,15 +32,17 @@ def delete_unused_image(instance, name: str, using: str = 'default') -> bool:
     # instance so deleting an old file never clears the newly assigned image.
     instance = type(instance)()
     image = ThumbnailerFieldFile(
-        instance, instance._meta.get_field('image'), name,
+        instance, instance._meta.get_field(field_name), name,
     )
     image.delete(save=False)
     return True
 
 
-def delete_after_commit(instance, name: str, using: str) -> None:
+def delete_after_commit(
+    instance, name: str, using: str, field_name: str = 'image',
+) -> None:
     """Log storage failures without failing an already committed deletion."""
     try:
-        delete_unused_image(instance, name, using)
+        delete_unused_image(instance, name, using, field_name=field_name)
     except Exception:
         logger.exception('Не удалось удалить файл изображения %s', name)

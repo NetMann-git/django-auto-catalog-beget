@@ -15,6 +15,12 @@ class Command(BaseCommand):
     """Keep active images and their thumbnails while cleaning product media."""
 
     help = 'Поиск неиспользуемых фото в media/products; удаление только с --delete.'
+    media_directory = 'products'
+    extra_extensions: set[str] = set()
+
+    def delete_candidate(self, name: str) -> bool:
+        """Recheck references before deleting a candidate and its thumbnails."""
+        return delete_unused_image(ProductGalleryImage(), name)
 
     def add_arguments(self, parser) -> None:
         parser.add_argument('--delete', action='store_true', help='Удалить найденные файлы.')
@@ -27,6 +33,7 @@ class Command(BaseCommand):
         candidates = []
         extensions = {'.jpg', '.jpeg', '.jfif', '.png', '.webp', '.gif', '.avif',
                       '.bmp', '.tif', '.tiff', '.heic', '.heif', '.ico'}
+        extensions.update(self.extra_extensions)
 
         def scan(directory: str) -> None:
             """Inspect only product media, without following local symlinks."""
@@ -52,7 +59,7 @@ class Command(BaseCommand):
             for child in directories:
                 scan(f'{directory}/{child}')
 
-        scan('products')
+        scan(self.media_directory)
         for name in sorted(candidates):
             self.stdout.write(name)
         self.stdout.write(f'Найдено неиспользуемых файлов: {len(candidates)}.')
@@ -64,9 +71,7 @@ class Command(BaseCommand):
         for name in candidates:
             # Recheck current references before deleting each file.
             try:
-                if default_storage.exists(name) and delete_unused_image(
-                    ProductGalleryImage(), name,
-                ):
+                if default_storage.exists(name) and self.delete_candidate(name):
                     deleted += 1
             except OSError as error:
                 failed += 1
