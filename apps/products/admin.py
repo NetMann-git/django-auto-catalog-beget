@@ -3,6 +3,8 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from easy_thumbnails.files import get_thumbnailer
+from .product_attribute_forms import ProductAttributeForm
+from .cache import CatalogCache
 
 from .models import (
     Product,
@@ -57,6 +59,12 @@ class AttributeTypeAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     inlines = [AttributeValueInline]
 
+    def get_inlines(self, request, obj=None):
+        """Free-entry types do not require predefined options."""
+        if obj and obj.data_type != 'choice':
+            return []
+        return super().get_inlines(request, obj)
+
 
 class ProductGalleryInline(admin.TabularInline):
     model = ProductGalleryImage
@@ -67,8 +75,9 @@ class ProductGalleryInline(admin.TabularInline):
 
 class ProductAttributeInline(admin.TabularInline):
     model = ProductAttribute
+    form = ProductAttributeForm
     extra = 1
-    fields = ("attribute_type", "attribute_value", "sort_order")
+    fields = ("attribute_type", "attribute_value", "free_value", "sort_order")
     ordering = ("sort_order",)
 
 
@@ -87,6 +96,11 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     save_on_top = True
+
+    def save_related(self, request, form, formsets, change):
+        """Invalidate cached attributes after all inline values are saved."""
+        super().save_related(request, form, formsets, change)
+        CatalogCache.clear_catalog()
     list_display = (
         "title",
         "article",

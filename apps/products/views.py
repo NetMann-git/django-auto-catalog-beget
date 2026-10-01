@@ -19,6 +19,7 @@ from django.db.models import Max, Q
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .forms import ProductForm, GalleryImageForm, BrandForm
+from .product_attribute_forms import ProductAttributeForm
 
 from .models import Product, ProductGalleryImage, AttributeType, AttributeValue, ProductAttribute
 
@@ -588,43 +589,29 @@ def product_attributes(request, product_id):
     """Управление характеристиками товара."""
     
     product = get_object_or_404(Product, id=product_id)
-    attribute_types = AttributeType.objects.all()
-    product_attributes = product.attributes.select_related('attribute_type', 'attribute_value')
-    
-    # Данные для выпадающего списка значений
-    values_data = {}
-    for attr_type in attribute_types:
-        values_data[str(attr_type.id)] = [
-            {'id': v.id, 'value': v.value} 
-            for v in attr_type.values.all()
-        ]
-    
+    instance = ProductAttribute(product=product)
     if request.method == 'POST':
-        attr_type_id = request.POST.get('attribute_type')
-        attr_value_id = request.POST.get('attribute_value')
-        
-        if attr_type_id and attr_value_id:
-            attr_type = get_object_or_404(AttributeType, id=attr_type_id)
-            attr_value = get_object_or_404(AttributeValue, id=attr_value_id)
-            
-            ProductAttribute.objects.update_or_create(
-                product=product,
-                attribute_type=attr_type,
-                defaults={'attribute_value': attr_value}
-            )
-            messages.success(request, 'Характеристика добавлена.')
-        else:
-            messages.error(request, 'Выберите тип и значение.')
-        
+        type_id = request.POST.get('attribute_type', '')
+        if type_id.isdecimal():
+            instance = product.attributes.filter(
+                attribute_type_id=type_id,
+            ).first() or instance
+    form = ProductAttributeForm(
+        request.POST if request.method == 'POST' else None,
+        instance=instance,
+    )
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Характеристика сохранена.')
         return redirect('catalog:product_attributes', product_id=product.id)
-    
-    context = {
+    return render(request, 'products/product_attributes.html', {
         'product': product,
-        'product_attributes': product_attributes,
-        'attribute_types': attribute_types,
-        'values_data': values_data,
-    }
-    return render(request, 'products/product_attributes.html', context)
+        'product_attributes': product.attributes.select_related(
+            'attribute_type', 'attribute_value',
+        ),
+        'form': form,
+    })
+
 
 @role_required(ROLE_MANAGER, ROLE_ADMIN)
 def attribute_delete(request, attribute_id):
