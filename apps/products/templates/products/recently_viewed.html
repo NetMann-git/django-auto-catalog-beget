@@ -4,45 +4,56 @@
 {% load static %}
 
 {% block extra_css %}
+    {{ block.super }}
     <link rel="stylesheet" href="{% static 'products/css/catalog/catalog.css' %}">
     <link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
+    <link rel="stylesheet" href="{% static 'wishlist/css/wishlist-page.css' %}">
 {% endblock %}
 
 {% block title %}История просмотров{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container wishlist-page history-page">
     <!-- Хлебные крошки -->
-    <nav class="breadcrumbs">
+    <nav class="breadcrumbs" aria-label="Хлебные крошки">
         <a href="/">Главная</a>
         <span>/</span>
         <a href="/catalog/">Каталог</a>
         <span>/</span>
         <span>История просмотров</span>
     </nav>
-    <h1>История просмотров</h1>
+    <header class="wishlist-page__header">
+        <div>
+            <p class="wishlist-page__eyebrow">Недавно просмотренные</p>
+            <h1>История просмотров <span class="wishlist-page__count" data-recently-viewed-count>{{ products|length }}</span></h1>
+            <p class="wishlist-page__intro">Вернитесь к автомобилям, которые вас заинтересовали. Сохраните понравившиеся варианты в избранное, чтобы не потерять их.</p>
+        </div>
+        <a class="wishlist-page__catalog" href="{% url 'catalog:catalog' %}">Продолжить выбор →</a>
+    </header>
     <div id="recently-viewed-container">
         <!-- Блок с товарами -->
         <div id="recently-viewed-products" {% if not products %}style="display:none;"{% endif %}>
-            <div id="recently-viewed-grid" class="product-grid">
+            <div id="recently-viewed-grid" class="product-grid products-grid">
                 {% for product in products %}
                     <div class="product-item" data-product-id="{{ product.id }}">
                         {% include "products/_product_card.html" with product=product %}
                     </div>
                 {% endfor %}
             </div>
-            <button type="button" 
+            <button type="button"
                     id="clear-recently-viewed-history"
-                    class="btn btn-outline"
+                    class="wishlist-page__clear"
                     data-url="{% url 'catalog:clear_recently_viewed_ajax' %}">
                 Очистить историю
             </button>
         </div>
 
         <!-- Блок с сообщением о пустой истории -->
-        <div id="empty-history-message" {% if products %}style="display:none;"{% endif %}>
-            <p>Вы ещё не просматривали товары.</p>
-            <a href="{% url 'catalog:catalog' %}" class="btn btn-primary">Перейти в каталог</a>
+        <div class="wishlist-page__empty" id="empty-history-message" {% if products %}style="display:none;"{% endif %}>
+            <div class="wishlist-page__empty-icon" aria-hidden="true">↶</div>
+            <h2>Здесь появятся просмотренные автомобили</h2>
+            <p>Откройте карточку автомобиля в каталоге — мы добавим его в историю, чтобы вы могли быстро вернуться к нему.</p>
+            <a href="{% url 'catalog:catalog' %}" class="wishlist-page__catalog wishlist-page__catalog--primary">Перейти в каталог</a>
         </div>
     </div>
 
