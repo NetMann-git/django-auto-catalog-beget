@@ -15,6 +15,7 @@ from apps.reviews.forms import ReviewForm
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db import transaction
+from django.db.models.deletion import ProtectedError
 from django.db.models import Max, Q
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -416,7 +417,11 @@ def brand_delete(request, brand_id):
 
     if request.method == "POST":
         name = brand.name
-        brand.delete()
+        try:
+            brand.delete()
+        except ProtectedError:
+            messages.error(request, 'Сначала удалите модели этой марки из справочника.')
+            return redirect("catalog:brand_list_manage")
         CatalogCache.clear_catalog()
         messages.success(request, f'Бренд "{name}" удалён.')
         return redirect("catalog:brand_list_manage")

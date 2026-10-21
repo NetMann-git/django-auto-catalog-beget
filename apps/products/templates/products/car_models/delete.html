@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Удаление модели{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/manage.css' %}">{% endblock %}
+{% block content %}<div class="form-container">
+<h1>Удалить модель {{ car_model }}?</h1>
+<p>Модель, выбранную в товарах, удалить нельзя. Сначала измените модель у этих автомобилей.</p>
+<form method="post">{% csrf_token %}<button type="submit" class="btn-save">Удалить</button> <a href="{% url 'catalog:car_model_list' %}">Отмена</a></form>
+</div>{% endblock %}

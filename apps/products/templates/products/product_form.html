@@ -12,6 +12,7 @@
 <div class="form-container">
     <h1>{{ title }}</h1>
     
+    <p><a href="{% url 'catalog:car_model_list' %}" target="_blank" rel="noopener">Справочник моделей автомобилей ↗</a></p>
     <!-- Кнопка Сохранить вверху -->
     <div style="margin-bottom: 20px;">
         <button type="submit" form="product-form" class="btn-save">💾 Сохранить товар</button>
@@ -124,5 +125,6 @@
 {% endblock %}
 
 {% block extra_js %}
+    {{ form.media }}
     <script src="{% static 'products/js/manager_slug.js' %}"></script>
 {% endblock %}

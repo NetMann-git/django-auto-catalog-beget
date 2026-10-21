@@ -1,4 +1,5 @@
 # apps/products/models/product_model.py
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 
@@ -105,6 +106,20 @@ class Product(models.Model):
         related_name="products",
         verbose_name="Бренд",
     )
+
+    car_model = models.ForeignKey(
+        'products.CarModel', on_delete=models.PROTECT,
+        null=True, blank=True, related_name='products',
+        verbose_name='Модель автомобиля',
+    )
+
+    def clean(self) -> None:
+        """Reject a model selected from a different brand."""
+        super().clean()
+        if self.car_model_id and self.car_model.brand_id != self.brand_id:
+            raise ValidationError({
+                'car_model': 'Модель должна принадлежать выбранной марке.',
+            })
 
     meta_title = models.CharField(
         max_length=255,

@@ -3,6 +3,7 @@ from django import forms
 from django.utils.safestring import mark_safe
 from .models import Product, ProductGalleryImage, Badge, Brand
 from .manager_slugs import AutoSlugMixin
+from .car_model_forms import ProductModelForm
 
 
 class ImagePreviewWidget(forms.ClearableFileInput):
@@ -23,7 +24,7 @@ class ImagePreviewWidget(forms.ClearableFileInput):
         return html
 
 
-class ProductForm(AutoSlugMixin, forms.ModelForm):
+class ProductForm(AutoSlugMixin, ProductModelForm):
     """Форма для создания и редактирования товара."""
     
     slug_source = "title"
@@ -43,7 +44,7 @@ class ProductForm(AutoSlugMixin, forms.ModelForm):
     class Meta:
         model = Product
         fields = [
-            'title', 'slug', 'category', 'brand', 'price', 'currency',
+            'title', 'slug', 'category', 'brand', 'car_model', 'price', 'currency',
             'short_description', 'description', 'image', 'is_active', 'is_featured',
             'availability_status', 'article', 'product_type', 'meta_title', 'meta_description',
             'badges'

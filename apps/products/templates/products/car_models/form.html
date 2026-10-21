@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{% if car_model %}Редактирование модели{% else %}Новая модель{% endif %}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/manage.css' %}">{% endblock %}
+{% block content %}<div class="form-container">
+<h1>{% if car_model %}Редактирование модели{% else %}Новая модель автомобиля{% endif %}</h1>
+<p><a href="{% url 'catalog:car_model_list' %}">← К моделям</a></p>
+<form method="post">{% csrf_token %}{{ form.non_field_errors }}
+{% for field in form %}<div class="form-group">{{ field.label_tag }}{{ field }}{{ field.errors }}{% if field.help_text %}<div class="help-text">{{ field.help_text }}</div>{% endif %}</div>{% endfor %}
+<button type="submit" class="btn-save">Сохранить</button></form>
+</div>{% endblock %}

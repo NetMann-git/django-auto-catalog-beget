@@ -1,3 +1,5 @@
+from .car_model_forms import CarModelForm, ProductModelForm
+from .models import CarModel
 # apps/products/admin.py
 
 from django.contrib import admin
@@ -96,6 +98,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    form = ProductModelForm
     save_on_top = True
 
     def save_related(self, request, form, formsets, change):
@@ -144,6 +147,7 @@ class ProductAdmin(admin.ModelAdmin):
                     "article",
                     "category",
                     "brand",
+                    "car_model",
                     "image",
                 )
             },
@@ -205,3 +209,29 @@ class ProductAdmin(admin.ModelAdmin):
             )
         return format_html('<span style="color: #aaa;">Нет фото</span>')
     image_tag.short_description = "Фото"
+
+
+@admin.register(CarModel)
+class CarModelAdmin(admin.ModelAdmin):
+    """Manage the brand/model dictionary in Django admin."""
+
+    form = CarModelForm
+    list_display = ('name', 'brand', 'sort_order', 'slug')
+    list_filter = ('brand',)
+    search_fields = ('name', 'brand__name')
+    list_select_related = ('brand',)
+
+    def save_model(self, request, obj, form, change):
+        """Refresh catalog caches after dictionary edits."""
+        super().save_model(request, obj, form, change)
+        CatalogCache.clear_catalog()
+
+    def delete_model(self, request, obj):
+        """Refresh catalog caches after dictionary deletion."""
+        super().delete_model(request, obj)
+        CatalogCache.clear_catalog()
+
+    def delete_queryset(self, request, queryset):
+        """Refresh caches after bulk deletion."""
+        super().delete_queryset(request, queryset)
+        CatalogCache.clear_catalog()
