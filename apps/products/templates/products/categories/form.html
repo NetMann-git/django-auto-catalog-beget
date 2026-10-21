@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Управление категориями{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/manage.css' %}">{% endblock %}
+{% block content %}<div class="manage-container">
+<h1>{% if category %}Редактирование категории{% else %}Новая категория{% endif %}</h1>
+<p><a href="{% url 'catalog:category_list_manage' %}">← К категориям</a></p>
+<form method="post">{% csrf_token %}{{ form.non_field_errors }}
+{% for field in form %}<div class="form-group">{{ field.label_tag }}{{ field }}{{ field.errors }}<div class="help-text">{{ field.help_text }}</div></div>{% endfor %}
+<button class="btn-save" type="submit">Сохранить</button></form></div>{% endblock %}

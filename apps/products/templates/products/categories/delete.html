@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Управление категориями{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/manage.css' %}">{% endblock %}
+{% block content %}<div class="manage-container">
+<h1>Удаление категории «{{ category.title }}»</h1>
+{% if product_count %}<p>В категории автомобилей: {{ product_count }}. Сначала перенесите их в другую категорию. Удаление недоступно.</p>
+{% else %}<p>Удалить эту пустую категорию?</p><form method="post">{% csrf_token %}<button type="submit" class="btn-delete">Удалить категорию</button></form>{% endif %}
+<p><a href="{% url 'catalog:category_list_manage' %}">← К категориям</a></p></div>{% endblock %}

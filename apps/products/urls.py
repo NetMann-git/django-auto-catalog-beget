@@ -1,6 +1,7 @@
 # apps/products/urls.py
 from django.urls import path
 from . import views
+from . import category_management
 from . import car_model_management
 from . import attribute_management
 
@@ -34,6 +35,14 @@ urlpatterns = [
          attribute_management.attribute_value_edit, name="attribute_value_edit"),
     path("manage/attribute-types/<int:type_id>/values/<int:value_id>/delete/",
          attribute_management.attribute_value_delete, name="attribute_value_delete"),
+    path("manage/categories/", category_management.category_list,
+         name="category_list_manage"),
+    path("manage/categories/create/", category_management.category_edit,
+         name="category_create"),
+    path("manage/categories/<int:category_id>/edit/",
+         category_management.category_edit, name="category_edit"),
+    path("manage/categories/<int:category_id>/delete/",
+         category_management.category_delete, name="category_delete"),
     path("manage/car-models/", car_model_management.car_model_list, name="car_model_list"),
     path("manage/car-models/create/", car_model_management.car_model_edit, name="car_model_create"),
     path("manage/car-models/<int:model_id>/edit/", car_model_management.car_model_edit, name="car_model_edit"),
