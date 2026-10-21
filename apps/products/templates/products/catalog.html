@@ -9,9 +9,9 @@
 {% endblock %}
 {% block content %}
 <div class="container catalog-compact catalog-sidebar-layout">
-<nav class="breadcrumbs"><a href="/">Главная</a> / Каталог</nav>
+<nav class="breadcrumbs"><a href="/">Главная</a> <span>/</span> <span>Каталог</span></nav>
 <h1>{% if page.title %}{{ page.title }}{% else %}Каталог автомобилей{% endif %}</h1>
-<p>{% if page.intro %}{{ page.intro }}{% else %}Подберите автомобиль из Китая и Южной Кореи{% endif %}</p>
+<p>{% if page.intro %}{{ page.intro }}{% else %}Подберите свой автомобиль из Китая и Южной Кореи с пробегом{% endif %}</p>
 <p id="catalog-request-status" role="status" aria-live="polite"></p>
 <div id="catalog-request-error" role="alert" hidden>Не удалось загрузить автомобили. <button type="button" id="catalog-retry">Повторить</button> <a id="catalog-fallback" href="?">Открыть страницу</a></div>
 <div id="catalog-workspace">{% include 'products/_catalog_workspace.html' %}</div>
