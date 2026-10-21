@@ -1,0 +1,45 @@
+/* Catalog-only sidebar. The reusable horizontal filter keeps its own styles. */
+.catalog-sidebar-layout #catalog-workspace {
+    display: grid;
+    grid-template-columns: 248px minmax(0, 1fr);
+    align-items: start;
+    gap: 24px;
+    margin-top: 24px;
+}
+.catalog-sidebar-layout .catalog-compact__panel {
+    margin: 0;
+    padding: 14px;
+    border-radius: 12px;
+}
+.catalog-sidebar-layout .catalog-compact__primary,
+.catalog-sidebar-layout .catalog-compact__secondary {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    margin-top: 12px;
+}
+.catalog-sidebar-layout .catalog-compact__primary > *,
+.catalog-sidebar-layout .catalog-compact__primary > fieldset { grid-column: auto; }
+.catalog-sidebar-layout .catalog-compact__form label,
+.catalog-sidebar-layout .catalog-compact__form legend { margin-bottom: 4px; }
+.catalog-sidebar-layout .catalog-compact__form input:not([type=hidden]),
+.catalog-sidebar-layout .catalog-compact__form select { height: 36px; padding: 6px 8px; }
+.catalog-sidebar-layout .catalog-compact__range { gap: 6px; }
+.catalog-sidebar-layout .catalog-compact__advanced { margin-top: 12px; }
+.catalog-sidebar-layout .catalog-compact__actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-top: 14px;
+}
+.catalog-sidebar-layout .catalog-compact__actions button { padding: 10px 8px; }
+.catalog-sidebar-layout .catalog-filter-reset { text-align: center; }
+.catalog-sidebar-layout .catalog-section-title { margin-top: 0; }
+.catalog-sidebar-layout .catalog-toolbar { margin-top: 12px; }
+@media (max-width: 1000px) and (min-width: 701px) {
+    .catalog-sidebar-layout #catalog-workspace { grid-template-columns: 224px minmax(0, 1fr); gap: 16px; }
+    .catalog-sidebar-layout .dress-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+    .catalog-sidebar-layout #catalog-workspace { grid-template-columns: minmax(0, 1fr); gap: 20px; margin-top: 18px; }
+    .catalog-sidebar-layout .catalog-compact__panel > summary { padding: 3px 0; }
+}

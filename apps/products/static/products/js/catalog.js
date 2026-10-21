@@ -13,7 +13,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let observer = null;
     let retry = null;
 
+    const mobileLayout = window.matchMedia('(max-width: 700px)');
+    function updatePanel() {
+        const panel = workspace.querySelector('#catalog-filter-panel');
+        panel.open = !mobileLayout.matches || !!workspace.querySelector('.catalog-filter-errors');
+    }
+    if (mobileLayout.addEventListener) mobileLayout.addEventListener('change', updatePanel);
+
     function initialize() {
+        updatePanel();
         const form = workspace.querySelector('#catalog-filter-form');
         const brand = form.elements.brand;
         const model = form.elements.model;

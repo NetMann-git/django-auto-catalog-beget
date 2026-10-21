@@ -5,9 +5,10 @@
 <link rel="stylesheet" href="{% static 'products/css/catalog/catalog.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/catalog/compact-filter.css' %}">
+<link rel="stylesheet" href="{% static 'products/css/catalog/sidebar-filter.css' %}">
 {% endblock %}
 {% block content %}
-<div class="container catalog-compact">
+<div class="container catalog-compact catalog-sidebar-layout">
 <nav class="breadcrumbs"><a href="/">Главная</a> / Каталог</nav>
 <h1>{% if page.title %}{{ page.title }}{% else %}Каталог автомобилей{% endif %}</h1>
 <p>{% if page.intro %}{{ page.intro }}{% else %}Подберите автомобиль из Китая и Южной Кореи{% endif %}</p>
