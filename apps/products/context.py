@@ -29,7 +29,7 @@ class CatalogContextBuilder:
         context.update(pagination.context())
 
         # Списки ограничены значениями опубликованных автомобилей.
-        from apps.products.models import AttributeValue, ProductAttribute
+        from apps.products.models import AttributeValue, ProductAttribute, CarModel
         from apps.products.filters import FUEL_SLUGS, parse_number
 
         active_attributes = ProductAttribute.objects.filter(
@@ -51,6 +51,24 @@ class CatalogContextBuilder:
                 attribute_type__slug__in=FUEL_SLUGS,
             ),
         ).distinct().order_by("value")
+
+        context["catalog_models"] = CarModel.objects.select_related("brand").all()
+        context["active_filter_count"] = sum(bool(value) for value in (
+            filters.brand, filters.model, filters.year, filters.query, filters.fuel_type,
+            filters.price_min or filters.price_max, filters.mileage_min or filters.mileage_max,
+            filters.engine_volume_min or filters.engine_volume_max,
+            filters.power_min or filters.power_max,
+        ))
+        context["advanced_filters_open"] = any((
+            filters.query, filters.fuel_type, filters.engine_volume_min,
+            filters.engine_volume_max, filters.power_min, filters.power_max,
+        ))
+        context["preserved_filters"] = [
+            (key, request.GET[key]) for key in (
+                "category", "availability", "transmission", "drive", "condition",
+                "year_min", "year_max",
+            ) if request.GET.get(key)
+        ]
 
         # 5. Избранное (wishlist)
         if request.user.is_authenticated:

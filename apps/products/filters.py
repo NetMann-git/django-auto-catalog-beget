@@ -5,7 +5,7 @@ from decimal import Decimal, InvalidOperation
 from django.db import connection
 from django.db.models.functions import Lower
 
-from apps.products.models import AttributeValue, Brand, ProductAttribute
+from apps.products.models import AttributeValue, Brand, CarModel, ProductAttribute
 
 
 NUMERIC_ATTRIBUTES = {
@@ -34,6 +34,7 @@ class CatalogFilter:
         self.query = request_get.get("q", "").strip()
         self.category = request_get.get("category", "")
         self.brand = request_get.get("brand", "")
+        self.model = request_get.get("model", "")
         self.year = request_get.get("year", "")
         self.year_min = request_get.get("year_min", "")
         self.year_max = request_get.get("year_max", "")
@@ -98,6 +99,11 @@ class CatalogFilter:
             queryset = queryset.filter(category_id=self.category) if self.category.isdigit() else queryset.none()
         if self.brand:
             queryset = queryset.filter(brand_id=self.brand) if self.brand.isdigit() else queryset.none()
+        if self.model:
+            if self.model.isascii() and self.model.isdigit() and len(self.model) < 19:
+                queryset = queryset.filter(car_model_id=self.model)
+            else:
+                return queryset.none()
         if self.availability:
             queryset = queryset.filter(availability_status=self.availability)
         for key in ("transmission", "drive", "condition"):
@@ -191,6 +197,11 @@ class CatalogFilter:
             "selected_brand_name": (
                 Brand.objects.filter(pk=self.brand).values_list("name", flat=True).first()
                 if self.brand.isdigit() else None
+            ),
+            "selected_model": self.model,
+            "selected_model_name": (
+                CarModel.objects.filter(pk=self.model).values_list("name", flat=True).first()
+                if self.model.isascii() and self.model.isdigit() and len(self.model) < 19 else None
             ),
             "selected_category": self.category,
             "selected_year": self.year,

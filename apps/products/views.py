@@ -2,6 +2,7 @@
 
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST
+from django.views.decorators.vary import vary_on_headers
 
 from .constants import MAX_COMPARISON_ITEMS, MAX_RECENTLY_VIEWED
 from .services import ProductService
@@ -94,8 +95,12 @@ def toggle_comparison_ajax(request, product_id):
     })
 
 
+@vary_on_headers("X-Requested-With", "X-Catalog-Mode")
 def catalog(request):
     context = CatalogContextBuilder.build(request)
+
+    if request.headers.get('X-Catalog-Mode') == 'replace':
+        return render(request, 'products/_catalog_workspace.html', context)
 
     # AJAX-подгрузка товаров при прокрутке
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
