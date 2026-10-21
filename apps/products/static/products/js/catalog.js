@@ -122,7 +122,12 @@ document.addEventListener('DOMContentLoaded', () => {
         request(url);
     });
     workspace.addEventListener('change', event => {
-        if (event.target.matches('[data-catalog-sort-form] select')) event.target.form.requestSubmit();
+        // Brand's own change handler has already cleared an incompatible model.
+        const autoSubmit = '[data-catalog-sort-form] select, ' +
+            '#catalog-filter-form select[name="brand"], ' +
+            '#catalog-filter-form select[name="model"], ' +
+            '#catalog-filter-form select[name="year"]';
+        if (event.target.matches(autoSubmit)) event.target.form.requestSubmit();
     });
     workspace.addEventListener('click', event => {
         if (event.target.closest('#load-more-btn')) { loadMore(); return; }
