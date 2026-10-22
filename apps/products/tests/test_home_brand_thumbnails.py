@@ -26,9 +26,12 @@ class HomeBrandThumbnailTests(TestCase):
                 name='Проверка', slug='test-brand',
                 logo=SimpleUploadedFile('large.png', content.getvalue(), 'image/png'),
             )
+            brand.catalog_count = 2
             html = render_to_string('home/sections/brands.html', {
                 'featured_brands': [brand],
             })
+            self.assertEqual(html.count('2 авто в каталоге'), 3)
+            self.assertIn(f'?brand={brand.pk}', html)
             sources = re.findall(r'src="([^"]+)"', html)
             self.assertEqual(len(sources), 3)
             self.assertEqual(len(set(sources)), 1)

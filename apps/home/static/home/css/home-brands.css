@@ -1,0 +1,53 @@
+/* Only the existing home brand sections; keep their grids and logo sizes. */
+.home-brands-interactive .home-brand-link {
+    box-sizing: border-box;
+    padding: 10px 4px;
+    margin-bottom: 12px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    text-align: center;
+    text-decoration: none;
+    color: #273448;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.home-brands-interactive .home-brand-link img {
+    object-fit: contain;
+    margin: 0 auto 8px !important;
+}
+.home-brands-interactive .home-brand-link__name {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+.home-brands-interactive .home-brand-link__count {
+    display: block;
+    margin-top: 3px;
+    color: #596579;
+    font-size: 11px;
+    line-height: 1.5;
+}
+.home-brands-interactive .home-brand-link__count > span { color: #a63327; }
+.home-brands-interactive .home-brands-interactive__hint {
+    margin: 14px 0 20px;
+    color: #596579;
+    font-size: 14px;
+    line-height: 1.6;
+}
+.home-brands-interactive .home-brand-link:focus-visible {
+    outline: 2px solid #b3382b;
+    outline-offset: 3px;
+    border-color: #e7c0ba;
+}
+@media (hover: hover) and (pointer: fine) {
+    .home-brands-interactive .home-brand-link:hover {
+        transform: translateY(-3px);
+        border-color: #e7c0ba;
+        box-shadow: 0 6px 16px rgba(39, 52, 72, .09);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .home-brands-interactive .home-brand-link { transition: none; }
+    .home-brands-interactive .home-brand-link:hover { transform: none; }
+}

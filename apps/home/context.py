@@ -3,7 +3,7 @@
 from apps.products.models import Brand
 from apps.appointments.forms import CallbackRequestForm
 from apps.products.repository import CatalogRepository
-from django.db.models import Q
+from django.db.models import Count, Q
 
 from apps.reviews.models import Review
 
@@ -20,8 +20,7 @@ class HomeContextBuilder:
         featured_brands = (
             Brand.objects
             .filter(products__is_active=True)
-            .distinct()
-            .prefetch_related("products")
+            .annotate(catalog_count=Count("products", distinct=True))
             .order_by("sort_order", "name")[:24]
         )
 
