@@ -30,7 +30,7 @@ class HomeBrandThumbnailTests(TestCase):
             html = render_to_string('home/sections/brands.html', {
                 'featured_brands': [brand],
             })
-            self.assertEqual(html.count('2 авто в каталоге'), 3)
+            self.assertEqual(html.count('class="home-brand-link__count">2</span>'), 3)
             self.assertIn(f'?brand={brand.pk}', html)
             sources = re.findall(r'src="([^"]+)"', html)
             self.assertEqual(len(sources), 3)

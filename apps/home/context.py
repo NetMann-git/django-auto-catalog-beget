@@ -21,7 +21,7 @@ class HomeContextBuilder:
             Brand.objects
             .filter(products__is_active=True)
             .annotate(catalog_count=Count("products", distinct=True))
-            .order_by("sort_order", "name")[:24]
+            .order_by("-catalog_count", "sort_order", "name", "pk")[:24]
         )
 
         published_clients = ClientShowcase.objects.filter(is_published=True)
