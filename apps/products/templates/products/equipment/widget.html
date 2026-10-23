@@ -1,0 +1,6 @@
+<div class="car-equipment car-equipment--editor"{% if widget.attrs.id %} id="{{ widget.attrs.id }}"{% endif %}>
+{% for group, options, index in widget.optgroups %}
+<fieldset class="car-equipment__group"><legend>{{ group }}</legend>
+<div class="car-equipment__choices">{% for option in options %}<div>{% include option.template_name with widget=option %}</div>{% endfor %}</div>
+</fieldset>{% empty %}<p>Справочник комплектации пока пуст.</p>{% endfor %}
+</div>

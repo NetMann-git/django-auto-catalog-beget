@@ -1,0 +1,8 @@
+{% if equipment_groups %}
+<section class="car-equipment" aria-labelledby="equipment-heading">
+<h2 id="equipment-heading">Комплектация</h2>
+{% for group, options in equipment_groups %}<div class="car-equipment__group"><h3>{{ group }}</h3>
+<ul class="car-equipment__list">{% for option in options %}<li><span class="car-equipment__check" aria-hidden="true">✓</span>{{ option.name }}</li>{% endfor %}</ul>
+</div>{% endfor %}
+<p class="car-equipment__note">Оборудование указано по информации об автомобиле. Это не подтверждение заводской комплектации по VIN.</p>
+</section>{% endif %}

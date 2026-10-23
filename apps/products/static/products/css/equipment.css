@@ -1,0 +1,11 @@
+.car-equipment { margin: 24px 0; color: inherit; }
+.car-equipment .car-equipment__group { min-width: 0; margin: 16px 0; padding: 16px; border: 1px solid #dce2e8; border-radius: 10px; }
+.car-equipment .car-equipment__group h3, .car-equipment .car-equipment__group legend { font-size: 16px; font-weight: 600; margin: 0 0 12px; padding: 0 4px; }
+.car-equipment .car-equipment__list, .car-equipment .car-equipment__choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 24px; }
+.car-equipment .car-equipment__list { list-style: none; padding: 0; margin: 0; }
+.car-equipment .car-equipment__list li { display: flex; align-items: baseline; gap: 9px; font-size: 14px; line-height: 1.6; }
+.car-equipment .car-equipment__check { color: #28764d; font-weight: 700; }
+.car-equipment .car-equipment__note { font-size: 12px; color: #677487; line-height: 1.6; }
+.car-equipment .car-equipment__choices label { display: flex; float: none; align-items: flex-start; gap: 8px; width: auto; font-size: 14px; line-height: 1.5; cursor: pointer; }
+.car-equipment .car-equipment__choices input[type=checkbox] { flex: 0 0 auto; width: 16px; height: 16px; margin: 3px 0 0; }
+@media (max-width: 700px) { .car-equipment .car-equipment__list, .car-equipment .car-equipment__choices { grid-template-columns: minmax(0, 1fr); } }

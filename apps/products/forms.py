@@ -47,7 +47,7 @@ class ProductForm(AutoSlugMixin, ProductModelForm):
             'title', 'slug', 'category', 'brand', 'car_model', 'price', 'currency',
             'short_description', 'description', 'image', 'is_active', 'is_featured',
             'availability_status', 'article', 'product_type', 'meta_title', 'meta_description',
-            'badges'
+            'badges', 'equipment'
         ]
         widgets = {
             'title': forms.TextInput(attrs={

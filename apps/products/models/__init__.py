@@ -9,3 +9,5 @@ from .attribute_type import AttributeType  # ← типы характерист
 from .attribute_value import AttributeValue  # ← значение характеристик
 from .brand import Brand  # ← Бренды
 from .car_model import CarModel
+
+from .equipment import EquipmentGroup, EquipmentOption

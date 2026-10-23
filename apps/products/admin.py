@@ -1,3 +1,4 @@
+from .models import EquipmentGroup, EquipmentOption
 from .car_model_forms import CarModelForm, ProductModelForm
 from .models import CarModel
 # apps/products/admin.py
@@ -138,6 +139,7 @@ class ProductAdmin(admin.ModelAdmin):
     view_on_site = False
 
     fieldsets = (
+        ('Комплектация', {'fields': ('equipment',)}),
         (
             "Основное",
             {
@@ -235,3 +237,26 @@ class CarModelAdmin(admin.ModelAdmin):
         """Refresh caches after bulk deletion."""
         super().delete_queryset(request, queryset)
         CatalogCache.clear_catalog()
+
+
+@admin.register(EquipmentGroup)
+class EquipmentGroupAdmin(admin.ModelAdmin):
+    """Edit equipment headings and their order."""
+
+    list_display = ('name', 'slug', 'sort_order')
+    list_editable = ('sort_order',)
+    prepopulated_fields = {'slug': ('name',)}
+
+
+@admin.register(EquipmentOption)
+class EquipmentOptionAdmin(admin.ModelAdmin):
+    """Maintain shared options without rewriting vehicle selections."""
+
+    list_display = ('name', 'group', 'encar_standard_code', 'sort_order', 'is_active')
+    list_editable = ('sort_order', 'is_active')
+    list_filter = ('group', 'is_active')
+    search_fields = ('name', 'encar_standard_code')
+
+    def has_delete_permission(self, request, obj=None):
+        """Keep historical selections; disable options instead of deleting them."""
+        return False

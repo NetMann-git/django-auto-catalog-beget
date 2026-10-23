@@ -22,6 +22,11 @@ class Product(models.Model):
 
     # Основная информация
     title = models.CharField(max_length=255, verbose_name="Название")
+    equipment = models.ManyToManyField(
+        'EquipmentOption', blank=True, related_name='products',
+        verbose_name='Комплектация',
+    )
+
     slug = models.SlugField(unique=True, verbose_name="URL")
 
     image = ThumbnailerImageField(

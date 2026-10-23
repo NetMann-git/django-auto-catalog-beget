@@ -1,10 +1,12 @@
 <!-- apps/products/templates/products/product_detail.html -->
 {% extends "base.html" %}
 {% load price_format l10n %}
+{% load equipment_tags %}
 {% load static %}
 {% load thumbnail %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{% static 'products/css/equipment.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/product/product.css' %}">
 <link rel="stylesheet" href="{% static 'products/css/catalog/catalog.css' %}">
@@ -162,6 +164,8 @@
             </div>
 
             <!-- Описание -->
+            {% vehicle_equipment product %}
+
             {% if product.description %}
             <section class="description-block">
                 <h2>Об автомобиле</h2>

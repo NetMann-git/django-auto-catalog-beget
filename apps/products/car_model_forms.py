@@ -5,7 +5,10 @@ from typing import Any
 from django import forms
 
 from .manager_slugs import AutoSlugMixin
-from .models import CarModel, Product
+from .models import CarModel, Product, EquipmentOption
+from .equipment_forms import (
+    EquipmentCheckboxes, EquipmentChoiceField, EquipmentFormMixin,
+)
 
 
 class CarModelSelect(forms.Select):
@@ -19,8 +22,14 @@ class CarModelSelect(forms.Select):
         return option
 
 
-class ProductModelForm(forms.ModelForm):
+class ProductModelForm(EquipmentFormMixin, forms.ModelForm):
     """Keep server-side model validation available without JavaScript."""
+
+    equipment = EquipmentChoiceField(
+        queryset=EquipmentOption.objects.none(), required=False,
+        widget=EquipmentCheckboxes, label='Комплектация',
+        help_text='Отметьте известные опции. Без отметки — наличие не указано.',
+    )
 
     car_model = forms.ModelChoiceField(
         queryset=CarModel.objects.select_related('brand'), required=False,
