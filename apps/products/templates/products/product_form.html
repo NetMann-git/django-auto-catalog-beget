@@ -23,6 +23,7 @@
         {% csrf_token %}
         
         {% for field in form %}
+            {% if field.name != 'equipment' %}
             <div class="form-group">
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                 
@@ -40,6 +41,7 @@
                 {% endif %}
                 {{ field.errors }}
             </div>
+            {% endif %}
         {% endfor %}
     </form>
     
@@ -115,6 +117,13 @@
             {% endif %}
         </div>
     {% endif %}
+
+    <section class="car-equipment-compact" aria-labelledby="manager-equipment-title">
+        <h3 id="manager-equipment-title">Комплектация</h3>
+        <p class="car-equipment-compact__hint">{{ form.equipment.help_text }}</p>
+        {{ form.equipment.errors }}
+        {{ form.equipment }}
+    </section>
 
     <!-- Кнопка Сохранить внизу -->
     <div style="margin-top: 20px; display: flex; gap: 15px;">

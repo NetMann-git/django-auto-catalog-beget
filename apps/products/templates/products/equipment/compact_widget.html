@@ -1,0 +1,5 @@
+<div class="car-equipment-compact__choices"{% if widget.attrs.id %} id="{{ widget.attrs.id }}"{% endif %}>
+{% for group, options, index in widget.optgroups %}{% for option in options %}
+<div class="car-equipment-compact__option">{% include option.template_name with widget=option %}</div>
+{% endfor %}{% empty %}<p>Справочник комплектации пока пуст.</p>{% endfor %}
+</div>

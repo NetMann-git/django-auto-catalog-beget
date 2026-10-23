@@ -1,0 +1,10 @@
+/* Manager-only layout; public equipment and admin keep their groups. */
+.car-equipment-compact { margin: 20px 0; padding: 14px; border: 1px solid #dce2e8; border-radius: 8px; background: #f8fafc; }
+.car-equipment-compact h3 { margin: 0 0 6px; font-size: 18px; }
+.car-equipment-compact__hint { margin: 0 0 12px; font-size: 12px; color: #596579; }
+.car-equipment-compact__choices { columns: 3 230px; column-gap: 18px; }
+.car-equipment-compact__option { break-inside: avoid; margin-bottom: 6px; }
+.car-equipment-compact__option label { display: flex; align-items: flex-start; gap: 6px; margin: 0; font-size: 12px; font-weight: 400; line-height: 1.45; cursor: pointer; overflow-wrap: anywhere; }
+.car-equipment-compact__option input[type=checkbox] { flex: 0 0 auto; width: 15px; height: 15px; margin: 1px 0 0; }
+.car-equipment-compact__option input:focus-visible { outline: 2px solid #b3382b; outline-offset: 2px; }
+@media (max-width: 600px) { .car-equipment-compact__choices { columns: 1; } }

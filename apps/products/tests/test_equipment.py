@@ -69,7 +69,14 @@ class EquipmentTests(TestCase):
             form.save()
             reopened = form_type(instance=self.product)
             self.assertEqual(set(reopened['equipment'].value()), set(ids))
-            self.assertIn('Экстерьер и интерьер', str(reopened['equipment']))
+            if form_type is ProductModelForm:
+                self.assertIn('Экстерьер и интерьер', str(reopened['equipment']))
+            else:
+                markup = str(reopened['equipment'])
+                self.assertNotIn('<fieldset', markup)
+                self.assertIn('[код 010]', markup)
+                self.assertIn('form="product-form"', markup)
+                self.assertLess(markup.index('[код 001]'), markup.index('[код 010]'))
             self.assertIn('type="checkbox"', str(reopened['equipment']))
             form = form_type(data=self.data(), instance=self.product)
             self.assertTrue(form.is_valid(), form.errors)

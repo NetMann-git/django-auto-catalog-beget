@@ -4,6 +4,9 @@ from django.utils.safestring import mark_safe
 from .models import Product, ProductGalleryImage, Badge, Brand
 from .manager_slugs import AutoSlugMixin
 from .car_model_forms import ProductModelForm
+from .equipment_forms import CompactEquipmentCheckboxes, CompactEquipmentChoiceField
+from .models import EquipmentOption
+from django.db.models import F
 
 
 class ImagePreviewWidget(forms.ClearableFileInput):
@@ -27,6 +30,13 @@ class ImagePreviewWidget(forms.ClearableFileInput):
 class ProductForm(AutoSlugMixin, ProductModelForm):
     """Форма для создания и редактирования товара."""
     
+    equipment = CompactEquipmentChoiceField(
+        queryset=EquipmentOption.objects.none(), required=False,
+        widget=CompactEquipmentCheckboxes(attrs={'form': 'product-form'}),
+        label='Комплектация',
+        help_text='Отметьте известные опции. Без отметки — наличие не указано.',
+    )
+
     slug_source = "title"
     slug = forms.SlugField(
         required=False, label="URL (slug)",
@@ -83,6 +93,9 @@ class ProductForm(AutoSlugMixin, ProductModelForm):
         if self.instance and self.instance.pk:
             self.fields['badges'].initial = self.instance.badges.all()
             self.fields['slug'].required = True
+        self.fields['equipment'].queryset = self.fields['equipment'].queryset.order_by(
+            F('encar_standard_code').asc(nulls_last=True), 'name', 'pk',
+        )
         self.fields['slug'].widget.attrs['class'] = 'form-control'
         self.fields['slug'].widget.attrs['data-slug-target'] = 'true'
     

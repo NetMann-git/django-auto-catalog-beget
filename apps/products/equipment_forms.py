@@ -43,3 +43,20 @@ class EquipmentFormMixin:
             self.fields['equipment'].queryset = EquipmentOption.objects.filter(
                 Q(is_active=True) | Q(pk__in=selected),
             ).select_related('group')
+
+
+class CompactEquipmentCheckboxes(forms.CheckboxSelectMultiple):
+    """Flat manager list associated with the main product form."""
+
+    template_name = 'products/equipment/compact_widget.html'
+
+    class Media:
+        css = {'all': ('products/css/equipment-compact.css',)}
+
+
+class CompactEquipmentChoiceField(EquipmentChoiceField):
+    """Show source codes only in the manager editor."""
+
+    def label_from_instance(self, obj: EquipmentOption) -> str:
+        code = f'[код {obj.encar_standard_code}]' if obj.encar_standard_code else '[без кода]'
+        return f'{code} {super().label_from_instance(obj)}'
