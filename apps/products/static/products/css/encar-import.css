@@ -1,0 +1,13 @@
+.encar-import { max-width: 1050px; margin: 24px auto; padding: 20px; color: #263449; }
+.encar-import h1 { font-size: 26px; } .encar-import h2 { font-size: 19px; margin: 24px 0 12px; }
+.encar-import fieldset, .encar-import details { min-width: 0; padding: 16px; margin: 16px 0; border: 1px solid #dce2e8; border-radius: 10px; }
+.encar-import__field { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; margin: 12px 0; }
+.encar-import__field > label { min-width: 180px; }
+.encar-import input:not([type=checkbox]), .encar-import select, .encar-import textarea { box-sizing: border-box; max-width: 100%; padding: 8px; border: 1px solid #ccd4df; border-radius: 6px; }
+.encar-import textarea { width: 100%; }
+.encar-import pre, .encar-import__text { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; }
+.encar-import__warnings { padding: 12px 20px; background: #fff6df; border-radius: 10px; }
+.encar-import .errorlist { color: #a02222; }
+.encar-import__equipment { columns: 2 300px; } .encar-import__equipment label { display: block; break-inside: avoid; margin-bottom: 8px; }
+.encar-import__actions { display: flex; gap: 12px; flex-wrap: wrap; margin: 24px 0; }
+@media (max-width: 650px) { .encar-import { padding: 12px; } .encar-import__equipment { columns: 1; } }

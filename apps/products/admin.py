@@ -1,3 +1,4 @@
+from .models import VehicleImportSource
 from .models import EquipmentGroup, EquipmentOption
 from .car_model_forms import CarModelForm, ProductModelForm
 from .models import CarModel
@@ -259,4 +260,22 @@ class EquipmentOptionAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         """Keep historical selections; disable options instead of deleting them."""
+        return False
+
+
+@admin.register(VehicleImportSource)
+class VehicleImportSourceAdmin(admin.ModelAdmin):
+    """Read-only diagnostics of confirmed imports."""
+
+    list_display = ('listing_id', 'internal_vehicle_id', 'product', 'imported_at')
+    search_fields = ('listing_id', 'internal_vehicle_id', 'product__title')
+    readonly_fields = tuple(field.name for field in VehicleImportSource._meta.fields)
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
         return False

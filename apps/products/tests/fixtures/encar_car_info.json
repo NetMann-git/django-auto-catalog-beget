@@ -1,0 +1,377 @@
+{
+  "schema_version": 1,
+  "source": {
+    "site": "Encar",
+    "listing_id": "42764770",
+    "url": "https://fem.encar.com/cars/detail/42764770",
+    "data_vehicle_id": "42761908",
+    "retrieved_at": "2026-10-22T19:34:09.407688+00:00"
+  },
+  "vehicle": {
+    "manufacturer_original": "기아",
+    "manufacturer_english": "Kia",
+    "model_original": "스포티지 5세대",
+    "model_english": null,
+    "model_group_english": "Sportage",
+    "grade_original": "디젤 2.0 4WD",
+    "grade_english": "Diesel 2.0 4WD",
+    "grade_detail_original": "프레스티지",
+    "grade_detail_english": "Prestige",
+    "model_year": "2022",
+    "registration_year_month": "2022-01",
+    "mileage_km": 100709,
+    "engine_displacement_cc": 1998,
+    "fuel_original": "디젤",
+    "transmission_original": "오토",
+    "color_original": "검정색",
+    "custom_color_original": null,
+    "seats": 5,
+    "body_type_original": "SUV"
+  },
+  "price": {
+    "source_value": 1890,
+    "source_unit": "만원",
+    "amount": 18900000,
+    "currency": "KRW",
+    "status_original": "ADVERTISE"
+  },
+  "description_original": "▶▶▶안녕하세요.대구M월드  프라임모터스 서 성열  입니다. \n      2003년부터 엔카딜러가입후 지금까지 허위매물신고 한건없고 민원발생 한건 없이 지금까지 영업을 하고 있습니다\n      매입부터 판매 사후AS까지 직접하고 있습니다\n\n▶이차량은 엔카에서 성능검사및 침수검사,사고유무검사를 해서  무사고차량임을 보증 받은 차량이며\n   만약에 성능과 틀릴시  피해규정에 의거 엔카에서 소비자에게 직접 손해배상을 해드립니다.\n\n\n--------------------------차량설명------------------------------- \n\n\n\n▶이차량은 원동기,동력전달,변속기,조향,제동,전기,연료계통등을  1달2천Km까지 받으실수 있는  보증서를 발급해드립니다.\n\n▶이차량은  무사고 차량 입니다(운전석 앞팬더교환)\n\n▶비흡연차량\n\n▶ 누유없고 하체 잡소리 없습니다\n\n▶ 인기있는  검정 입니다. \n\n▶ 실내와 실외가 깨끗합니다. \n\n▶모든 정비를 마친 상태입니다. 타이어는 60-70%정도 됩니다\n\n▶옵션사항  : 스타일(110만원)+드라이브 와이즈(100만원)+12.3인치 내비게이션(165만원)입니다\n  \n\n----------------------오시는길-----------------------------------\n\n대구광역시 서구 이현동 42-30번지 M월드 3층 프라임모터스\n\n\n▶당사는 허위매물 클린회원이며 시세보다 터무니 없이 낮은 가격에 등록된 차량은 허위 매물일 경우가 많습니다.",
+  "equipment": {
+    "standard_codes": [
+      "001",
+      "004",
+      "005",
+      "006",
+      "007",
+      "008",
+      "014",
+      "015",
+      "017",
+      "019",
+      "020",
+      "021",
+      "022",
+      "023",
+      "024",
+      "026",
+      "027",
+      "031",
+      "032",
+      "033",
+      "034",
+      "055",
+      "056",
+      "057",
+      "058",
+      "062",
+      "072",
+      "074",
+      "075",
+      "077",
+      "079",
+      "081",
+      "082",
+      "086",
+      "088",
+      "094",
+      "096",
+      "097"
+    ],
+    "choice_codes": [
+      "1019",
+      "1020",
+      "1021"
+    ],
+    "selected_choices": [
+      {
+        "code": "1019",
+        "name_original": "드라이브 와이즈",
+        "description_original": "전방 충돌방지 보조(교차로 대향차), 후측방 충돌방지 보조, 후방 교차 충돌방지 보조, 스마트 크루즈 컨트롤(정차&재출발), 안전 하차 경고\n※ 내비게이션 적용 시 내비게이션 기반 스마트 크루즈 컨트롤(고속도로/자동차 전용도로 內 안전구간/곡선로), 고속도로 주행 보조 기능 지원"
+      },
+      {
+        "code": "1020",
+        "name_original": "스타일",
+        "description_original": "235/55 R19 타이어&전면가공 휠, 프로젝션 LED 헤드램프, 프론트 LED 턴시그널 램프, LED 포그램프, 고급형 LED 리어콤비네이션 램프, 리어 LED 턴시그널 램프, 블랙 하이그로시 (프론트 범퍼 로워, 리어 범퍼, 도어 가니쉬, 휠아치 몰딩, 테일게이트 가니쉬, 아웃사이드 미러 베이스), 크롬 가니쉬 (라디에이터 그릴 어퍼, 프론트 범퍼, 리어 범퍼, 도어)"
+      },
+      {
+        "code": "1021",
+        "name_original": "12.3인치 내비게이션",
+        "description_original": "12.3인치 내비게이션(기아 커넥트, 폰 프로젝션, 기아 페이), 인포테인먼트/공조 전환 조작계, 내비게이션 무선 업데이트 , 샤크핀 안테나, 후방 모니터, 레인센서, 독립제어 풀오토 에어컨(운전석/동승석), 공기청정 시스템(미세먼지 센서 포함), 오토디포그, 애프터 블로우"
+      }
+    ],
+    "unresolved_choice_codes": [],
+    "other_codes": [],
+    "tuning_codes": [],
+    "standard_dictionary_version": "1.9",
+    "standard_items": [
+      {
+        "code": "001",
+        "name_original": "브레이크 잠김 방지(ABS)",
+        "name_ru": "Антиблокировочная система тормозов (ABS)",
+        "source": "encar_standard_getauto_crosscheck_12"
+      },
+      {
+        "code": "004",
+        "name_original": "앞좌석 AV 모니터",
+        "name_ru": "Передний мультимедийный экран",
+        "source": "encar_standard_getauto_crosscheck_12"
+      },
+      {
+        "code": "005",
+        "name_original": "내비게이션",
+        "name_ru": "Навигация",
+        "source": "encar_standard_getauto_crosscheck_12"
+      },
+      {
+        "code": "006",
+        "name_original": "파워 도어록",
+        "name_ru": "Центральный замок",
+        "source": "encar_standard_getauto_crosscheck_12"
+      },
+      {
+        "code": "007",
+        "name_original": "파워 윈도우",
+        "name_ru": "Электростеклоподъёмники",
+        "source": "encar_standard_getauto_crosscheck_12"
+      },
+      {
+        "code": "008",
+        "name_original": "파워 스티어링 휠",
+        "name_ru": "Усилитель рулевого управления",
+        "source": "encar_standard_getauto_crosscheck_12"
+      },
+      {
+        "code": "014",
+        "name_original": "가죽시트",
+        "name_ru": "Кожаные сиденья",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "015",
+        "name_original": "무선도어 잠금장치",
+        "name_ru": "Дистанционное управление дверными замками",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "017",
+        "name_original": "알루미늄 휠",
+        "name_ru": "Легкосплавные диски",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "019",
+        "name_original": "미끄럼 방지(TCS)",
+        "name_ru": "Антипробуксовочная система (TCS)",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "020",
+        "name_original": "에어백(사이드)",
+        "name_ru": "Боковые подушки безопасности",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "021",
+        "name_original": "전동시트(운전석)",
+        "name_ru": "Электрорегулировка сиденья водителя",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "022",
+        "name_original": "열선시트(앞좌석)",
+        "name_ru": "Подогрев передних сидений",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "023",
+        "name_original": "자동 에어컨",
+        "name_ru": "Автоматический климат-контроль",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "024",
+        "name_original": "전동접이 사이드 미러",
+        "name_ru": "Электроскладывание боковых зеркал",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "026",
+        "name_original": "에어백(운전석)",
+        "name_ru": "Подушка безопасности водителя",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "027",
+        "name_original": "에어백(동승석)",
+        "name_ru": "Подушка безопасности переднего пассажира",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "031",
+        "name_original": "스티어링 휠 리모컨",
+        "name_ru": "Управление функциями автомобиля на руле",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "032",
+        "name_original": "주차감지센서(후방)",
+        "name_ru": "Задние датчики парковки",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "033",
+        "name_original": "타이어 공기압센서(TPMS)",
+        "name_ru": "Контроль давления в шинах (TPMS)",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "034",
+        "name_original": "통풍시트(운전석)",
+        "name_ru": "Вентиляция сиденья водителя",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "055",
+        "name_original": "차체 자세 제어장치(ESC)",
+        "name_ru": "Система стабилизации (ESC)",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "056",
+        "name_original": "에어백(커튼)",
+        "name_ru": "Шторки безопасности",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "057",
+        "name_original": "스마트키",
+        "name_ru": "Смарт-ключ",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "058",
+        "name_original": "후방 카메라",
+        "name_ru": "Камера заднего вида",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "062",
+        "name_original": "루프랙",
+        "name_ru": "Рейлинги на крыше",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "072",
+        "name_original": "USB 단자",
+        "name_ru": "Разъём USB",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "074",
+        "name_original": "하이패스",
+        "name_ru": "Hi-Pass — электронная оплата платных дорог",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "075",
+        "name_original": "헤드램프(LED)",
+        "name_ru": "Светодиодные фары (LED)",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "077",
+        "name_original": "통풍시트(동승석)",
+        "name_ru": "Вентиляция сиденья переднего пассажира",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "079",
+        "name_original": "크루즈 컨트롤(어댑티브)",
+        "name_ru": "Адаптивный круиз-контроль",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "081",
+        "name_original": "레인센서",
+        "name_ru": "Датчик дождя",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "082",
+        "name_original": "열선 스티어링 휠",
+        "name_ru": "Подогрев рулевого колеса",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "086",
+        "name_original": "후측방 경보 시스템",
+        "name_ru": "Предупреждение об объектах сзади сбоку",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "088",
+        "name_original": "차선이탈 경보 시스템(LDWS)",
+        "name_ru": "Предупреждение о выходе из полосы (LDWS)",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "094",
+        "name_original": "전자식 주차브레이크(EPB)",
+        "name_ru": "Электронный стояночный тормоз (EPB)",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "096",
+        "name_original": "블루투스",
+        "name_ru": "Bluetooth",
+        "source": "encar_har_snapshot"
+      },
+      {
+        "code": "097",
+        "name_original": "오토 라이트",
+        "name_ru": "Автоматическое включение света",
+        "source": "encar_har_snapshot"
+      }
+    ],
+    "unresolved_standard_codes": [],
+    "ambiguous_standard_codes": []
+  },
+  "warnings": [],
+  "data_retrieval": {
+    "description": {
+      "status": "received",
+      "source": "public_api",
+      "data_id": "42761908"
+    },
+    "choices": {
+      "status": "received",
+      "source": "public_api",
+      "data_id": "42761908"
+    }
+  },
+  "translation": {
+    "language": "ru",
+    "method": "local_dictionary_and_user_supplied_text",
+    "vehicle_ru": {
+      "fuel_original": "Дизель",
+      "transmission_original": "Автоматическая",
+      "color_original": "Чёрный",
+      "body_type_original": "SUV"
+    },
+    "vehicle_en": {
+      "model": "Sportage (5th generation)",
+      "grade": "Diesel 2.0 4WD",
+      "grade_detail": "Prestige"
+    },
+    "vehicle_en_sources": {
+      "model": "dictionary",
+      "grade": "encar",
+      "grade_detail": "encar"
+    },
+    "untranslated_vehicle_fields": [],
+    "seller_text_ru": "Объявление Encar: 42764770\n\nОПИСАНИЕ ПРОДАВЦА:\n\n▶▶▶Здравствуйте. Это Со Сонъёль из Prime Motors в Daegu M World.\n      С 2003 года после регистрации дилером Encar и до сих пор работаю без единого сообщения о фиктивном объявлении и без единого случая жалоб.\n      От покупки до продажи и послепродажного обслуживания всё делаю сам.\n\n▶Этот автомобиль прошёл в Encar проверку эксплуатационных характеристик, проверку на затопление и проверку наличия ДТП и получил гарантию того, что является автомобилем без ДТП.\n   Если характеристики не совпадут, Encar напрямую возместит потребителю ущерб согласно правилам возмещения.\n\n--------------------------Описание автомобиля-------------------------------\n\n\n\n▶На этот автомобиль выдаётся гарантийный документ, по которому можно обратиться по вопросам двигателя, передачи мощности, трансмиссии, рулевого управления, торможения, электрики, топливной системы и т.п. до 1 месяца/2 000 км.\n\n▶Этот автомобиль без ДТП (замена переднего крыла со стороны водителя)\n\n▶Автомобиль некурящего владельца\n\n▶Утечек нет, посторонних шумов снизу нет\n\n▶Популярный чёрный цвет.\n\n▶Салон и экстерьер чистые.\n\n▶Все работы по обслуживанию выполнены. Шины примерно на 60–70%.\n\n▶Опции: Style (1 100 000 вон) + Drive Wise (1 000 000 вон) + 12,3-дюймовая навигация (1 650 000 вон)\n\n----------------------Как добраться-----------------------------------\n\nDaegu Metropolitan City, Seo-gu, Ihyeon-dong, 42-30, M World, 3 этаж, Prime Motors\n\n\n▶Наша компания является чистым участником по фиктивным объявлениям, и автомобили, выставленные по абсурдно низкой по сравнению с рынком цене, часто являются фиктивными объявлениями.\n\nОПЦИЯ [1019]:\n\nDrive Wise\n\nПомощь предотвращения frontal collision (встречный транспорт на перекрёстке), помощь предотвращения столкновения сзади-сбоку, помощь предотвращения заднего перекрёстного столкновения, Smart Cruise Control (остановка и повторный старт), предупреждение о безопасном выходе\n※ При применении навигации поддерживаются навигационный Smart Cruise Control (безопасные участки/кривые в пределах автомагистралей/дорог только для автомобилей) и функция помощи при движении по автомагистрали\n\nОПЦИЯ [1020]:\n\nStyle\n\nШины 235/55 R19 и диски с фронтальной обработкой, проекционные LED-фары, передние LED-указатели поворота, LED-противотуманные фары, улучшенные LED-задние комбинированные фонари, задние LED-указатели поворота, чёрный высокоглянцевый цвет (нижняя часть переднего бампера, задний бампер, накладка двери, молдинг колёсной арки, накладка задней двери, основание наружного зеркала), хромированная накладка (верхняя часть решётки радиатора, передний бампер, задний бампер, дверь)\n\nОПЦИЯ [1021]:\n\n12,3-дюймовая навигация\n\n12,3-дюймовая навигация (Kia Connect, проекция телефона, Kia Pay), блок переключения управления информационно-развлекательной системой/климат-контролем, беспроводное обновление навигации, плавниковая антенна, задний монитор, датчик дождя, полностью автоматический климат-контроль с независимым управлением (водитель/пассажир), система очистки воздуха (включая датчик мелкой пыли), авто-антизапотевание, After Blow",
+    "seller_text_status": "user_supplied",
+    "source_changed": false,
+    "updated_at": "2026-10-22T19:35:36.179758+00:00"
+  }
+}

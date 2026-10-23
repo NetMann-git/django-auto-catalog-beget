@@ -1,0 +1,9 @@
+{% extends 'base.html' %}{% load static %}
+{% block title %}Импорт из Encar{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/manage.css' %}">{% endblock %}
+{% block content %}<div class="form-container">
+<a href="{% url 'users:manager_dashboard' %}">← В панель менеджера</a>
+<h1>Импорт из Encar</h1><p>Загрузите один car_info.json. Сначала покажем данные для проверки. Фотографии не загружаются.</p>
+<form method="post" enctype="multipart/form-data">{% csrf_token %}{{ form.as_p }}
+<button type="submit" name="action" value="upload" class="btn-save">Предварительный просмотр</button></form>
+</div>{% endblock %}

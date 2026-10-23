@@ -1,6 +1,7 @@
 # apps/products/urls.py
 from django.urls import path
 from . import views
+from .encar_import.views import import_encar
 from . import category_management
 from . import car_model_management
 from . import attribute_management
@@ -8,6 +9,7 @@ from . import attribute_management
 app_name = "catalog"
 
 urlpatterns = [
+    path("manage/import-encar/", import_encar, name="import_encar"),
     path("", views.catalog, name="catalog"),
     
     # Маршруты сравнения (должны быть ПЕРЕД <slug:slug>/)

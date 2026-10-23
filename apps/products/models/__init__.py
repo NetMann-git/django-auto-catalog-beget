@@ -11,3 +11,4 @@ from .brand import Brand  # ← Бренды
 from .car_model import CarModel
 
 from .equipment import EquipmentGroup, EquipmentOption
+from .import_source import VehicleImportSource

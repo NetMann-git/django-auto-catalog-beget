@@ -21,7 +21,7 @@ class Command(BaseCommand):
         folder = Path(settings.BASE_DIR) / 'patch-backups'
         folder.mkdir(exist_ok=True)
         stamp = datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S-%f')
-        target = folder / f'before-82-45-{stamp}.sqlite3'
+        target = folder / f'before-migration-{stamp}.sqlite3'
         try:
             with sqlite3.connect(source.as_uri() + '?mode=ro', uri=True) as original:
                 with sqlite3.connect(target) as backup:
