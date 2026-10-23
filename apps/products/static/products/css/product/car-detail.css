@@ -47,3 +47,48 @@
 @media (max-width: 960px) { .car-detail > .dress-detail { grid-template-columns: minmax(0, 1fr); } .car-detail__information { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 600px) { .car-detail { padding: 18px 16px 36px; } .car-detail .dress-info { padding: 20px; border-radius: 16px; } .car-detail__information .dress-specs, .car-detail__information .description-block { padding: 20px; } .car-detail__information { margin-top: 24px; gap: 16px; } .car-detail .recently-viewed-header .btn-clear-history { position: static; transform: none; } .car-detail .recently-viewed-header { gap: 12px; } }
 @media (prefers-reduced-motion: reduce) { .car-detail .dress-actions a { transition: none; } }
+
+/* Full-width information sections; two compact columns of general data. */
+.car-detail .car-detail__information { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+.car-detail__information .dress-specs,
+.car-detail__information > .car-equipment {
+    min-width: 0; margin: 0; padding: 22px 26px;
+    background: #fff; border: 1px solid #e3e7ed; border-radius: 16px;
+    box-shadow: 0 4px 18px rgba(36, 49, 70, .035);
+}
+.car-detail__information .dress-specs > h2,
+.car-detail__information > .car-equipment > h2 {
+    display: flex; align-items: center; gap: 10px;
+    margin: 0 0 16px; color: #243146; font-size: 20px; line-height: 1.4;
+}
+.car-detail__information .dress-specs > h2::before,
+.car-detail__information > .car-equipment > h2::before {
+    content: ''; width: 4px; height: 20px; flex: 0 0 auto;
+    border-radius: 4px; background: #b3382b;
+}
+.car-detail__spec-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 36px; }
+.car-detail__spec-grid .spec-row,
+.car-detail__spec-grid .spec-row:last-child {
+    padding: 9px 0; gap: 12px; border-bottom: 1px solid #edf0f4;
+    font-size: 13px; line-height: 1.5; align-items: baseline;
+}
+.car-detail__spec-grid .spec-row span { overflow-wrap: anywhere; }
+.car-detail__information > .car-equipment .car-equipment__group {
+    margin: 0; padding: 16px 0; border: 0; border-top: 1px solid #edf0f4; border-radius: 0;
+}
+.car-detail__information > .car-equipment .car-equipment__group h3 {
+    margin: 0 0 12px; padding: 0; color: #536075; font-size: 14px; font-weight: 600;
+}
+.car-detail__information > .car-equipment .car-equipment__list { gap: 8px 32px; }
+.car-detail__information > .car-equipment .car-equipment__list li { font-size: 13px; line-height: 1.55; }
+.car-detail__information > .car-equipment .car-equipment__check {
+    display: inline-flex; justify-content: center; align-items: center;
+    width: 18px; height: 18px; flex: 0 0 auto; border-radius: 50%;
+    background: #edf6f0; color: #28764d; font-size: 11px;
+}
+.car-detail__information > .car-equipment .car-equipment__note { margin: 8px 0 0; }
+@media (max-width: 600px) {
+    .car-detail__spec-grid { grid-template-columns: minmax(0, 1fr); }
+    .car-detail__information .dress-specs,
+    .car-detail__information > .car-equipment { padding: 18px 16px; }
+}

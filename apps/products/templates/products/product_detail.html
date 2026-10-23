@@ -144,7 +144,8 @@
                 ТАБЛИЦА ХАРАКТЕРИСТИК
             ======================================= -->
             <div class="dress-specs">
-                <h2>Характеристики</h2>
+                <h2>Общие данные</h2>
+                <div class="car-detail__spec-grid">
 
                 {% if product.article %}
                 <div class="spec-row">
@@ -161,9 +162,10 @@
                 {% empty %}
                     <p class="text-muted">Характеристики не указаны.</p>
                 {% endfor %}
+                </div>
             </div>
 
-            <!-- Описание -->
+            <!-- Комплектация -->
             {% vehicle_equipment product %}
 
             {% if product.description %}
