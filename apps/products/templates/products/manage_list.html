@@ -55,7 +55,7 @@
                     </td>
                     <td>{{ product.article|default:"—" }}</td>
                     <td>{{ product.price|price_format }} {{ product.currency }}</td>
-                    <td>{{ product.category.name|default:"—" }}</td>
+                    <td>{{ product.category.title|default:"—" }}</td>
                     <td>
                         <span class="status-badge status-{% if product.is_active %}active{% else %}inactive{% endif %}">
                             {% if product.is_active %}Активен{% else %}Неактивен{% endif %}

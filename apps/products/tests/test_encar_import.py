@@ -59,7 +59,9 @@ class EncarImportTests(TestCase):
     def create(self):
         response = self.client.post(self.url, self.submission(self.preview()))
         self.assertEqual(response.status_code, 302, getattr(response, 'context', None) and response.context['form'].errors)
-        return Product.objects.get()
+        product = Product.objects.get()
+        self.assertEqual(product.article, product.import_sources.get(source='encar').listing_id)
+        return product
 
     def test_real_file_preview_cancel_create_and_repeat(self):
         preview = self.preview()

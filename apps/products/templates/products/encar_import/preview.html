@@ -4,6 +4,8 @@
 {% block content %}<div class="encar-import">
 <h1>Проверка импорта</h1>
 {% if product %}<h2>Автомобиль уже существует. Обновить данные?</h2><p><a href="{% url 'catalog:product_edit' product.pk %}">{{ product.title }}</a></p>{% else %}<p>Будет создан неопубликованный черновик.</p>{% endif %}
+{% if product %}<p><a href="{% url 'catalog:product_edit' product.pk %}#product-gallery">Добавить фотографии без изменения данных JSON</a></p>{% endif %}
+<p>После подтверждения артикул будет равен ID исходного объявления: <strong>{{ proposal.listing_id }}</strong>{% if product %} (сейчас: {{ product.article|default:'не заполнен' }}){% endif %}.</p>
 <p>Источник: <strong>Encar</strong> · Объявление: {{ proposal.listing_id }} · Внутренний ID: {{ proposal.internal_id|default:'не указан' }}</p>
 <p><a href="{{ proposal.url }}" target="_blank" rel="noopener noreferrer">Открыть исходное объявление ↗</a></p>
 <p>Получено парсером: {{ proposal.retrieved|default:'дата не распознана' }}. Время импорта будет записано после сохранения.</p>

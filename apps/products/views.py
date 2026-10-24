@@ -442,14 +442,14 @@ def brand_delete(request, brand_id):
 def product_list_manage(request):
     """Список товаров для управления (менеджер)."""
     
-    products = Product.objects.all().order_by('-id')  # ИСПРАВЛЕНО
+    products = Product.objects.select_related('category').order_by('-id')
     
     search = request.GET.get('search', '')
     if search:
         products = products.filter(
             Q(title__icontains=search) |
             Q(article__icontains=search) |
-            Q(category__name__icontains=search)
+            Q(category__title__icontains=search)
         )
     
     paginator = Paginator(products, 20)

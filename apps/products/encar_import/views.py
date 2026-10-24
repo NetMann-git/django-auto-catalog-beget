@@ -23,7 +23,22 @@ def import_encar(request: HttpRequest) -> HttpResponse:
     """Keep previews in signed user-bound payloads, not in product records."""
     upload = UploadForm(request.POST or None, request.FILES or None)
     if request.method == 'GET':
-        return render(request, 'products/encar_import/upload.html', {'form': upload})
+        listing_id = request.GET.get('listing_id', '').strip()
+        lookup_source = None
+        lookup_error = ''
+        if listing_id:
+            if not listing_id.isascii() or not listing_id.isdigit() or len(listing_id) > 30:
+                lookup_error = 'Введите числовой ID исходного объявления Encar.'
+            else:
+                lookup_source = VehicleImportSource.objects.select_related('product').filter(
+                    source='encar', listing_id=listing_id,
+                ).first()
+                if lookup_source is None:
+                    lookup_error = 'Импортная связь с этим ID не найдена. Загрузите JSON для предпросмотра. Совпадение одного артикула не считается подтверждённой связью.'
+        return render(request, 'products/encar_import/upload.html', {
+            'form': upload, 'listing_id': listing_id,
+            'lookup_source': lookup_source, 'lookup_error': lookup_error,
+        })
     if request.POST.get('action') == 'upload':
         if not upload.is_valid():
             return render(request, 'products/encar_import/upload.html', {'form': upload})

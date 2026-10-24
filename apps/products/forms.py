@@ -97,7 +97,30 @@ class ProductForm(AutoSlugMixin, ProductModelForm):
         )
         self.fields['slug'].widget.attrs['class'] = 'form-control'
         self.fields['slug'].widget.attrs['data-slug-target'] = 'true'
+        if self.instance.pk:
+            listing_ids = list(self.instance.import_sources.filter(
+                source='encar',
+            ).values_list('listing_id', flat=True))
+            if len(listing_ids) == 1:
+                self.fields['article'].disabled = True
+                self.initial['article'] = listing_ids[0]
+                self.fields['article'].help_text = (
+                    'Артикул совпадает с ID исходного объявления Encar. '
+                    'Внутренний ID автомобиля хранится отдельно.'
+                )
     
+    def clean_article(self):
+        """Keep the linked listing ID without silently taking another article."""
+        article = self.cleaned_data.get('article', '')
+        if self.fields['article'].disabled and Product.objects.filter(
+            article=article,
+        ).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError(
+                'ID Encar уже используется как артикул другой карточки. '
+                'Сначала устраните конфликт.'
+            )
+        return article
+
     def save(self, commit=True):
         product = super().save(commit=False)
         if commit:

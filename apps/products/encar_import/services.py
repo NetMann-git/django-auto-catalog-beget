@@ -48,6 +48,14 @@ def save_import(form, proposal: dict, expected: dict) -> tuple:
             if cleaned.get(field):
                 setattr(product, field, cleaned[field])
                 changed.append({'brand': 'марка', 'car_model': 'модель', 'category': 'категория'}[field])
+    listing_id = proposal['listing_id']
+    if Product.objects.filter(article=listing_id).exclude(pk=product.pk).exists():
+        raise ValidationError('Этот артикул уже занят другой карточкой. Проверьте её: автоматически объединять автомобили нельзя.')
+    if product.pk and product.import_sources.filter(source='encar').exclude(listing_id=listing_id).exists():
+        raise ValidationError('У карточки несколько разных ID Encar. Сначала исправьте связи источников в админке.')
+    if product.article != listing_id:
+        product.article = listing_id
+        changed.append('артикул (ID исходного объявления Encar)')
     product.full_clean()
     product.save()
     for attr_form in form.attribute_forms:
