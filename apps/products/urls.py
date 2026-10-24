@@ -1,6 +1,6 @@
 # apps/products/urls.py
 from django.urls import path
-from . import views
+from . import views, gallery_management
 from .encar_import.views import import_encar
 from . import category_management
 from . import car_model_management
@@ -59,9 +59,12 @@ urlpatterns = [
     path('attributes/<int:product_id>/', views.product_attributes, name='product_attributes'),
     path('attribute/delete/<int:attribute_id>/', views.attribute_delete, name='attribute_delete'),
 
+    path('gallery/prepare/<int:product_id>/', gallery_management.prepare, name='gallery_prepare'),
+    path('gallery/order/<int:product_id>/', gallery_management.reorder, name='gallery_order'),
+    path('gallery/cover/<int:image_id>/', gallery_management.cover, name='gallery_cover'),
     # Галерея
-    path('gallery/add/<int:product_id>/', views.gallery_add, name='gallery_add'),
-    path('gallery/delete/<int:image_id>/', views.gallery_delete, name='gallery_delete'),
+    path('gallery/add/<int:product_id>/', gallery_management.upload, name='gallery_add'),
+    path('gallery/delete/<int:image_id>/', gallery_management.delete, name='gallery_delete'),
     
     # Страница товара (должна быть последней)
     path("<slug:slug>/", views.product_detail, name="product_detail"),

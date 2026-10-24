@@ -36,7 +36,7 @@
         ======================================= -->
         <div class="dress-photo">
             <div class="gallery-wrapper">
-                {% if product.gallery.all %}
+                {% if gallery_images %}
                     <div class="gallery-thumbs-vertical">
                         {% if product.image %}
                             <img src="{% thumbnail product.image 100x75 crop %}"
@@ -44,7 +44,7 @@
                                  class="gallery-thumb-vertical active"
                                  alt="{{ product.title }}">
                         {% endif %}
-                        {% for photo in product.gallery.all %}
+                        {% for photo in gallery_images %}
                             <img src="{% thumbnail photo.image 100x75 crop %}"
                                  data-full="{% thumbnail photo.image 800x600 crop %}"
                                  class="gallery-thumb-vertical"
@@ -60,7 +60,7 @@
                              alt="{{ product.title }}"
                              class="main-image"
                              style="cursor:pointer;">
-                        {% if product.gallery.all %}
+                        {% if gallery_images %}
                             <button class="image-arrow prev-image" id="prev-image-btn">‹</button>
                             <button class="image-arrow next-image" id="next-image-btn">›</button>
                         {% endif %}
@@ -70,10 +70,10 @@
                 </div>
             </div>
 
-            {% if product.gallery.all %}
+            {% if gallery_images %}
             <div class="gallery-counter">
                 Фото <span id="current-photo">1</span> из <span id="total-photos">
-                    {% with total=product.gallery.all.count|add:1 %}
+                    {% with total=gallery_images.count|add:1 %}
                         {{ total }}
                     {% endwith %}
                 </span>

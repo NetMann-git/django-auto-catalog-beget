@@ -1,6 +1,6 @@
 # apps/products/views.py
 
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.views.decorators.vary import vary_on_headers
 
@@ -17,13 +17,13 @@ from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models.deletion import ProtectedError
-from django.db.models import Max, Q
+from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 
-from .forms import ProductForm, GalleryImageForm, BrandForm
+from .forms import ProductForm, BrandForm
 from .attribute_formsets import ManagerAttributeFormSet
 
-from .models import Product, ProductGalleryImage, AttributeType, AttributeValue, ProductAttribute
+from .models import Product, AttributeType, AttributeValue, ProductAttribute
 
 from .repository import CatalogRepository
 
@@ -215,6 +215,7 @@ def product_detail(request, slug):
     ]
 
     context["review_form"] = ReviewForm(user=request.user)
+    context["gallery_images"] = product.gallery.exclude(image=product.image.name or '')
 
     return render(request, "products/product_detail.html", context)
 
@@ -538,60 +539,6 @@ def product_delete(request, product_id):
         'products/product_confirm_delete.html',
         context,
     )
-
-
-@role_required(ROLE_MANAGER, ROLE_ADMIN)
-def gallery_add(request: HttpRequest, product_id: int) -> HttpResponse:
-    """Validate selected images before appending them to the gallery."""
-  
-    product = get_object_or_404(Product, id=product_id)
-    
-    if request.method == 'POST':
-        images = request.FILES.getlist('image')
-        if not images:
-            messages.error(request, 'Выберите хотя бы одну фотографию.')
-            return redirect('catalog:product_edit', product_id=product.id)
-
-        forms = []
-        for image in images:
-            form = GalleryImageForm(request.POST, {'image': image})
-            if not form.is_valid():
-                details = '; '.join(
-                    str(error)
-                    for errors in form.errors.values()
-                    for error in errors
-                )
-                messages.error(
-                    request,
-                    f'Файл «{image.name}»: {details} '
-                    'Фотографии не добавлены. Проверьте выбранные файлы.',
-                )
-                return redirect('catalog:product_edit', product_id=product.id)
-            forms.append(form)
-
-        with transaction.atomic():
-            last_order = product.gallery.aggregate(value=Max('sort_order'))['value']
-            next_order = (last_order if last_order is not None else -1) + 1
-            for offset, form in enumerate(forms):
-                gallery_image = form.save(commit=False)
-                gallery_image.product = product
-                gallery_image.sort_order = next_order + offset
-                gallery_image.save()
-        messages.success(request, f'Добавлено фотографий: {len(forms)}.')
-    
-    return redirect('catalog:product_edit', product_id=product.id)
-
-
-@role_required(ROLE_MANAGER, ROLE_ADMIN)
-def gallery_delete(request, image_id):
-    """Удаление изображения из галереи."""
-    
-    image = get_object_or_404(ProductGalleryImage, id=image_id)
-    product_id = image.product.id
-    image.delete()
-    messages.success(request, 'Изображение удалено из галереи.')
-    
-    return redirect('catalog:product_edit', product_id=product_id)
 
 
 @role_required(ROLE_MANAGER, ROLE_ADMIN)

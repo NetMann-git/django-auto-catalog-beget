@@ -29,6 +29,8 @@ class Product(models.Model):
 
     slug = models.SlugField(unique=True, verbose_name="URL")
 
+    image_sha256 = models.CharField(max_length=64, blank=True, default='', editable=False)
+
     image = ThumbnailerImageField(
         upload_to="products/",
         blank=True,

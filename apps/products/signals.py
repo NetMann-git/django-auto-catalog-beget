@@ -25,6 +25,7 @@ def remember_previous_image(
 ) -> None:
     """Remember the stored image before saving a replacement or clearing it."""
     instance._previous_image_name = None
+    instance._image_changed = False
     if raw or not instance.pk:
         return
     field_name = 'logo' if sender is Brand else 'image'
@@ -35,6 +36,10 @@ def remember_previous_image(
         .filter(pk=instance.pk)
         .values_list(field_name, flat=True)
         .first()
+    )
+    current = getattr(instance, field_name)
+    instance._image_changed = (
+        instance._previous_image_name != current.name or not current._committed
     )
 
 
@@ -48,6 +53,11 @@ def remove_replaced_image(
     if raw:
         return
     previous_name = getattr(instance, "_previous_image_name", None)
+    if sender in (Product, ProductGalleryImage) and getattr(instance, "_image_changed", False):
+        # A replacement through the ordinary form/admin invalidates the cache too.
+        sender._base_manager.using(using).filter(pk=instance.pk).update(image_sha256='')
+        instance.image_sha256 = ''
+
     field_name = 'logo' if sender is Brand else 'image'
     if previous_name and previous_name != getattr(instance, field_name).name:
         transaction.on_commit(

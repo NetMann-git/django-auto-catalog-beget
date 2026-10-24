@@ -13,6 +13,8 @@ class ProductGalleryImage(models.Model):
         related_name="gallery",
     )
 
+    image_sha256 = models.CharField(max_length=64, blank=True, default='', editable=False)
+
     image = models.ImageField(
         upload_to="products/gallery/",
     )

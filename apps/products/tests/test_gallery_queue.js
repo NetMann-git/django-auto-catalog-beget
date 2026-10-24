@@ -1,0 +1,64 @@
+/* Run with Node: exercises the shipped queue script without extra packages. */
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
+const path = require('node:path');
+const {webcrypto} = require('node:crypto');
+class Element {
+  constructor() { this.events = {}; this.children = []; this.dataset = {}; }
+  addEventListener(name, fn) { this.events[name] = fn; }
+  append(...items) { this.children.push(...items); }
+  replaceChildren() { this.children = []; }
+  remove() { this.removed = true; }
+}
+const nodes = new Map();
+const element = name => { if (!nodes.has(name)) nodes.set(name, new Element()); return nodes.get(name); };
+const root = element('root');
+root.dataset = {prepare: '/prepare', upload: '/upload'};
+root.querySelector = element;
+root.querySelectorAll = () => [];
+element('[name=csrfmiddlewaretoken]').value = 'csrf-test';
+const cap = element('gallery-upload-limits');
+cap.textContent = JSON.stringify({files: 60, bytes: 1000, total: 10000, pixels: 40000000, gallery: 300});
+let calls = [], failBlue = true, saved = new Set();
+const context = {
+  document: {getElementById: id => id === 'product-gallery' ? root : element(id), createElement: () => new Element()},
+  window: {crypto: webcrypto, addEventListener() {}}, crypto: webcrypto,
+  URL: {createObjectURL: f => f.name, revokeObjectURL() {}},
+  Intl, FormData, AbortController, setTimeout, clearTimeout, Uint8Array,
+  confirm: () => true, location: {reload() {}},
+  fetch: async (url, options) => {
+    assert.equal(options.headers['X-CSRFToken'], 'csrf-test');
+    assert.equal(options.method, 'POST');
+    const data = options.body;
+    let body = {}, ok = true;
+    if (url === '/prepare') {
+      body = data.get('action') === 'hashes' ? {ready: true} : {token: 'signed'};
+    } else {
+      const file = data.get('image'); calls.push(file.name);
+      const content = await file.text();
+      if (content === 'blue' && failBlue) { failBlue = false; ok = false; body = {error: 'Временная ошибка'}; }
+      else { body = {status: saved.has(content) ? 'duplicate' : 'added'}; saved.add(content); }
+    }
+    return {ok, status: ok ? 200 : 409, headers: {get: () => 'application/json'}, json: async () => body};
+  },
+};
+vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../static/products/js/gallery-manager.js'), 'utf8'), context);
+(async () => {
+  element('[data-files]').files = [
+    new File(['blue'], 'photo_10.jpg'), new File(['red'], 'photo_2.jpg'),
+    new File(['red'], 'photo_11.jpg'), new File(['remove'], 'photo_20.jpg'),
+  ];
+  element('[data-files]').events.change();
+  const cards = element('[data-queue]').children;
+  assert.deepEqual(cards.map(c => c.children[1].textContent), ['photo_2.jpg','photo_10.jpg','photo_11.jpg','photo_20.jpg']);
+  cards[3].children[4].events.click();
+  assert.match(element('[data-summary]').textContent, /Выбрано: 3/);
+  await element('[data-start]').events.click();
+  assert.deepEqual(calls, ['photo_2.jpg','photo_10.jpg','photo_11.jpg']);
+  assert.equal(element('[data-status]').textContent, 'Добавлено: 1, пропущено дублей: 1, ошибок: 1.');
+  await element('[data-retry]').events.click();
+  assert.deepEqual(calls, ['photo_2.jpg','photo_10.jpg','photo_11.jpg','photo_10.jpg']);
+  assert.equal(element('[data-status]').textContent, 'Добавлено: 2, пропущено дублей: 1, ошибок: 0.');
+  console.log('Queue checks passed: numeric sort, removal, sequential requests, duplicates, partial failure, retry.');
+})().catch(error => { console.error(error); process.exitCode = 1; });
