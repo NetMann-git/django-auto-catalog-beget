@@ -14,7 +14,7 @@
       <article class="car-gallery__card">
         <img src="{% thumbnail photo.image 240x180 crop %}" alt="{{ photo.alt|default:product.title }}" loading="lazy">
         {% if product.image.name == photo.image.name %}<strong>Обложка</strong>{% endif %}
-        <label>Порядок <input name="order_{{ photo.pk }}" type="number" min="0" max="1000000" value="{{ photo.sort_order }}" required></label>
+        <label class="car-gallery__order"><span>Порядок</span><input inputmode="numeric" name="order_{{ photo.pk }}" type="number" min="0" max="1000000" value="{{ photo.sort_order }}" required></label>
         <button type="submit" formaction="{% url 'catalog:gallery_cover' photo.pk %}" formnovalidate>Сделать обложкой</button>
         <button type="submit" formaction="{% url 'catalog:gallery_delete' photo.pk %}" formnovalidate data-delete-photo>Удалить</button>
       </article>
@@ -36,6 +36,6 @@
     <button type="button" data-start>Загрузить фотографии</button>
     <button type="button" data-retry hidden>Повторить неудачные</button>
     <a href="#product-gallery" data-refresh hidden>Обновить галерею после загрузки</a>
-    <noscript>Для очереди фотографий включите JavaScript. Обычное поле изображения автомобиля остаётся доступным.</noscript>
+    <noscript>Для очереди фотографий включите JavaScript. Фотографии загружаются через эту очередь.</noscript>
   </div>
 </section>

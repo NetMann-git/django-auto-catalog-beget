@@ -55,7 +55,7 @@ class ProductForm(AutoSlugMixin, ProductModelForm):
         model = Product
         fields = [
             'title', 'slug', 'category', 'brand', 'car_model', 'price', 'currency',
-            'short_description', 'description', 'image', 'is_active', 'is_featured',
+            'short_description', 'description', 'is_active', 'is_featured',
             'availability_status', 'article', 'product_type', 'meta_title', 'meta_description',
             'badges', 'equipment'
         ]
@@ -78,7 +78,6 @@ class ProductForm(AutoSlugMixin, ProductModelForm):
             'currency': forms.Select(attrs={'class': 'form-control'}),
             'short_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 6}),
-            'image': ImagePreviewWidget(attrs={'class': 'form-control'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'is_featured': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'availability_status': forms.Select(attrs={'class': 'form-control'}),
