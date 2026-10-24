@@ -4,17 +4,18 @@
 {% block content %}<div class="form-container">
 <a href="{% url 'users:manager_dashboard' %}">← В панель менеджера</a>
 <h1>Импорт из Encar</h1><p>Загрузите один car_info.json. Сначала покажем данные для проверки. После сохранения данные можно дополнить локальными фотографиями через галерею автомобиля.</p>
-<h2>Найти ранее импортированный автомобиль</h2>
+<h2>Найти автомобиль по ID Encar или артикулу</h2>
 <form method="get">
 <label for="encar-listing-id">ID исходного объявления Encar (артикул)</label>
 <input id="encar-listing-id" name="listing_id" value="{{ listing_id }}" inputmode="numeric" pattern="[0-9]{1,30}" maxlength="30" required>
 <button type="submit" class="btn-save">Найти автомобиль</button>
 </form>
 {% if lookup_error %}<p role="status">{{ lookup_error }}</p>{% endif %}
-{% if lookup_source %}
-<p>Найден: <strong>{{ lookup_source.product.title }}</strong> · ID объявления: {{ lookup_source.listing_id }}</p>
-<p><a href="{% url 'catalog:product_edit' lookup_source.product_id %}">Редактировать автомобиль</a> ·
-<a href="{% url 'catalog:product_edit' lookup_source.product_id %}#product-gallery">Добавить фотографии</a></p>
+{% if lookup_product %}
+<p>Найден: <strong>{{ lookup_product.title }}</strong> · ID объявления: {{ listing_id }}</p>
+<p><a href="{% url 'catalog:product_edit' lookup_product.pk %}">Редактировать автомобиль</a> ·
+<a href="{% url 'catalog:product_edit' lookup_product.pk %}#product-gallery">Добавить фотографии</a></p>
+{% if not lookup_source %}<p>Найдена ручная карточка по точному совпадению артикула. Связь с Encar будет создана только после подтверждения импорта JSON. Фотографии можно добавить уже сейчас.</p>{% endif %}
 <p>Для выборочного обновления загрузите ниже JSON этого объявления. Перед сохранением появится сравнение данных.</p>
 {% endif %}
 <h2>Загрузить или обновить данные из JSON</h2>

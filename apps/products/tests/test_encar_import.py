@@ -234,3 +234,64 @@ class EncarImportTests(TestCase):
         self.assertEqual(self.client.post(self.url, data).status_code, 302)
         self.assertEqual(Product.objects.get().description, '')
         self.assertEqual(VehicleImportSource.objects.get().original_description, raw['description_original'])
+
+    def manual_product(self):
+        from apps.products.encar_import.parser import parse
+        return Product.objects.create(
+            title='Название менеджера', slug='manual-car',
+            description='Ручное описание', price='1234567',
+            article=parse(self.raw)['listing_id'], is_active=True,
+        )
+
+    def test_manual_article_preview_bind_repeat_preserves_manual_data(self):
+        product = self.manual_product()
+        preview = self.preview()
+        self.assertEqual(preview.context['product'], product)
+        self.assertTrue(preview.context['matched_by_article'])
+        self.assertFalse(VehicleImportSource.objects.exists())
+        self.assertFalse(preview.context['form']['apply_title'].value())
+        self.assertFalse(preview.context['form']['apply_description'].value())
+        self.assertEqual(self.client.post(self.url, self.submission(preview)).status_code, 302)
+        self.assertEqual(Product.objects.count(), 1)
+        source = VehicleImportSource.objects.get()
+        self.assertEqual(source.product_id, product.pk)
+        product.refresh_from_db()
+        self.assertEqual(product.title, 'Название менеджера')
+        self.assertEqual(product.description, 'Ручное описание')
+        self.assertEqual(product.price, 1234567)
+        self.assertEqual(product.slug, 'manual-car')
+        self.assertTrue(product.is_active)
+        self.client.post(self.url, self.submission(self.preview()))
+        self.assertEqual(Product.objects.count(), 1)
+        self.assertEqual(VehicleImportSource.objects.count(), 1)
+
+    def test_manual_article_ambiguity_creates_nothing(self):
+        product = self.manual_product()
+        Product.objects.create(title='Вторая', slug='second-manual', price=1, article=product.article)
+        response = self.preview()
+        self.assertContains(response, 'Найдено несколько автомобилей')
+        self.assertFalse(VehicleImportSource.objects.exists())
+        self.assertEqual(Product.objects.count(), 2)
+
+    def test_manual_article_lookup_allows_photos_without_binding(self):
+        product = self.manual_product()
+        response = self.client.get(self.url, {'listing_id': product.article})
+        self.assertEqual(response.context['lookup_product'], product)
+        self.assertContains(response, reverse('catalog:product_edit', args=[product.pk]) + '#product-gallery')
+        self.assertFalse(VehicleImportSource.objects.exists())
+
+    def test_manual_edit_after_preview_rejects_binding(self):
+        product = self.manual_product()
+        data = self.submission(self.preview())
+        product.description = 'Новая ручная правка'
+        product.save()
+        response = self.client.post(self.url, data)
+        self.assertContains(response, 'Карточка изменилась после предпросмотра')
+        self.assertFalse(VehicleImportSource.objects.exists())
+        self.assertEqual(Product.objects.count(), 1)
+
+    def test_manual_other_listing_link_not_rebound(self):
+        product = self.manual_product()
+        VehicleImportSource.objects.create(product=product, source='encar', listing_id='111', raw_json={})
+        self.assertContains(self.preview(), 'уже связан с другим объявлением')
+        self.assertEqual(VehicleImportSource.objects.get().listing_id, '111')

@@ -3,6 +3,7 @@
 {% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/manage.css' %}"><link rel="stylesheet" href="{% static 'products/css/encar-import.css' %}">{% endblock %}
 {% block content %}<div class="encar-import">
 <h1>Проверка импорта</h1>
+{% if matched_by_article %}<p><strong>Найдена существующая ручная карточка по артикулу {{ product.article }}.</strong> При подтверждении она будет связана с этим объявлением Encar. Новая карточка не создаётся. Проверьте автомобиль и выберите только нужные изменения.</p>{% endif %}
 {% if product %}<h2>Автомобиль уже существует. Обновить данные?</h2><p><a href="{% url 'catalog:product_edit' product.pk %}">{{ product.title }}</a></p>{% else %}<p>Будет создан неопубликованный черновик.</p>{% endif %}
 {% if product %}<p><a href="{% url 'catalog:product_edit' product.pk %}#product-gallery">Добавить фотографии без изменения данных JSON</a></p>{% endif %}
 <p>После подтверждения артикул будет равен ID исходного объявления: <strong>{{ proposal.listing_id }}</strong>{% if product %} (сейчас: {{ product.article|default:'не заполнен' }}){% endif %}.</p>

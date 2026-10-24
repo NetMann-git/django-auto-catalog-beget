@@ -10,6 +10,31 @@ from apps.products.manager_slugs import unique_slug
 from apps.products.models import Product, VehicleImportSource
 
 
+def resolve_identity(listing_id: str, *, lock: bool = False) -> tuple:
+    """Use a confirmed source first, otherwise one exact manual article match."""
+    sources = VehicleImportSource.objects.filter(source='encar')
+    products = Product.objects.all()
+    if lock:
+        sources = sources.select_for_update()
+        products = products.select_for_update()
+    source = sources.filter(listing_id=listing_id).first()
+    if source:
+        return source, products.get(pk=source.product_id)
+    matches = list(products.filter(article=listing_id).order_by('pk')[:2])
+    if len(matches) > 1:
+        raise ValidationError(
+            'Найдено несколько автомобилей с артикулом ' + listing_id
+            + '. Исправьте повторяющиеся артикулы перед импортом.'
+        )
+    product = matches[0] if matches else None
+    if product and sources.filter(product=product).exists():
+        raise ValidationError(
+            'Автомобиль с этим артикулом уже связан с другим объявлением Encar. '
+            'Проверьте артикул и существующую связь; автоматическая перепривязка запрещена.'
+        )
+    return None, product
+
+
 def fingerprint(product) -> str:
     """Detect edits made after preview, including equipment and attributes."""
     if product is None:
@@ -23,8 +48,7 @@ def fingerprint(product) -> str:
 @transaction.atomic
 def save_import(form, proposal: dict, expected: dict) -> tuple:
     """Create a draft or modify only explicitly selected values, all-or-nothing."""
-    source = VehicleImportSource.objects.select_for_update().filter(source='encar', listing_id=proposal['listing_id']).first()
-    product = Product.objects.select_for_update().get(pk=source.product_id) if source else None
+    source, product = resolve_identity(proposal['listing_id'], lock=True)
     if getattr(product, 'pk', None) != expected['product_id'] or fingerprint(product) != expected['fingerprint']:
         raise ValidationError('Карточка изменилась после предпросмотра. Загрузите файл заново и проверьте изменения.')
     if source and source.imported_at.isoformat() != expected.get('imported_at'):
@@ -71,6 +95,8 @@ def save_import(form, proposal: dict, expected: dict) -> tuple:
         product.equipment.add(*cleaned['equipment'])
         changed.append(f'комплектация: выбрано {len(cleaned["equipment"])}')
     if source is None:
+        if not created:
+            changed.append('ручная карточка привязана к объявлению Encar по артикулу')
         source = VehicleImportSource(product=product, source='encar', listing_id=proposal['listing_id'])
     source.raw_json = proposal['raw']
     source.source_url = proposal['url']
