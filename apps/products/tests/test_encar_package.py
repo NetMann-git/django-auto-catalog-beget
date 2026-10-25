@@ -390,3 +390,45 @@ class EncarPackageTests(TestCase):
         response = self.client.post(self.url, data)
         self.assertContains(response, 'Карточка изменилась после предпросмотра.')
         self.assertEqual(product.gallery.filter(sort_order=100).count(), 2)
+
+    def test_manual_preview_errors_are_visible_and_choices_survive(self):
+        product = Product.objects.create(
+            title='Ручной автомобиль', slug='manual', article=self.listing_id, price=777,
+        )
+        preview = self.preview()
+        data = self.submission(preview)
+        data.update(equipment_mode='replace', photo_selection=['0'], package_cover='0')
+        data.pop('confirm_replace', None)
+        response = self.client.post(self.url, data)
+        self.assertContains(response, 'Изменения не сохранены')
+        self.assertContains(response, 'href="#encar-equipment"')
+        self.assertContains(response, 'Подтвердите полную замену')
+        self.assertEqual(response.context['form']['photo_selection'].value(), ['0'])
+        self.assertContains(response, 'products/js/encar-preview.js')
+        product.refresh_from_db()
+        self.assertEqual(product.title, 'Ручной автомобиль')
+        self.assertFalse(product.import_sources.exists())
+        self.assertFalse(product.gallery.exists())
+
+    def test_choice_validation_is_attached_to_visible_control(self):
+        from apps.products.encar_import.forms import ImportForm
+        from apps.products.encar_import.parser import parse
+        from apps.products.models import AttributeType
+        kind = AttributeType.objects.create(
+            name='Тестовая характеристика', slug='test-visible-error', data_type='choice',
+        )
+        proposal = parse(self.raw)
+        proposal['specs'] = [
+            {'label': 'Коробка передач', 'value': 'Автомат', 'slugs': [kind.slug]},
+        ]
+        product = Product.objects.create(title='Ручная', slug='manual', price=1)
+        form = ImportForm(data={
+            'token': 'test', 'equipment_mode': 'keep',
+            'attr_0_apply': 'on', 'attr_0_type': str(kind.pk),
+            'attr_0_text': 'Автомат', 'attr_0_choice': '',
+        }, proposal=proposal, product=product)
+        self.assertFalse(form.is_valid())
+        self.assertIn('attr_0_choice', form.errors)
+        self.assertNotIn('attr_0_text', form.errors)
+        self.assertEqual(form.error_summary[0]['target'], 'encar-attribute-0')
+        self.assertIn('Коробка передач', form.error_summary[0]['label'])

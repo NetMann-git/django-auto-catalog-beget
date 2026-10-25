@@ -59,3 +59,14 @@
  .encar-import__actions button { width: 100%; }
  .encar-import__equipment { columns: 1; }
 }
+
+.encar-import__errors {
+    margin: 0 0 24px; padding: 20px 24px;
+    border: 2px solid #b83232; border-radius: 12px;
+    background: #fff3f3; color: #722020;
+}
+.encar-import__errors h2 { margin-top: 0; }
+.encar-import__errors a { color: #8c2020; text-decoration: underline; }
+.encar-import__errors > ul > li { margin-bottom: 12px; }
+.encar-import [id^="encar-"] { scroll-margin-top: 130px; }
+.encar-import .errorlist { font-weight: 600; overflow-wrap: anywhere; }

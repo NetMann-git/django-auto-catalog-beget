@@ -109,6 +109,30 @@ class ImportForm(forms.Form):
                               'label': spec['label'], 'incoming': spec['value'], 'current': current.get(kind.pk, '') if kind else '',
                               'fields': [self[prefix + suffix] for suffix in ('_apply', '_type', '_choice', '_text')]})
 
+    @property
+    def error_summary(self) -> list[dict]:
+        """Describe every validation error, including hidden controls."""
+        result = []
+        for name, errors in self.errors.items():
+            target = 'encar-main'
+            label = self.fields[name].label if name in self.fields else 'Общая проверка'
+            if name.startswith('attr_'):
+                index = int(name.split('_')[1])
+                target = f'encar-attribute-{index}'
+                label = 'Характеристики · ' + self.rows[index]['label'] + ' · ' + str(label)
+            elif name in ('equipment', 'equipment_mode', 'confirm_replace'):
+                target = 'encar-equipment'
+                label = 'Комплектация · ' + str(label)
+            elif name in ('photo_selection', 'package_cover', 'replace_photos'):
+                target = 'encar-photos'
+                label = 'Фотографии · ' + str(label)
+            elif name == 'token':
+                label = 'Срок действия предпросмотра'
+            else:
+                label = 'Основные данные · ' + str(label)
+            result.append({'target': target, 'label': label, 'messages': errors})
+        return result
+
     def clean(self) -> dict:
         cleaned = super().clean()
         if cleaned.get('apply_title') and not cleaned.get('title'):
@@ -139,5 +163,5 @@ class ImportForm(forms.Form):
             if form.is_valid():
                 self.attribute_forms.append(form)
             else:
-                self.add_error(prefix + '_text', ' '.join(str(message) for errors in form.errors.values() for message in errors))
+                self.add_error(prefix + ('_choice' if kind.data_type == 'choice' else '_text'), ' '.join(str(message) for errors in form.errors.values() for message in errors))
         return cleaned

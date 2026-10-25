@@ -3,6 +3,16 @@
 {% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/manage.css' %}"><link rel="stylesheet" href="{% static 'products/css/encar-import.css' %}">{% endblock %}
 {% block content %}
 <div class="encar-import">
+  {% if form.errors %}
+  <aside class="encar-import__errors" id="encar-errors" role="alert" tabindex="-1">
+    <h2>Изменения не сохранены</h2>
+    <p>Исправьте ошибки ниже и снова нажмите «Сохранить выбранные изменения». Ваш выбор сохранён в форме.</p>
+    <ul>{% for error in form.error_summary %}<li>
+      <a href="#{{ error.target }}"><strong>{{ error.label }}</strong></a>
+      <ul>{% for message in error.messages %}<li>{{ message }}</li>{% endfor %}</ul>
+    </li>{% endfor %}</ul>
+  </aside>
+  {% endif %}
   <header class="encar-import__hero">
     <span class="encar-import__eyebrow">Импорт из Encar · шаг 2 из 3</span>
     <h1>Проверьте автомобиль перед сохранением</h1>
@@ -27,7 +37,7 @@
   <form method="post">
     {% csrf_token %}{{ form.token }}{{ form.non_field_errors }}
     {% if package_token %}<input type="hidden" name="package_token" value="{{ package_token }}"><input type="hidden" name="review_token" value="{{ review_token }}">{% endif %}
-    <section class="encar-import__section">
+    <section class="encar-import__section" id="encar-main" tabindex="-1">
       <h2>1. Основные данные</h2>
       <p class="encar-import__muted">Галочка «Применить» разрешает изменение соответствующего блока. Без неё заполненные поля остаются прежними. Пустые значения не стирают данные.</p>
       <div class="encar-import__grid">
@@ -66,7 +76,7 @@
       <h2>2. Общие данные автомобиля</h2>
       <p class="encar-import__muted">Сравните значения и отметьте нужные характеристики. Для списка выберите значение из справочника; для числа или текста используйте соответствующее поле. После смены типа нажмите «Обновить предпросмотр».</p>
       <div class="encar-import__attributes">
-      {% for row in form.rows %}<fieldset>
+      {% for row in form.rows %}<fieldset id="encar-attribute-{{ forloop.counter0 }}" tabindex="-1">
         <legend>{{ row.label }}</legend>
         <div class="encar-import__compare"><div><small>Сейчас на сайте</small>{{ row.current|default:'Не заполнено / не сопоставлено' }}</div><div><small>Из файла</small><strong>{{ row.incoming }}</strong></div></div>
         <label class="encar-import__check">{{ row.fields.0 }} {{ row.fields.0.label }}</label>{{ row.fields.0.errors }}
@@ -74,17 +84,17 @@
           <summary>Настроить сопоставление и значение</summary>
           <div class="encar-import__field">{{ row.fields.1.label_tag }}{{ row.fields.1 }}{{ row.fields.1.errors }}</div>
           {% if row.data_type == 'choice' %}
-          <div class="encar-import__field">{{ row.fields.2.label_tag }}{{ row.fields.2 }}{{ row.fields.2.errors }}</div>{{ row.fields.3.as_hidden }}
+          <div class="encar-import__field">{{ row.fields.2.label_tag }}{{ row.fields.2 }}{{ row.fields.2.errors }}</div>{{ row.fields.3.as_hidden }}{{ row.fields.3.errors }}
           {% elif row.data_type == 'number' or row.data_type == 'text' %}
-          <div class="encar-import__field">{{ row.fields.3.label_tag }}{{ row.fields.3 }}{{ row.fields.3.errors }}</div>{{ row.fields.2.as_hidden }}
+          <div class="encar-import__field">{{ row.fields.3.label_tag }}{{ row.fields.3 }}{{ row.fields.3.errors }}</div>{{ row.fields.2.as_hidden }}{{ row.fields.2.errors }}
           {% else %}
-          <p class="encar-import__muted">Выберите характеристику на сайте и обновите предпросмотр, чтобы настроить значение.</p>{{ row.fields.2.as_hidden }}{{ row.fields.3.as_hidden }}
+          <p class="encar-import__muted">Выберите характеристику на сайте и обновите предпросмотр, чтобы настроить значение.</p>{{ row.fields.2.as_hidden }}{{ row.fields.2.errors }}{{ row.fields.3.as_hidden }}{{ row.fields.3.errors }}
           {% endif %}
         </details>
       </fieldset>{% empty %}<p>В файле нет характеристик для сопоставления.</p>{% endfor %}
       </div>
     </section>
-    <section class="encar-import__section">
+    <section class="encar-import__section" id="encar-equipment" tabindex="-1">
       <h2>3. Комплектация</h2>
       <p class="encar-import__muted">По умолчанию выбранные опции добавятся к имеющимся. Отсутствие кода не означает отсутствие оборудования.</p>
       <div class="encar-import__field">{{ form.equipment_mode.label_tag }}{{ form.equipment_mode }}{{ form.equipment_mode.errors }}</div>
@@ -93,7 +103,7 @@
       <div class="encar-import__equipment">{{ form.equipment }}{{ form.equipment.errors }}</div>
       <details {% if form.confirm_replace.errors %}open{% endif %}><summary>Подтверждение полной замены комплектации</summary><label class="encar-import__check">{{ form.confirm_replace }} {{ form.confirm_replace.label }}</label>{{ form.confirm_replace.errors }}<p class="encar-import__muted">Нужно только при выборе режима «Заменить набор».</p></details>
     </section>
-    {% if package_token %}<section class="encar-import__section">{% include 'products/encar_import/package_photos.html' %}</section>{% endif %}
+    {% if package_token %}<section class="encar-import__section" id="encar-photos" tabindex="-1">{% include 'products/encar_import/package_photos.html' %}</section>{% endif %}
     <p class="encar-import__muted">До подтверждения карточка не изменяется. После сохранения откроется обычный редактор автомобиля.</p>
     <div class="encar-import__actions">
       <button type="submit" name="action" value="{% if package_token %}save_package{% else %}save{% endif %}" class="btn-save">{% if product %}Сохранить выбранные изменения{% else %}Создать черновик{% endif %}</button>
@@ -103,3 +113,5 @@
   </form>
 </div>
 {% endblock %}
+
+{% block extra_js %}<script src="{% static 'products/js/encar-preview.js' %}" defer></script>{% endblock %}
