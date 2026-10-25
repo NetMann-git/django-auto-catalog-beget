@@ -1,0 +1,11 @@
+{% extends 'base.html' %}{% load static %}
+{% block title %}Выбор автомобиля для пакета Encar{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/encar-import.css' %}">{% endblock %}
+{% block content %}<div class="encar-import">
+<h1>Уточните автомобиль</h1>
+<p>Артикул {{ listing_id }} повторяется. Ниже карточки, доступные для привязки. Выберите нужную для предпросмотра. На этом шаге данные не изменяются.</p>
+<form method="post">{% csrf_token %}<input type="hidden" name="package_token" value="{{ package_token }}">
+{% for car in candidates %}<p><label><input type="radio" name="product_id" value="{{ car.pk }}" required> № {{ car.pk }} · {{ car.title }} · {{ car.price }} {{ car.currency }} · {{ car.slug }}</label> <a href="{% url 'catalog:product_edit' car.pk %}" target="_blank" rel="noopener">Проверить карточку</a></p>{% endfor %}
+<button type="submit" name="action" value="choose_product">К предпросмотру</button>
+<button type="submit" name="action" value="cancel_package" formnovalidate>Отменить</button>
+</form></div>{% endblock %}

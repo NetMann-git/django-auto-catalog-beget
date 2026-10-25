@@ -112,7 +112,7 @@ class ProductForm(AutoSlugMixin, ProductModelForm):
     def clean_article(self):
         """Keep the linked listing ID without silently taking another article."""
         article = self.cleaned_data.get('article', '')
-        if self.fields['article'].disabled and Product.objects.filter(
+        if self.fields['article'].disabled and self.instance.article != article and Product.objects.filter(
             article=article,
         ).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError(

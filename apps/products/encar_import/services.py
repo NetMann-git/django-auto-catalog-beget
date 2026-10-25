@@ -10,7 +10,7 @@ from apps.products.manager_slugs import unique_slug
 from apps.products.models import Product, VehicleImportSource
 
 
-def resolve_identity(listing_id: str, *, lock: bool = False) -> tuple:
+def resolve_identity(listing_id: str, *, lock: bool = False, selected_id=None) -> tuple:
     """Use a confirmed source first, otherwise one exact manual article match."""
     sources = VehicleImportSource.objects.filter(source='encar')
     products = Product.objects.all()
@@ -19,7 +19,14 @@ def resolve_identity(listing_id: str, *, lock: bool = False) -> tuple:
         products = products.select_for_update()
     source = sources.filter(listing_id=listing_id).first()
     if source:
+        if selected_id is not None and source.product_id != selected_id:
+            raise ValidationError('Связь Encar изменилась. Откройте предпросмотр заново.')
         return source, products.get(pk=source.product_id)
+    if selected_id is not None:
+        candidate = products.filter(pk=selected_id, article=listing_id).first()
+        if candidate is None or sources.filter(product=candidate).exists():
+            raise ValidationError('Выбранная карточка больше не подходит для привязки по артикулу.')
+        return None, candidate
     matches = list(products.filter(article=listing_id).order_by('pk')[:2])
     if len(matches) > 1:
         raise ValidationError(
@@ -48,7 +55,7 @@ def fingerprint(product) -> str:
 @transaction.atomic
 def save_import(form, proposal: dict, expected: dict) -> tuple:
     """Create a draft or modify only explicitly selected values, all-or-nothing."""
-    source, product = resolve_identity(proposal['listing_id'], lock=True)
+    source, product = resolve_identity(proposal['listing_id'], lock=True, selected_id=expected.get('selected_product_id'))
     if getattr(product, 'pk', None) != expected['product_id'] or fingerprint(product) != expected['fingerprint']:
         raise ValidationError('Карточка изменилась после предпросмотра. Загрузите файл заново и проверьте изменения.')
     if source and source.imported_at.isoformat() != expected.get('imported_at'):
@@ -73,7 +80,8 @@ def save_import(form, proposal: dict, expected: dict) -> tuple:
                 setattr(product, field, cleaned[field])
                 changed.append({'brand': 'марка', 'car_model': 'модель', 'category': 'категория'}[field])
     listing_id = proposal['listing_id']
-    if Product.objects.filter(article=listing_id).exclude(pk=product.pk).exists():
+    if (source is None and not expected.get('selected_product_id')
+            and Product.objects.filter(article=listing_id).exclude(pk=product.pk).exists()):
         raise ValidationError('Этот артикул уже занят другой карточкой. Проверьте её: автоматически объединять автомобили нельзя.')
     if product.pk and product.import_sources.filter(source='encar').exclude(listing_id=listing_id).exists():
         raise ValidationError('У карточки несколько разных ID Encar. Сначала исправьте связи источников в админке.')
@@ -109,5 +117,5 @@ def save_import(form, proposal: dict, expected: dict) -> tuple:
     if proposal['original_description']:
         source.original_description = proposal['original_description']
     source.save()
-    transaction.on_commit(CatalogCache.clear_catalog)
+    transaction.on_commit(CatalogCache.clear_catalog, robust=True)
     return product, created, changed

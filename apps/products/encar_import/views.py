@@ -20,6 +20,12 @@ SALT = 'products.encar.preview.v1'
 @require_http_methods(['GET', 'POST'])
 def import_encar(request: HttpRequest) -> HttpResponse:
     """Keep previews in signed user-bound payloads, not in product records."""
+    if request.method == 'POST' and (
+        request.POST.get('package_token') or
+        getattr(request.FILES.get('file'), 'name', '').lower().endswith('.zip')
+    ):
+        from .package_views import handle_package
+        return handle_package(request)
     upload = UploadForm(request.POST or None, request.FILES or None)
     if request.method == 'GET':
         listing_id = request.GET.get('listing_id', '').strip()

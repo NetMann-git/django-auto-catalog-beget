@@ -1,0 +1,16 @@
+<h2>Фотографии из пакета</h2>
+<p>Собран: {{ package_manifest.created_at }}. Это время сборки пакета, не получения объявления.</p>
+<p>Пакет может содержать фотографии прежних загрузок и не гарантирует полноту текущей галереи Encar. Проверьте состав. SHA-256 подтверждает целостность файлов, а не подлинность объявления.</p>
+{% if package_manifest.warnings %}<ul>{% for warning in package_manifest.warnings %}<li>{{ warning }}</li>{% endfor %}</ul>{% endif %}
+<p>Старые фото сохраняются; новые добавляются в конец. Обложка сохраняется, если вы явно не выберете другую.</p>
+{{ form.photo_selection.errors }}
+<div class="encar-package-photos">
+{% for photo in package_photos %}
+<label class="encar-package-photo">
+<img src="{% url 'catalog:package_thumbnail' package_token photo.index %}" width="240" height="180" alt="{{ photo.original_filename }}" loading="lazy">
+<span><input type="checkbox" name="photo_selection" value="{{ photo.index }}" {% if photo.selected %}checked{% endif %}>{{ photo.original_filename }}</span>
+<small>№ {{ photo.order }} · {{ photo.width }} × {{ photo.height }} · {{ photo.bytes|filesizeformat }}</small>
+</label>
+{% empty %}<p>Пакет содержит только данные, без фотографий.</p>{% endfor %}
+</div>
+<p>{{ form.package_cover.label_tag }} {{ form.package_cover }} {{ form.package_cover.errors }}</p>

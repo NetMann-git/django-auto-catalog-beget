@@ -2,6 +2,7 @@
 from django.urls import path
 from . import views, gallery_management
 from .encar_import.views import import_encar
+from .encar_import.package_views import package_thumbnail
 from . import category_management
 from . import car_model_management
 from . import attribute_management
@@ -9,6 +10,7 @@ from . import attribute_management
 app_name = "catalog"
 
 urlpatterns = [
+    path("manage/import-encar/photo/<str:token>/<int:index>/", package_thumbnail, name="package_thumbnail"),
     path("manage/import-encar/", import_encar, name="import_encar"),
     path("", views.catalog, name="catalog"),
     

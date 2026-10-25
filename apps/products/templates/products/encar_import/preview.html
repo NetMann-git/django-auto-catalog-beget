@@ -21,6 +21,11 @@
 <ul>{% for attr in current_attributes %}<li>{{ attr.attribute_type.name }}: {{ attr.attribute_value.value|default:'—' }}</li>{% endfor %}</ul>
 </details>{% endif %}
 <form method="post">{% csrf_token %}{{ form.token }}{{ form.non_field_errors }}
+{% if package_token %}
+<input type="hidden" name="package_token" value="{{ package_token }}">
+<input type="hidden" name="review_token" value="{{ review_token }}">
+{% include 'products/encar_import/package_photos.html' %}
+{% endif %}
 <h2>Основные данные из файла</h2>
 {% for field in general %}<div class="encar-import__field">{{ field.label_tag }}{{ field }}{{ field.errors }}</div>{% endfor %}
 <p>Пустые поля не стирают существующие значения. Русское описание можно отредактировать перед сохранением.</p>
@@ -35,7 +40,7 @@
 <div class="encar-import__equipment">{{ form.equipment }}{{ form.equipment.errors }}</div>
 <p>{{ form.confirm_replace }} {{ form.confirm_replace.label_tag }}{{ form.confirm_replace.errors }}</p>
 <p>Отсутствие кода не доказывает отсутствие опции. Неизвестные коды сохранятся в данных источника.</p>
-<div class="encar-import__actions"><button type="submit" name="action" value="review" formnovalidate>Обновить предпросмотр</button>
-<button type="submit" name="action" value="save" class="btn-save">{% if product %}Сохранить выбранные изменения{% else %}Создать черновик{% endif %}</button>
-<a href="{% url 'catalog:import_encar' %}">Отменить</a></div>
+<div class="encar-import__actions"><button type="submit" name="action" value="{% if package_token %}review_package{% else %}review{% endif %}" formnovalidate>Обновить предпросмотр</button>
+<button type="submit" name="action" value="{% if package_token %}save_package{% else %}save{% endif %}" class="btn-save">{% if product %}Сохранить выбранные изменения{% else %}Создать черновик{% endif %}</button>
+{% if package_token %}<button type="submit" name="action" value="cancel_package" formnovalidate>Отменить и удалить временные фото</button>{% else %}<a href="{% url 'catalog:import_encar' %}">Отменить</a>{% endif %}</div>
 </form></div>{% endblock %}

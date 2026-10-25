@@ -3,7 +3,7 @@
 {% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/manage.css' %}">{% endblock %}
 {% block content %}<div class="form-container">
 <a href="{% url 'users:manager_dashboard' %}">← В панель менеджера</a>
-<h1>Импорт из Encar</h1><p>Загрузите один car_info.json. Сначала покажем данные для проверки. После сохранения данные можно дополнить локальными фотографиями через галерею автомобиля.</p>
+<h1>Импорт из Encar</h1><p>Загрузите car_info.json или ZIP-пакет автомобиля версии 1. Сначала покажем данные для проверки. После сохранения данные можно дополнить локальными фотографиями через галерею автомобиля.</p>
 <h2>Найти автомобиль по ID Encar или артикулу</h2>
 <form method="get">
 <label for="encar-listing-id">ID исходного объявления Encar (артикул)</label>
@@ -18,7 +18,9 @@
 {% if not lookup_source %}<p>Найдена ручная карточка по точному совпадению артикула. Связь с Encar будет создана только после подтверждения импорта JSON. Фотографии можно добавить уже сейчас.</p>{% endif %}
 <p>Для выборочного обновления загрузите ниже JSON этого объявления. Перед сохранением появится сравнение данных.</p>
 {% endif %}
-<h2>Загрузить или обновить данные из JSON</h2>
+<h2>Загрузить или обновить данные из JSON / ZIP</h2>
 <form method="post" enctype="multipart/form-data">{% csrf_token %}{{ form.as_p }}
 <button type="submit" name="action" value="upload" class="btn-save">Предварительный просмотр</button></form>
 </div>{% endblock %}
+
+{% block extra_js %}<script src="{% static 'products/js/encar-package-upload.js' %}" defer></script>{% endblock %}

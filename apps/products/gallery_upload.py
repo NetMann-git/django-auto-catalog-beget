@@ -90,7 +90,7 @@ def validate_image(upload) -> tuple[bytes, str, str]:
     return data, hashlib.sha256(data).hexdigest(), extension
 
 
-def add_photo(pk: int, upload, expected: dict) -> str:
+def add_photo(pk: int, upload, expected: dict, *, journal=None) -> str:
     """Append one validated original; roll back its storage write on DB failure."""
     from django.core.files.base import ContentFile
 
@@ -114,6 +114,8 @@ def add_photo(pk: int, upload, expected: dict) -> str:
             stored_name = field.storage.save(
                 f'products/gallery/{uuid4().hex}{extension}', ContentFile(data),
             )
+            if journal is not None:
+                journal.append((field.storage, stored_name))
             photo = ProductGalleryImage.objects.create(
                 product=product, image=stored_name,
                 sort_order=0 if last is None else last + 1,

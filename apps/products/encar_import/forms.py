@@ -8,7 +8,18 @@ from .parser import MAX_BYTES, read_json
 
 
 class UploadForm(forms.Form):
-    file = forms.FileField(label='Файл автомобиля', help_text='car_info.json, UTF-8, до 1 МБ.')
+    file = forms.FileField(label='Файл автомобиля', help_text='car_info.json (до 1 МБ) или пакет encar_<ID>.zip версии 1. Большие подборки загружайте отдельным JSON и через галерею.')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from .package import maximum
+        self.fields['file'].help_text = (
+            f'car_info.json до 1 МиБ или ZIP версии 1 до {maximum() / 1024**2:g} МиБ. '
+            'Большие подборки: отдельный JSON и порционная загрузка фото в галерее.'
+        )
+        self.fields['file'].widget.attrs.update({
+            'accept': '.json,.zip', 'data-package-max-bytes': maximum(),
+        })
 
     def clean_file(self):
         uploaded = self.cleaned_data['file']
