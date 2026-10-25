@@ -91,12 +91,11 @@ class ProductForm(AutoSlugMixin, ProductModelForm):
         super().__init__(*args, **kwargs)
         if self.instance and self.instance.pk:
             self.fields['badges'].initial = self.instance.badges.all()
-            self.fields['slug'].required = True
+            self.fields['slug'].required = False
         self.fields['equipment'].queryset = self.fields['equipment'].queryset.order_by(
             F('encar_standard_code').asc(nulls_last=True), 'name', 'pk',
         )
         self.fields['slug'].widget.attrs['class'] = 'form-control'
-        self.fields['slug'].widget.attrs['data-slug-target'] = 'true'
         if self.instance.pk:
             listing_ids = list(self.instance.import_sources.filter(
                 source='encar',
@@ -109,6 +108,10 @@ class ProductForm(AutoSlugMixin, ProductModelForm):
                     'Внутренний ID автомобиля хранится отдельно.'
                 )
     
+    def clean_slug(self) -> str:
+        """Defer URL approval to the shared product form."""
+        return self.instance.slug if self.instance.pk else ''
+
     def clean_article(self):
         """Keep the linked listing ID without silently taking another article."""
         article = self.cleaned_data.get('article', '')

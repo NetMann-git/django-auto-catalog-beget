@@ -26,7 +26,7 @@ def latin_slug(value: str) -> str:
     return slugify(ascii_text)
 
 
-def unique_slug(model, title: str) -> str:
+def unique_slug(model, title: str, *, exclude_pk=None) -> str:
     """Подобрать свободный URL-код с учётом длины поля модели."""
     maximum = model._meta.get_field("slug").max_length
     base = latin_slug(title)[:maximum].strip("-")
@@ -36,7 +36,7 @@ def unique_slug(model, title: str) -> str:
         )
     candidate = base
     counter = 2
-    while model.objects.filter(slug=candidate).exists():
+    while model.objects.filter(slug=candidate).exclude(pk=exclude_pk).exists():
         suffix = f"-{counter}"
         candidate = base[:maximum - len(suffix)].rstrip("-") + suffix
         counter += 1

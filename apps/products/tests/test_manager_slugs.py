@@ -40,7 +40,7 @@ class ManagerSlugsTests(TestCase):
         self.assertTrue(manual.is_valid(), manual.errors)
         self.assertEqual(manual.save().slug, "chery-auto")
 
-    def test_product_auto_slug_preserves_existing_address_on_edit(self):
+    def test_product_auto_slug_updates_existing_address_on_edit(self):
         form = ProductForm(data={
             "title": "Чери Тигго 8 2022", "slug": "", "price": "2900000",
             "currency": "RUB", "availability_status": "in_stock",
@@ -52,10 +52,10 @@ class ManagerSlugsTests(TestCase):
         updated = ProductForm(data={
             "title": "Чери Тигго 8 2022 рестайлинг", "slug": product.slug,
             "price": "2900000", "currency": "RUB",
-            "availability_status": "in_stock",
+            "availability_status": "in_stock", "regenerate_slug": "on",
         }, instance=product)
         self.assertTrue(updated.is_valid(), updated.errors)
-        self.assertEqual(updated.save().slug, "cheri-tiggo-8-2022")
+        self.assertEqual(updated.save().slug, "cheri-tiggo-8-2022-restayling")
 
     def test_existing_type_slug_is_not_edited(self):
         kind = AttributeType.objects.create(
@@ -66,3 +66,24 @@ class ManagerSlugsTests(TestCase):
         }, instance=kind)
         self.assertTrue(form.is_valid(), form.errors)
         self.assertEqual(form.save().slug, "mileage")
+
+    def test_rename_without_approval_keeps_url_even_with_forged_slug(self):
+        product = Product.objects.create(title='Старое', slug='old-url', price=1)
+        form = ProductForm(data={
+            'title': 'Новое название', 'slug': 'forged',
+            'price': '1', 'currency': 'RUB', 'availability_status': 'in_stock',
+        }, instance=product)
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(form.save().slug, 'old-url')
+
+    def test_approved_url_is_unique_and_stable_on_repeat(self):
+        Product.objects.create(title='Другой', slug='novoe', price=1)
+        product = Product.objects.create(title='Старое', slug='old-url', price=1)
+        for _ in range(2):
+            form = ProductForm(data={
+                'title': 'Новое', 'slug': '', 'regenerate_slug': 'on',
+                'price': '1', 'currency': 'RUB', 'availability_status': 'in_stock',
+            }, instance=product)
+            self.assertTrue(form.is_valid(), form.errors)
+            product = form.save()
+            self.assertEqual(product.slug, 'novoe-2')

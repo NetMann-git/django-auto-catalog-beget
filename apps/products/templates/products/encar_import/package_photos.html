@@ -1,8 +1,19 @@
-<h2>Фотографии из пакета</h2>
-<p>Собран: {{ package_manifest.created_at }}. Это время сборки пакета, не получения объявления.</p>
+<h2>4. Фотографии · {{ package_photos|length }}</h2>
+<details><summary>Сведения о пакете и предупреждения</summary><p>Собран: {{ package_manifest.created_at }}. Это время сборки пакета, не получения объявления.</p>
 <p>Пакет может содержать фотографии прежних загрузок и не гарантирует полноту текущей галереи Encar. Проверьте состав. SHA-256 подтверждает целостность файлов, а не подлинность объявления.</p>
-{% if package_manifest.warnings %}<ul>{% for warning in package_manifest.warnings %}<li>{{ warning }}</li>{% endfor %}</ul>{% endif %}
-<p>Старые фото сохраняются; новые добавляются в конец. Обложка сохраняется, если вы явно не выберете другую.</p>
+{% if package_manifest.warnings %}<ul>{% for warning in package_manifest.warnings %}<li>{{ warning }}</li>{% endfor %}</ul>{% endif %}</details>
+<p>По умолчанию старые фото сохраняются; новые добавляются в конец. Обложка сохраняется, если вы явно не выберете другую.</p>
+{% if product %}
+<details><summary>Посмотреть текущие фотографии автомобиля</summary>
+<div class="encar-package-photos">
+{% if product.image %}<div class="encar-package-photo"><img src="{{ product.image.url }}" width="240" height="180" alt="Текущая обложка" loading="lazy"><span>Текущая обложка</span></div>{% endif %}
+{% for image in product.gallery.all %}{% if image.image and image.image.name != product.image.name %}<div class="encar-package-photo"><img src="{{ image.image.url }}" width="240" height="180" alt="Фото из текущей галереи" loading="lazy"><span>Порядок: {{ image.sort_order }}</span></div>{% endif %}{% endfor %}
+</div>
+</details>
+<div class="encar-import__danger">
+<label class="encar-import__check">{{ form.replace_photos }} {{ form.replace_photos.label }}</label>{{ form.replace_photos.errors }}
+<p class="encar-import__muted">Будут удалены все прежние фотографии, включая обложку. Останутся только отмеченные ниже. Выберите новую обложку или оставьте автоматический выбор первой фотографии. Удаление произойдёт только после успешного сохранения.</p>
+</div>{% endif %}
 {{ form.photo_selection.errors }}
 <div class="encar-package-photos">
 {% for photo in package_photos %}

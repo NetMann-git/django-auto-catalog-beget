@@ -33,6 +33,9 @@ class ImportForm(forms.Form):
     """Unchecked update switches preserve manually edited product values."""
 
     token = forms.CharField(widget=forms.HiddenInput)
+    regenerate_slug = forms.BooleanField(
+        required=False, label='Обновить URL из итогового названия',
+    )
     apply_title = forms.BooleanField(required=False, label='Применить название')
     title = forms.CharField(max_length=255, required=False, label='Название')
     apply_description = forms.BooleanField(required=False, label='Применить русское описание')
@@ -100,7 +103,10 @@ class ImportForm(forms.Form):
             if not kind or (kind.data_type == 'choice' and len(match) != 1):
                 self.warnings.append(f'{spec["label"]}: проверьте сопоставление со справочником.')
                 self.fields[prefix + '_apply'].initial = False
-            self.rows.append({'label': spec['label'], 'incoming': spec['value'], 'current': current.get(kind.pk, '') if kind else '',
+            self.rows.append({
+                              'data_type': kind.data_type if kind else '',
+                              'needs_review': not kind or (kind.data_type == 'choice' and len(match) != 1),
+                              'label': spec['label'], 'incoming': spec['value'], 'current': current.get(kind.pk, '') if kind else '',
                               'fields': [self[prefix + suffix] for suffix in ('_apply', '_type', '_choice', '_text')]})
 
     def clean(self) -> dict:

@@ -12,7 +12,11 @@ document.addEventListener('DOMContentLoaded', () => {
         ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya',
         і: 'i', ї: 'yi', є: 'ye', ґ: 'g'
     };
-    let automatic = !target.value.trim();
+    const approval = document.querySelector('[data-slug-approve]');
+    const original = target.value;
+    let automatic = approval
+        ? target.dataset.slugExisting !== 'true' || approval.checked
+        : !target.value.trim();
 
     function latinSlug(value) {
         return Array.from(value.toLowerCase(), (letter) =>
@@ -26,6 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/^-+|-+$/g, '');
     }
 
+    if (approval) approval.addEventListener('change', () => {
+        automatic = target.dataset.slugExisting !== 'true' || approval.checked;
+        target.value = automatic ? latinSlug(source.value) : original;
+    });
     source.addEventListener('input', () => {
         if (automatic) target.value = latinSlug(source.value);
     });

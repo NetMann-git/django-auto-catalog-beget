@@ -32,13 +32,17 @@ class PackageForm(ImportForm):
         widget=forms.CheckboxSelectMultiple,
     )
     package_cover = forms.ChoiceField(required=False, label='Обложка')
+    replace_photos = forms.BooleanField(
+        required=False,
+        label='Удалить старые фотографии и полностью заменить галерею выбранными',
+    )
 
     def __init__(self, *args, manifest: dict, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['photo_selection'].choices = [
             (str(i), p['original_filename']) for i, p in enumerate(manifest['photos'])
         ]
-        self.fields['package_cover'].choices = [('', 'Сохранить текущую; если её нет — первая добавленная')]
+        self.fields['package_cover'].choices = [('', 'Автоматически: текущая обложка; при замене — первое выбранное фото')]
         self.fields['package_cover'].choices += self.fields['photo_selection'].choices
         self.initial['photo_selection'] = [str(i) for i in range(len(manifest['photos']))]
         if not self.product or not self.product.image:
@@ -50,6 +54,8 @@ class PackageForm(ImportForm):
         cover = cleaned.get('package_cover', '')
         if cover and cover not in cleaned.get('photo_selection', []):
             self.add_error('package_cover', 'Для обложки отметьте эту фотографию для добавления.')
+        if cleaned.get('replace_photos') and not cleaned.get('photo_selection'):
+            self.add_error('photo_selection', 'Для замены выберите хотя бы одну фотографию.')
         return cleaned
 
 
@@ -117,6 +123,14 @@ def handle_package(request):
                 with transaction.atomic():
                     product, created, changes = save_import(form, proposal, expected)
                     selected = set(form.cleaned_data['photo_selection'])
+                    if form.cleaned_data['replace_photos']:
+                        # Signals defer physical deletion until the outer commit.
+                        # A failed upload rolls back both the gallery and cover.
+                        ProductGalleryImage.objects.filter(product=product).delete()
+                        product.image = ''
+                        product.image_sha256 = ''
+                        product.save(update_fields=['image', 'image_sha256'])
+                        changes.append('галерея полностью заменена')
                     if selected:
                         while not prepare_hashes(product.pk):
                             pass

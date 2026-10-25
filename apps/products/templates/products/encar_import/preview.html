@@ -1,46 +1,105 @@
-{% extends 'base.html' %}{% load static %}
-{% block title %}Проверка импорта Encar{% endblock %}
+{% extends 'base.html' %}{% load static price_format %}
+{% block title %}Предварительный просмотр — импорт Encar{% endblock %}
 {% block extra_css %}<link rel="stylesheet" href="{% static 'products/css/manage.css' %}"><link rel="stylesheet" href="{% static 'products/css/encar-import.css' %}">{% endblock %}
-{% block content %}<div class="encar-import">
-<h1>Проверка импорта</h1>
-{% if matched_by_article %}<p><strong>Найдена существующая ручная карточка по артикулу {{ product.article }}.</strong> При подтверждении она будет связана с этим объявлением Encar. Новая карточка не создаётся. Проверьте автомобиль и выберите только нужные изменения.</p>{% endif %}
-{% if product %}<h2>Автомобиль уже существует. Обновить данные?</h2><p><a href="{% url 'catalog:product_edit' product.pk %}">{{ product.title }}</a></p>{% else %}<p>Будет создан неопубликованный черновик.</p>{% endif %}
-{% if product %}<p><a href="{% url 'catalog:product_edit' product.pk %}#product-gallery">Добавить фотографии без изменения данных JSON</a></p>{% endif %}
-<p>После подтверждения артикул будет равен ID исходного объявления: <strong>{{ proposal.listing_id }}</strong>{% if product %} (сейчас: {{ product.article|default:'не заполнен' }}){% endif %}.</p>
-<p>Источник: <strong>Encar</strong> · Объявление: {{ proposal.listing_id }} · Внутренний ID: {{ proposal.internal_id|default:'не указан' }}</p>
-<p><a href="{{ proposal.url }}" target="_blank" rel="noopener noreferrer">Открыть исходное объявление ↗</a></p>
-<p>Получено парсером: {{ proposal.retrieved|default:'дата не распознана' }}. Время импорта будет записано после сохранения.</p>
-<p>Цена источника: {% if proposal.price != None %}{{ proposal.price }} {{ proposal.currency }}{% else %}не указана{% endif %}. Она хранится отдельно от цены продажи.</p>
-{% if form.warnings %}<aside class="encar-import__warnings"><h2>Обратите внимание</h2><ul>{% for warning in form.warnings %}<li>{{ warning }}</li>{% endfor %}</ul></aside>{% endif %}
-<details><summary>Оригинальное описание продавца (без перевода)</summary><pre>{{ proposal.original_description|default:'Описание не указано.' }}</pre></details>
-{% if product %}<details open><summary>Сейчас на сайте</summary>
-<dl><dt>Название</dt><dd>{{ product.title }}</dd><dt>Описание</dt><dd class="encar-import__text">{{ product.description|default:'Не заполнено' }}</dd>
-<dt>Цена продажи</dt><dd>{{ product.price }} {{ product.currency }}</dd>
-<dt>Марка / модель / категория</dt><dd>{{ product.brand|default:'—' }} / {{ product.car_model|default:'—' }} / {{ product.category|default:'—' }}</dd></dl>
-<p>Цена продажи, публикация, фотографии и адрес страницы сохраняются.</p>
-<ul>{% for attr in current_attributes %}<li>{{ attr.attribute_type.name }}: {{ attr.attribute_value.value|default:'—' }}</li>{% endfor %}</ul>
-</details>{% endif %}
-<form method="post">{% csrf_token %}{{ form.token }}{{ form.non_field_errors }}
-{% if package_token %}
-<input type="hidden" name="package_token" value="{{ package_token }}">
-<input type="hidden" name="review_token" value="{{ review_token }}">
-{% include 'products/encar_import/package_photos.html' %}
-{% endif %}
-<h2>Основные данные из файла</h2>
-{% for field in general %}<div class="encar-import__field">{{ field.label_tag }}{{ field }}{{ field.errors }}</div>{% endfor %}
-<p>Пустые поля не стирают существующие значения. Русское описание можно отредактировать перед сохранением.</p>
-<h2>Характеристики</h2>
-<p>Для типа «выбор из списка» укажите готовое значение. Для числовых и текстовых типов используется поле «Число или текст». После смены типа нажмите «Обновить предпросмотр».</p>
-{% for row in form.rows %}<fieldset><legend>{{ row.label }}</legend>
-<p>Сейчас: <strong>{{ row.current|default:'не заполнено / тип не сопоставлен' }}</strong> → Из файла: <strong>{{ row.incoming }}</strong></p>
-{% for field in row.fields %}<div class="encar-import__field">{{ field.label_tag }}{{ field }}{{ field.errors }}</div>{% endfor %}</fieldset>{% endfor %}
-<h2>Комплектация</h2>
-{% if product %}<details open><summary>Текущий набор (при замене невыбранные опции будут удалены)</summary><ul>{% for option in current_equipment %}<li>{{ option.name }}</li>{% empty %}<li>Ничего не выбрано</li>{% endfor %}</ul></details>{% endif %}
-<p>{{ form.equipment_mode.label_tag }} {{ form.equipment_mode }}{{ form.equipment_mode.errors }}</p>
-<div class="encar-import__equipment">{{ form.equipment }}{{ form.equipment.errors }}</div>
-<p>{{ form.confirm_replace }} {{ form.confirm_replace.label_tag }}{{ form.confirm_replace.errors }}</p>
-<p>Отсутствие кода не доказывает отсутствие опции. Неизвестные коды сохранятся в данных источника.</p>
-<div class="encar-import__actions"><button type="submit" name="action" value="{% if package_token %}review_package{% else %}review{% endif %}" formnovalidate>Обновить предпросмотр</button>
-<button type="submit" name="action" value="{% if package_token %}save_package{% else %}save{% endif %}" class="btn-save">{% if product %}Сохранить выбранные изменения{% else %}Создать черновик{% endif %}</button>
-{% if package_token %}<button type="submit" name="action" value="cancel_package" formnovalidate>Отменить и удалить временные фото</button>{% else %}<a href="{% url 'catalog:import_encar' %}">Отменить</a>{% endif %}</div>
-</form></div>{% endblock %}
+{% block content %}
+<div class="encar-import">
+  <header class="encar-import__hero">
+    <span class="encar-import__eyebrow">Импорт из Encar · шаг 2 из 3</span>
+    <h1>Проверьте автомобиль перед сохранением</h1>
+    <p class="encar-import__lead">{% if product %}Обновление карточки <strong>{{ product.title }}</strong>. Отметьте только данные, которые хотите изменить. Цена продажи и статус публикации сохранятся.{% else %}Будет создан черновик. Проверьте данные, укажите цену продажи и наличие. На сайте автомобиль появится только после публикации.{% endif %}</p>
+    <ol class="encar-import__steps"><li>1. Загрузка файла ✓</li><li aria-current="step"><strong>2. Проверка и выбор данных</strong></li><li>3. Сохранение и редактирование</li></ol>
+    {% if matched_by_article %}<p class="encar-import__muted">Найдена ручная карточка по артикулу {{ product.article }}. Она будет связана с объявлением Encar; новый автомобиль не создаётся.</p>{% endif %}
+    {% if product %}<a href="{% url 'catalog:product_edit' product.pk %}#product-gallery">Открыть существующую карточку и галерею →</a>{% endif %}
+  </header>
+  <details>
+    <summary><strong>Источник и сведения об объявлении · № {{ proposal.listing_id }}</strong></summary>
+    <dl class="encar-import__facts">
+      <div><dt>Артикул после сохранения</dt><dd>{{ proposal.listing_id }}</dd></div>
+      <div><dt>Внутренний ID Encar</dt><dd>{{ proposal.internal_id|default:'Не указан' }}</dd></div>
+      <div><dt>Получено парсером</dt><dd>{{ proposal.retrieved|default:'Дата не указана' }}</dd></div>
+      <div><dt>Цена в источнике</dt><dd>{% if proposal.price != None %}{{ proposal.price|price_format }} {{ proposal.currency }}{% else %}Не указана{% endif %}</dd></div>
+      {% if product %}<div><dt>Цена продажи — без изменений</dt><dd>{{ product.price|price_format }} {{ product.currency }}</dd></div>{% endif %}
+    </dl>
+    <p class="encar-import__muted">Цена источника хранится отдельно и не заменяет цену продажи. Время импорта записывается после подтверждения.</p>
+    {% if proposal.url %}<a href="{{ proposal.url }}" target="_blank" rel="noopener noreferrer">Открыть объявление Encar ↗</a>{% endif %}
+  </details>
+  {% if form.warnings %}<aside class="encar-import__warnings"><h2>Нужна проверка · {{ form.warnings|length }}</h2><ul>{% for warning in form.warnings %}<li>{{ warning }}</li>{% endfor %}</ul></aside>{% endif %}
+  <form method="post">
+    {% csrf_token %}{{ form.token }}{{ form.non_field_errors }}
+    {% if package_token %}<input type="hidden" name="package_token" value="{{ package_token }}"><input type="hidden" name="review_token" value="{{ review_token }}">{% endif %}
+    <section class="encar-import__section">
+      <h2>1. Основные данные</h2>
+      <p class="encar-import__muted">Галочка «Применить» разрешает изменение соответствующего блока. Без неё заполненные поля остаются прежними. Пустые значения не стирают данные.</p>
+      <div class="encar-import__grid">
+        <div class="encar-import__card">
+          <h3>Название автомобиля</h3>
+          {% if product %}<p class="encar-import__muted">Сейчас: <strong>{{ product.title }}</strong></p>{% endif %}
+          <label class="encar-import__check">{{ form.apply_title }} {{ form.apply_title.label }}</label>{{ form.apply_title.errors }}
+          <div class="encar-import__field">{{ form.title.label_tag }}{{ form.title }}{{ form.title.errors }}</div>
+          {% if product %}
+          <p class="encar-import__muted">Текущий URL: {{ product.get_absolute_url }}</p>
+          <label class="encar-import__check">{{ form.regenerate_slug }} {{ form.regenerate_slug.label }}</label>{{ form.regenerate_slug.errors }}
+          <p class="encar-import__muted">Без этой отметки адрес не изменится даже при новом названии. Если разрешить смену, старые ссылки перестанут открывать карточку.</p>
+          {% else %}<p class="encar-import__muted">URL новой карточки будет создан автоматически из названия.</p>{% endif %}
+        </div>
+        <div class="encar-import__card">
+          <h3>Марка, модель и категория</h3>
+          {% if product %}<p class="encar-import__muted">Сейчас: {{ product.brand|default:'—' }} / {{ product.car_model|default:'—' }} / {{ product.category|default:'—' }}</p>{% endif %}
+          <label class="encar-import__check">{{ form.apply_identity }} {{ form.apply_identity.label }}</label>{{ form.apply_identity.errors }}
+          <div class="encar-import__field">{{ form.brand.label_tag }}{{ form.brand }}{{ form.brand.errors }}</div>
+          <div class="encar-import__field">{{ form.car_model.label_tag }}{{ form.car_model }}{{ form.car_model.errors }}</div>
+          <div class="encar-import__field">{{ form.category.label_tag }}{{ form.category }}{{ form.category.errors }}</div>
+        </div>
+      </div>
+      {% if not product %}<div class="encar-import__grid">
+        <div class="encar-import__field">{{ form.price.label_tag }}{{ form.price }}{{ form.price.errors }}</div>
+        <div class="encar-import__field">{{ form.availability.label_tag }}{{ form.availability }}{{ form.availability.errors }}</div>
+      </div>{% endif %}
+      <h3>Описание</h3>
+      <label class="encar-import__check">{{ form.apply_description }} {{ form.apply_description.label }}</label>{{ form.apply_description.errors }}
+      <div class="encar-import__field">{{ form.description.label_tag }}{{ form.description }}{{ form.description.errors }}</div>
+      <p class="encar-import__muted">Проверьте перевод или вставьте свой русский текст.</p>
+      {% if product %}<details><summary>Текущее описание на сайте</summary><div class="encar-import__text">{{ product.description|default:'Не заполнено' }}</div></details>{% endif %}
+      <details><summary>Оригинальное описание продавца</summary><pre>{{ proposal.original_description|default:'Описание не указано' }}</pre></details>
+    </section>
+    <section class="encar-import__section">
+      <h2>2. Общие данные автомобиля</h2>
+      <p class="encar-import__muted">Сравните значения и отметьте нужные характеристики. Для списка выберите значение из справочника; для числа или текста используйте соответствующее поле. После смены типа нажмите «Обновить предпросмотр».</p>
+      <div class="encar-import__attributes">
+      {% for row in form.rows %}<fieldset>
+        <legend>{{ row.label }}</legend>
+        <div class="encar-import__compare"><div><small>Сейчас на сайте</small>{{ row.current|default:'Не заполнено / не сопоставлено' }}</div><div><small>Из файла</small><strong>{{ row.incoming }}</strong></div></div>
+        <label class="encar-import__check">{{ row.fields.0 }} {{ row.fields.0.label }}</label>{{ row.fields.0.errors }}
+        <details {% if row.needs_review or row.fields.1.errors or row.fields.2.errors or row.fields.3.errors %}open{% endif %}>
+          <summary>Настроить сопоставление и значение</summary>
+          <div class="encar-import__field">{{ row.fields.1.label_tag }}{{ row.fields.1 }}{{ row.fields.1.errors }}</div>
+          {% if row.data_type == 'choice' %}
+          <div class="encar-import__field">{{ row.fields.2.label_tag }}{{ row.fields.2 }}{{ row.fields.2.errors }}</div>{{ row.fields.3.as_hidden }}
+          {% elif row.data_type == 'number' or row.data_type == 'text' %}
+          <div class="encar-import__field">{{ row.fields.3.label_tag }}{{ row.fields.3 }}{{ row.fields.3.errors }}</div>{{ row.fields.2.as_hidden }}
+          {% else %}
+          <p class="encar-import__muted">Выберите характеристику на сайте и обновите предпросмотр, чтобы настроить значение.</p>{{ row.fields.2.as_hidden }}{{ row.fields.3.as_hidden }}
+          {% endif %}
+        </details>
+      </fieldset>{% empty %}<p>В файле нет характеристик для сопоставления.</p>{% endfor %}
+      </div>
+    </section>
+    <section class="encar-import__section">
+      <h2>3. Комплектация</h2>
+      <p class="encar-import__muted">По умолчанию выбранные опции добавятся к имеющимся. Отсутствие кода не означает отсутствие оборудования.</p>
+      <div class="encar-import__field">{{ form.equipment_mode.label_tag }}{{ form.equipment_mode }}{{ form.equipment_mode.errors }}</div>
+      {% if product %}<details><summary>Уже выбрано на сайте · {{ current_equipment|length }}</summary><ul class="encar-import__equipment">{% for option in current_equipment %}<li>{{ option.name }}</li>{% empty %}<li>Ничего не выбрано</li>{% endfor %}</ul></details>{% endif %}
+      <h3>Распознанные опции из файла</h3>
+      <div class="encar-import__equipment">{{ form.equipment }}{{ form.equipment.errors }}</div>
+      <details {% if form.confirm_replace.errors %}open{% endif %}><summary>Подтверждение полной замены комплектации</summary><label class="encar-import__check">{{ form.confirm_replace }} {{ form.confirm_replace.label }}</label>{{ form.confirm_replace.errors }}<p class="encar-import__muted">Нужно только при выборе режима «Заменить набор».</p></details>
+    </section>
+    {% if package_token %}<section class="encar-import__section">{% include 'products/encar_import/package_photos.html' %}</section>{% endif %}
+    <p class="encar-import__muted">До подтверждения карточка не изменяется. После сохранения откроется обычный редактор автомобиля.</p>
+    <div class="encar-import__actions">
+      <button type="submit" name="action" value="{% if package_token %}save_package{% else %}save{% endif %}" class="btn-save">{% if product %}Сохранить выбранные изменения{% else %}Создать черновик{% endif %}</button>
+      <button type="submit" name="action" value="{% if package_token %}review_package{% else %}review{% endif %}" formnovalidate>Обновить предпросмотр</button>
+      {% if package_token %}<button type="submit" name="action" value="cancel_package" formnovalidate>Отменить импорт</button>{% else %}<a href="{% url 'catalog:import_encar' %}">Отменить импорт</a>{% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -48,6 +48,7 @@ def fingerprint(product) -> str:
         return ''
     state = {'fields': {field.attname: str(getattr(product, field.attname)) for field in product._meta.fields},
              'equipment': sorted(product.equipment.values_list('pk', flat=True)),
+             'gallery': list(product.gallery.order_by('pk').values_list('pk', 'image', 'sort_order')),
              'attributes': list(product.attributes.order_by('pk').values_list('pk', 'attribute_type_id', 'attribute_value_id', 'sort_order'))}
     return hashlib.sha256(json.dumps(state, sort_keys=True).encode()).hexdigest()
 
@@ -88,6 +89,11 @@ def save_import(form, proposal: dict, expected: dict) -> tuple:
     if product.article != listing_id:
         product.article = listing_id
         changed.append('артикул (ID исходного объявления Encar)')
+    if created or cleaned.get('regenerate_slug'):
+        previous_slug = product.slug
+        product.slug = unique_slug(Product, product.title, exclude_pk=product.pk)
+        if product.slug != previous_slug:
+            changed.append('URL (по подтверждению)')
     product.full_clean()
     product.save()
     for attr_form in form.attribute_forms:

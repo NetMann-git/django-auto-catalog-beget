@@ -297,3 +297,96 @@ class EncarPackageTests(TestCase):
         self.assertEqual(self.preview().status_code, 302)
         self.assertEqual(self.client.get(reverse('catalog:package_thumbnail', args=[token, 0])).status_code, 302)
         self.assertFalse(Product.objects.exists())
+
+    def test_replace_gallery_commits_files_only_after_success(self):
+        self.save(self.preview())
+        product = Product.objects.get()
+        old_names = list(product.gallery.values_list('image', flat=True))
+        storage = product.image.storage
+        preview = self.preview(photos=[picture('green', 'PNG')])
+        data = self.submission(preview)
+        data['replace_photos'] = 'on'
+        data['package_cover'] = ''
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, 302)
+        product.refresh_from_db()
+        self.assertEqual(product.gallery.count(), 1)
+        self.assertEqual(product.image.name, product.gallery.get().image.name)
+        self.assertTrue(product.image.name.endswith('.png'))
+        self.assertTrue(storage.exists(product.image.name))
+        self.assertTrue(all(not storage.exists(name) for name in old_names))
+
+    def test_replace_gallery_failure_keeps_old_cover_and_files(self):
+        self.save(self.preview())
+        product = Product.objects.get()
+        cover = product.image.name
+        old_names = list(product.gallery.values_list('image', flat=True))
+        preview = self.preview(photos=[picture('green'), picture('yellow')])
+        data = self.submission(preview)
+        data['replace_photos'] = 'on'
+        original = ProductGalleryImage.objects.create
+        calls = 0
+
+        def fail_second(**kwargs):
+            nonlocal calls
+            calls += 1
+            if calls == 2:
+                raise IntegrityError('replacement failed')
+            return original(**kwargs)
+
+        with self.captureOnCommitCallbacks(execute=True):
+            with patch.object(ProductGalleryImage.objects, 'create', side_effect=fail_second):
+                response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, 200)
+        product.refresh_from_db()
+        self.assertEqual(product.image.name, cover)
+        self.assertEqual(list(product.gallery.values_list('image', flat=True)), old_names)
+        self.assertTrue(all(product.image.storage.exists(name) for name in old_names))
+        actual = [p for p in Path(self.tmp.name, 'media').rglob('*') if p.is_file()]
+        self.assertEqual(len(actual), len(set(old_names)))
+
+    def test_replace_requires_selected_photo_and_preview_is_read_only(self):
+        self.save(self.preview())
+        product = Product.objects.get()
+        old_names = list(product.gallery.values_list('image', flat=True))
+        preview = self.preview()
+        data = self.submission(preview)
+        data.update(replace_photos='on', photo_selection=[], package_cover='')
+        response = self.client.post(self.url, data)
+        self.assertContains(response, 'Для замены выберите хотя бы одну фотографию.')
+        self.assertEqual(list(product.gallery.values_list('image', flat=True)), old_names)
+
+    def test_import_slug_requires_separate_approval(self):
+        product = Product.objects.create(
+            title='Ручное название', slug='manual-url',
+            article=self.listing_id, price=1,
+        )
+        self.save(self.preview(photos=[]))
+        product.refresh_from_db()
+        self.assertEqual(product.slug, 'manual-url')
+        preview = self.preview(photos=[])
+        data = self.submission(preview)
+        data.update(apply_title='on', title='Новый автомобиль')
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, 302)
+        product.refresh_from_db()
+        self.assertEqual(product.slug, 'manual-url')
+        preview = self.preview(photos=[])
+        data = self.submission(preview)
+        data['regenerate_slug'] = 'on'
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, 302)
+        product.refresh_from_db()
+        self.assertEqual(product.slug, 'novyy-avtomobil')
+
+    def test_gallery_changes_invalidate_replace_preview(self):
+        self.save(self.preview())
+        product = Product.objects.get()
+        preview = self.preview()
+        data = self.submission(preview)
+        data['replace_photos'] = 'on'
+        product.gallery.update(sort_order=100)
+        response = self.client.post(self.url, data)
+        self.assertContains(response, 'Карточка изменилась после предпросмотра.')
+        self.assertEqual(product.gallery.filter(sort_order=100).count(), 2)

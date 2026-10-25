@@ -135,7 +135,7 @@ class ProductAdmin(admin.ModelAdmin):
         "short_description",
         "description",
     )
-    prepopulated_fields = {"slug": ("title",)}
+    prepopulated_fields = {}
     filter_horizontal = ("badges",)
     view_on_site = False
 
@@ -147,6 +147,7 @@ class ProductAdmin(admin.ModelAdmin):
                 "fields": (
                     "title",
                     "slug",
+                    "regenerate_slug",
                     "article",
                     "category",
                     "brand",
