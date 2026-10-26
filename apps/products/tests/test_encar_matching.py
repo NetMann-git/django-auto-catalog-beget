@@ -91,3 +91,41 @@ class EncarMatchingTests(TestCase):
         self.assertTrue(form.is_valid(), form.errors)
         self.assertEqual(form.attribute_forms, [])
         self.assertFalse(self.product.attributes.exists())
+
+    def test_custom_slug_matches_type_and_value_in_initial_preview(self):
+        kind = AttributeType.objects.create(
+            name='Тип кузова', slug='tip-kuzova', data_type='choice',
+        )
+        for incoming in ('SUV', 'Компактный класс'):
+            value = AttributeValue.objects.create(attribute_type=kind, value=incoming)
+            self.proposal['specs'] = [
+                {'label': 'Тип кузова', 'value': incoming, 'slugs': ['body_type']},
+            ]
+            form = ImportForm(proposal=self.proposal, product=self.product, token='test')
+            self.assertEqual(form['attr_0_type'].value(), kind.pk)
+            self.assertEqual(form['attr_0_choice'].value(), value.pk)
+
+    def test_custom_slug_and_empty_posted_type_are_resolved(self):
+        kind = AttributeType.objects.create(
+            name='Тип кузова', slug='my-body', data_type='choice',
+        )
+        value = AttributeValue.objects.create(attribute_type=kind, value='Компактный класс')
+        self.proposal['specs'] = [
+            {'label': 'Тип кузова', 'value': 'Компактный класс', 'slugs': ['body_type']},
+        ]
+        form = ImportForm(data={
+            'token': 'test', 'equipment_mode': 'keep', 'attr_0_apply': 'on',
+            'attr_0_type': '', 'attr_0_choice': '',
+        }, proposal=self.proposal, product=self.product)
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(form.cleaned_data['attr_0_type'], kind)
+        self.assertEqual(form.cleaned_data['attr_0_choice'], value)
+
+    def test_duplicate_type_names_are_not_guessed(self):
+        for slug, name in (('custom-one', 'Тип кузова'), ('custom-two', 'Тип  кузова')):
+            AttributeType.objects.create(name=name, slug=slug, data_type='choice')
+        self.proposal['specs'] = [
+            {'label': 'Тип кузова', 'value': 'SUV', 'slugs': ['body_type']},
+        ]
+        form = ImportForm(proposal=self.proposal, product=self.product, token='test')
+        self.assertIsNone(form['attr_0_type'].value())

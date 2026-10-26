@@ -97,9 +97,17 @@ class ImportForm(forms.Form):
             self.warnings.append('Марка не сопоставлена однозначно. Выберите её вручную или оставьте пустой.')
         current = {a.attribute_type_id: a.attribute_value.value if a.attribute_value else ''
                    for a in product.attributes.select_related('attribute_value')} if existing else {}
+        attribute_types = list(AttributeType.objects.all())
         for index, spec in enumerate(proposal['specs']):
             prefix = f'attr_{index}'
-            kinds = list(AttributeType.objects.filter(slug__in=spec['slugs'])[:2])
+            kinds = [item for item in attribute_types if item.slug in spec['slugs']]
+            if not kinds:
+                # Manager-created types have transliterated or custom slugs.
+                # A unique exact label is safe; ambiguous labels need review.
+                kinds = [
+                    item for item in attribute_types
+                    if normalize_choice(item.name) == normalize_choice(spec['label'])
+                ]
             kind = kinds[0] if len(kinds) == 1 else None
             posted = self.data.get(prefix + '_type') if self.is_bound else None
             if self.is_bound:
