@@ -1,10 +1,17 @@
 """Explicit manager choices for a single JSON import."""
+import unicodedata
+
 from django import forms
 
 from apps.products.constants import AVAILABILITY_CHOICES
 from apps.products.models import AttributeType, AttributeValue, Brand, CarModel, Category, EquipmentOption
 from apps.products.product_attribute_forms import ProductAttributeForm
 from .parser import MAX_BYTES, read_json
+
+
+def normalize_choice(value: str) -> str:
+    """Compare labels consistently on SQLite/MySQL without guessing synonyms."""
+    return ' '.join(unicodedata.normalize('NFC', str(value)).split()).casefold()
 
 
 class UploadForm(forms.Form):
@@ -77,6 +84,9 @@ class ImportForm(forms.Form):
             self.fields['price'].required = True
             self.fields['availability'].required = True
             self.fields['title'].required = True
+        # QueryDict is immutable; never modify request.POST itself.
+        if self.is_bound:
+            self.data = self.data.copy()
         self.rows = []
         self.warnings = list(proposal['warnings'])
         recognized_codes = set(recognized.values_list('encar_standard_code', flat=True))
@@ -93,12 +103,24 @@ class ImportForm(forms.Form):
             kind = kinds[0] if len(kinds) == 1 else None
             posted = self.data.get(prefix + '_type') if self.is_bound else None
             if self.is_bound:
-                kind = AttributeType.objects.filter(pk=posted).first() if posted and posted.isascii() and posted.isdigit() and len(posted) < 19 else None
+                if posted:
+                    kind = AttributeType.objects.filter(pk=posted).first() if posted.isascii() and posted.isdigit() and len(posted) < 19 else None
+                elif kind:
+                    self.data[prefix + '_type'] = str(kind.pk)
             self.fields[prefix + '_apply'] = forms.BooleanField(required=False, label='Применить', initial=not existing and kind is not None)
             self.fields[prefix + '_type'] = forms.ModelChoiceField(queryset=AttributeType.objects.all(), required=False, label='Характеристика на сайте', initial=kind)
             self.fields[prefix + '_text'] = forms.CharField(required=False, max_length=255, label='Число или текст', initial=spec['value'])
             choices = AttributeValue.objects.filter(attribute_type=kind) if kind else AttributeValue.objects.none()
-            match = list(choices.filter(value__iexact=spec['value'])[:2])
+            match = [
+                value for value in choices
+                if normalize_choice(value.value) == normalize_choice(spec['value'])
+            ] if kind and kind.data_type == 'choice' else []
+            if self.is_bound and kind:
+                if kind.data_type == 'choice':
+                    if not self.data.get(prefix + '_choice') and len(match) == 1:
+                        self.data[prefix + '_choice'] = str(match[0].pk)
+                elif not str(self.data.get(prefix + '_text', '')).strip():
+                    self.data[prefix + '_text'] = spec['value']
             self.fields[prefix + '_choice'] = forms.ModelChoiceField(queryset=choices, required=False, label='Значение из справочника (для типа «выбор»)', initial=match[0] if len(match) == 1 else None)
             if not kind or (kind.data_type == 'choice' and len(match) != 1):
                 self.warnings.append(f'{spec["label"]}: проверьте сопоставление со справочником.')
