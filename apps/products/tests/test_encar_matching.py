@@ -129,3 +129,38 @@ class EncarMatchingTests(TestCase):
         ]
         form = ImportForm(proposal=self.proposal, product=self.product, token='test')
         self.assertIsNone(form['attr_0_type'].value())
+
+    def test_source_codes_match_without_matching_display_names(self):
+        for source_key, slug, name, data_type in (
+            ('registration_year_month', 'registration_year_month', 'Год и месяц регистрации', 'text'),
+            ('body_type_original', 'body_type_original', 'Классификация автомобиля', 'choice'),
+        ):
+            with self.subTest(slug=slug):
+                kind = AttributeType.objects.create(name=name, slug=slug, data_type=data_type)
+                spec = next(item for item in self.proposal['specs'] if item['key'] == source_key)
+                proposal = {**self.proposal, 'specs': [spec]}
+                value = None
+                if data_type == 'choice':
+                    value = AttributeValue.objects.create(attribute_type=kind, value=spec['value'])
+                preview = ImportForm(proposal=proposal, product=self.product, token='test')
+                self.assertEqual(preview['attr_0_type'].value(), kind.pk)
+                if value:
+                    self.assertEqual(preview['attr_0_choice'].value(), value.pk)
+                form = ImportForm(data={
+                    'token': 'test', 'equipment_mode': 'keep', 'attr_0_apply': 'on',
+                    'attr_0_type': '', 'attr_0_choice': '', 'attr_0_text': '',
+                }, proposal=proposal, product=self.product)
+                self.assertTrue(form.is_valid(), form.errors)
+                attr = form.attribute_forms[0].save(commit=False)
+                attr.product = self.product
+                attr.save()
+                self.assertEqual(attr.attribute_type, kind)
+                self.assertEqual(attr.attribute_value.value, spec['value'])
+
+    def test_old_and_new_codes_together_require_manual_selection(self):
+        for slug in ('registration_date', 'registration_year_month'):
+            AttributeType.objects.create(name=slug, slug=slug, data_type='text')
+        spec = next(item for item in self.proposal['specs'] if item['key'] == 'registration_year_month')
+        proposal = {**self.proposal, 'specs': [spec]}
+        form = ImportForm(proposal=proposal, product=self.product, token='test')
+        self.assertIsNone(form['attr_0_type'].value())

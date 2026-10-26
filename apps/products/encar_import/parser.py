@@ -115,14 +115,14 @@ def parse(raw: dict) -> dict:
     specs = []
     definitions = [
         ('model_year', 'Год выпуска', ('year',), False),
-        ('registration_year_month', 'Первая регистрация', ('registration_date',), False),
+        ('registration_year_month', 'Первая регистрация', ('registration_date', 'registration_year_month'), False),
         ('mileage_km', 'Пробег, км', ('mileage',), True),
         ('engine_displacement_cc', 'Объём двигателя, л', ('engine_volume',), True),
         ('fuel_original', 'Тип топлива', ('engine_type', 'fuel_type'), False),
         ('transmission_original', 'Коробка передач', ('transmission',), False),
         ('color_original', 'Цвет', ('color',), False),
         ('seats', 'Количество мест', ('seats',), True),
-        ('body_type_original', 'Тип кузова', ('body_type',), False),
+        ('body_type_original', 'Тип кузова', ('body_type', 'body_type_original'), False),
     ]
     for key, label, slugs, numeric in definitions:
         value = text(ru.get(key) or vehicle.get(key))
