@@ -22,7 +22,24 @@ from .notifications import (
 )
 
 
-class AppointmentModelTests(TestCase):
+class OfflineNotificationsTestCase(TestCase):
+    """Keep this test module independent of real credentials and HTTP services."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.enterClassContext(override_settings(
+            EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
+        ))
+        cls.enterClassContext(patch(
+            'requests.sessions.Session.request',
+            side_effect=AssertionError(
+                'Unexpected HTTP request in appointments tests; mock the service.',
+            ),
+        ))
+
+
+class AppointmentModelTests(OfflineNotificationsTestCase):
 
     @classmethod
     def setUpTestData(cls):
@@ -79,7 +96,7 @@ class AppointmentModelTests(TestCase):
         self.assertEqual(Appointment.objects.count(), 1)
 
 
-class AvailableSlotsTests(TestCase):
+class AvailableSlotsTests(OfflineNotificationsTestCase):
 
     @classmethod
     def setUpTestData(cls):
@@ -143,8 +160,11 @@ class AvailableSlotsTests(TestCase):
 
         self.assertTrue(free_slot["available"])
 
-class CallbackRequestTests(TestCase):
-    def test_callback_request_is_saved(self):
+class CallbackRequestTests(OfflineNotificationsTestCase):
+    @patch('apps.appointments.views.send_max_notification')
+    @patch('apps.appointments.views.send_telegram_notification')
+    @patch('apps.appointments.views.send_email_notification')
+    def test_callback_request_is_saved(self, email, telegram, max_message):
         response = self.client.post(
             '/appointments/callback-submit/',
             {'name': 'Иван', 'phone': '+7 (999) 123-45-67'},
@@ -161,6 +181,9 @@ class CallbackRequestTests(TestCase):
         self.assertEqual(callback.name, 'Иван')
         self.assertEqual(callback.phone, '+7 (999) 123-45-67')
         self.assertEqual(callback.source, 'homepage')
+        email.assert_called_once_with(callback)
+        telegram.assert_called_once_with(callback)
+        max_message.assert_called_once_with(callback)
 
     def test_callback_request_rejects_invalid_phone(self):
         response = self.client.post(
@@ -186,7 +209,7 @@ class CallbackRequestTests(TestCase):
         self.assertEqual(CallbackRequest.objects.count(), 0)
 
 
-class CarInquiryTests(TestCase):
+class CarInquiryTests(OfflineNotificationsTestCase):
     """Запрос расчёта сохраняет контакт и выбранный автомобиль."""
 
     @classmethod
@@ -394,7 +417,7 @@ class CarInquiryTests(TestCase):
     DEFAULT_FROM_EMAIL="site@example.com",
     MANAGER_EMAILS=["manager1@example.com", "manager2@example.com"],
 )
-class CallbackEmailNotificationTests(TestCase):
+class CallbackEmailNotificationTests(OfflineNotificationsTestCase):
     def test_send_email_notification(self):
         callback = CallbackRequest.objects.create(
             name="Иван",
@@ -442,7 +465,7 @@ class CallbackEmailNotificationTests(TestCase):
     TELEGRAM_BOT_TOKEN="test-token",
     TELEGRAM_MANAGER_CHAT_ID="123456789",
 )
-class CallbackTelegramNotificationTests(TestCase):
+class CallbackTelegramNotificationTests(OfflineNotificationsTestCase):
     @override_settings(TELEGRAM_MANAGER_CHAT_ID="111, 222, 111")
     @patch("apps.appointments.notifications.requests.post")
     def test_sends_to_each_unique_chat(self, mocked_post):
@@ -515,7 +538,7 @@ class CallbackTelegramNotificationTests(TestCase):
     MAX_BOT_TOKEN="max-test-token",
     MAX_MANAGER_CHAT_ID="987654321",
 )
-class CallbackMaxNotificationTests(TestCase):
+class CallbackMaxNotificationTests(OfflineNotificationsTestCase):
     @patch("apps.appointments.notifications.requests.post")
     def test_send_max_notification(self, mocked_post):
         mocked_post.return_value.raise_for_status.return_value = None
@@ -560,3 +583,16 @@ class CallbackMaxNotificationTests(TestCase):
 
         self.assertFalse(result)
         self.assertTrue(CallbackRequest.objects.filter(pk=callback.pk).exists())
+
+
+class NotificationIsolationTests(OfflineNotificationsTestCase):
+    def test_unmocked_http_is_blocked_before_connecting(self):
+        with self.assertRaisesMessage(AssertionError, 'Unexpected HTTP request'):
+            requests.get('https://example.invalid/no-network', timeout=1)
+
+    def test_email_backend_is_local(self):
+        from django.conf import settings
+        self.assertEqual(
+            settings.EMAIL_BACKEND,
+            'django.core.mail.backends.locmem.EmailBackend',
+        )
