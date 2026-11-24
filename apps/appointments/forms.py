@@ -1,5 +1,7 @@
 # apps/appointments/forms.py
 
+import re
+
 from django import forms
 from .models import Appointment, CallbackRequest
 
@@ -61,7 +63,9 @@ class CallbackRequestForm(forms.ModelForm):
 
     def clean_phone(self):
         phone = self.cleaned_data.get('phone', '').strip()
-        digits = ''.join(ch for ch in phone if ch.isdigit())
+        if not re.fullmatch(r'\+?[0-9() .\-]+', phone):
+            raise forms.ValidationError('Введите телефон цифрами, например +7 (999) 123-45-67.')
+        digits = ''.join(ch for ch in phone if ch in '0123456789')
         if len(digits) < 10:
             raise forms.ValidationError('Введите корректный номер телефона.')
         if len(digits) > 15:
@@ -74,6 +78,13 @@ class CarInquiryForm(CallbackRequestForm):
 
     name = forms.CharField(max_length=100, label='Ваше имя')
     city = forms.CharField(max_length=120, label='Город доставки')
+    comment = forms.CharField(
+        required=False, max_length=2000, label='Комментарий (необязательно)',
+        widget=forms.Textarea(attrs={
+            'rows': 3, 'maxlength': 2000,
+            'placeholder': 'Ваши вопросы об автомобиле (необязательно)',
+        }),
+    )
 
     class Meta:
         model = CallbackRequest

@@ -43,6 +43,7 @@
 
     form.addEventListener('submit', function (event) {
         event.preventDefault();
+        if (submitButton && submitButton.disabled) return;
         clearErrors();
 
         var phone = form.querySelector('[name="phone"]');

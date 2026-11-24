@@ -22,6 +22,7 @@ from django.template.loader import render_to_string
 
 from datetime import datetime, timedelta
 from .models import Appointment, CallbackRequest, WorkingHours
+from .lead_guard import LeadRateLimited, save_lead
 
 
 @require_http_methods(['GET', 'POST'])
@@ -31,6 +32,7 @@ def car_inquiry(request, product_id):
     is_order = request.GET.get('type') == 'order'
     is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
     form = CarInquiryForm(request.POST if request.method == 'POST' else None)
+    retry_after = None
 
     if request.method == 'POST':
         # Невидимое поле не мешает посетителю, но отсекает простых ботов.
@@ -43,30 +45,39 @@ def car_inquiry(request, product_id):
             inquiry = form.save(commit=False)
             inquiry.product = product
             inquiry.source = 'product_order' if is_order else 'product_detail'
-            inquiry.save()
-            send_email_notification(inquiry)
-            send_telegram_notification(inquiry)
-            send_max_notification(inquiry)
+            try:
+                created = save_lead(request, inquiry)
+            except LeadRateLimited as error:
+                form.add_error(None, str(error))
+                retry_after = error.retry_after
+            else:
+                if created:
+                    send_email_notification(inquiry)
+                    send_telegram_notification(inquiry)
+                    send_max_notification(inquiry)
 
-            message = 'Заявка получена. Менеджер свяжется с вами.'
-            if is_ajax:
-                return JsonResponse({'success': True, 'message': message})
-            if is_order:
-                request.session['car_order_success_product_id'] = product.pk
+                message = 'Заявка получена. Менеджер свяжется с вами.'
+                if is_ajax:
+                    return JsonResponse({'success': True, 'message': message})
+                if is_order:
+                    request.session['car_order_success_product_id'] = product.pk
+                    return redirect(product.get_absolute_url())
+                messages.success(request, message)
                 return redirect(product.get_absolute_url())
-            messages.success(request, message)
-            return redirect(product.get_absolute_url())
 
     template = (
         'appointments/_car_inquiry_form.html'
         if is_ajax else 'appointments/car_inquiry_page.html'
     )
-    return render(
+    response = render(
         request,
         template,
         {'form': form, 'product': product, 'is_order': is_order},
-        status=400 if request.method == 'POST' else 200,
+        status=429 if retry_after else (400 if request.method == 'POST' else 200),
     )
+    if retry_after:
+        response['Retry-After'] = str(retry_after)
+    return response
 
 
 def get_available_slots(request, date):
@@ -217,12 +228,23 @@ def callback_submit(request):
     if form.is_valid():
         callback = form.save(commit=False)
         callback.source = 'homepage'
-        callback.save()
+        try:
+            created = save_lead(request, callback)
+        except LeadRateLimited as error:
+            if is_ajax:
+                response = JsonResponse({
+                    'success': False, 'message': str(error), 'errors': {},
+                }, status=429)
+                response['Retry-After'] = str(error.retry_after)
+                return response
+            messages.error(request, str(error))
+            return redirect(f"{reverse('home')}#callback")
 
         # Заявка уже сохранена в БД. Ошибка SMTP не влияет на результат формы.
-        send_email_notification(callback)
-        send_telegram_notification(callback)
-        send_max_notification(callback)
+        if created:
+            send_email_notification(callback)
+            send_telegram_notification(callback)
+            send_max_notification(callback)
 
         message = 'Спасибо! Заявка принята. Мы свяжемся с вами в ближайшее время.'
         if is_ajax:

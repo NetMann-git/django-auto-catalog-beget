@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault();
         const form = event.target;
         const button = form.querySelector('[type="submit"]');
+        if (button.disabled) return;
         button.disabled = true;
         try {
             const data = new FormData(form);
@@ -63,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers,
                 body: data,
             });
-            if (response.status === 400) {
+            if (response.status === 400 || response.status === 429) {
                 content.innerHTML = await response.text();
                 return;
             }

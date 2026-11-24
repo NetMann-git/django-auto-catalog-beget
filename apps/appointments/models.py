@@ -170,3 +170,15 @@ class CallbackRequest(models.Model):
 
     def __str__(self):
         return f'{self.name or "Без имени"} — {self.phone}'
+
+
+class LeadGuardBucket(models.Model):
+    """Shared short-lived counters; keys contain HMACs, not raw contacts."""
+
+    key = models.CharField(max_length=64, primary_key=True)
+    started_at = models.DateTimeField()
+    count = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        verbose_name = 'Счётчик защиты заявок'
+        verbose_name_plural = 'Счётчики защиты заявок'
