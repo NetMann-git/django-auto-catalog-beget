@@ -64,6 +64,7 @@
     <link rel="stylesheet" href="{% static 'css/scroll-to-top.css' %}">
     <link rel="stylesheet" href="{% static 'css/carstar-footer.css' %}?v=82-63">
     <link rel="stylesheet" href="{% static 'appointments/css/footer-callback.css' %}?v=82-65">
+    <link rel="stylesheet" href="{% static 'css/site-tooltips.css' %}?v=82-71">
 </head>
 
 <body class="sticky-header {% block body_class %}{% endblock %}{% block body_theme_class %} {{ current_theme }}-theme{% endblock %}">
@@ -137,5 +138,6 @@
     {% endblock %}
     {% include 'appointments/_footer_callback.html' %}
     <script src="{% static 'appointments/js/footer-callback.js' %}?v=82-67" defer></script>
+    <script src="{% static 'js/site-tooltips.js' %}?v=82-71" defer></script>
 </body>
 </html>

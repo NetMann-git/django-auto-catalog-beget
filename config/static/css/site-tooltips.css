@@ -1,0 +1,22 @@
+/* Isolated shared tooltip; no changes to links or button layout. */
+.carstar-tooltip {
+    position: fixed;
+    z-index: 2147483647;
+    box-sizing: border-box;
+    width: max-content;
+    max-width: min(300px, calc(100vw - 24px));
+    margin: 0;
+    padding: 9px 13px;
+    border: 1px solid #d5a357;
+    border-radius: 9px;
+    background: #16232f;
+    color: #fff;
+    font: 400 13px/1.45 Arial, sans-serif;
+    text-align: left;
+    text-transform: none;
+    letter-spacing: normal;
+    overflow-wrap: anywhere;
+    box-shadow: 0 6px 22px #0003;
+    pointer-events: auto;
+}
+.carstar-tooltip[hidden] { display: none !important; }
