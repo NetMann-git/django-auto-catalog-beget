@@ -1,0 +1,22 @@
+<dialog class="footer-callback" id="footer-callback-dialog" aria-labelledby="footer-callback-title" aria-describedby="footer-callback-intro">
+    <button class="footer-callback__close" type="button" aria-label="Закрыть окно">×</button>
+    <div class="footer-callback__accent" aria-hidden="true">КОРЕЯ · КИТАЙ → ВАШ АВТОМОБИЛЬ</div>
+    <h2 id="footer-callback-title">Ваш следующий автомобиль<br>начинается с разговора</h2>
+    <p id="footer-callback-intro">Обсудим подбор, доставку и стоимость под ключ. Оставьте телефон — менеджер свяжется с вами.</p>
+    <form method="post" action="{% url 'appointments:callback_submit' %}" class="footer-callback__form">
+        {% csrf_token %}
+        <label for="footer-callback-name">Ваше имя</label>
+        <input id="footer-callback-name" name="name" autocomplete="name" maxlength="100" required placeholder="Как к вам обращаться?" aria-describedby="footer-callback-name-error">
+        <span id="footer-callback-name-error" class="footer-callback__error" data-error="name"></span>
+        <label for="footer-callback-phone">Телефон</label>
+        <input id="footer-callback-phone" name="phone" type="tel" autocomplete="tel" maxlength="30" required placeholder="+7 (___) ___-__-__" aria-describedby="footer-callback-phone-error">
+        <span id="footer-callback-phone-error" class="footer-callback__error" data-error="phone"></span>
+        <div class="footer-callback__trap" aria-hidden="true">
+            <label for="footer-callback-website">Ваш сайт</label>
+            <input id="footer-callback-website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+        <button class="footer-callback__submit" type="submit">Жду звонка <span aria-hidden="true">→</span></button>
+        <p class="footer-callback__privacy">Нажимая «Жду звонка», вы соглашаетесь с <a href="{% url 'personal_data_consent' %}" target="_blank" rel="noopener">обработкой персональных данных</a>. <a href="{% url 'privacy_policy' %}" target="_blank" rel="noopener">Политика конфиденциальности</a>.</p>
+    </form>
+    <div class="footer-callback__status" role="status" aria-live="polite" tabindex="-1"></div>
+</dialog>
