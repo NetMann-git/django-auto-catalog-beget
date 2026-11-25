@@ -1,73 +1,107 @@
-/* Шапка главной: логотип и меню, без пустой правой колонки. */
-
+/* Главная: отдельная сетка шапки, без зависимости от колонок Joomla. */
+#sp-header > .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    width: 100%;
+    margin: 0;
+    padding: 0 20px;
+}
+#sp-header > .row > #sp-logo,
+#sp-header > .row > #sp-menu {
+    width: auto;
+    max-width: none;
+    min-width: 0;
+    padding: 0;
+}
+#sp-header #sp-menu > .sp-column {
+    justify-content: flex-end;
+    min-width: 0;
+}
+#sp-header #sp-logo .logo {
+    margin-right: 0;
+}
 @media (min-width: 992px) {
-    #sp-menu .sp-megamenu-parent > li > a,
-    #sp-menu .sp-megamenu-parent > li > span {
+    #sp-header > .row {
+        grid-template-columns: minmax(220px, 25%) minmax(0, 1fr);
+        column-gap: 24px;
+        padding: 0 clamp(24px, 3vw, 64px);
+    }
+    #sp-header #sp-menu > .sp-column {
+        justify-content: center;
+    }
+    #sp-header #sp-menu .sp-megamenu-wrapper {
+        width: 100%;
+        min-width: 0;
+    }
+    #sp-header #sp-menu .sp-megamenu-parent {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: nowrap;
+        gap: clamp(12px, 1.8vw, 34px);
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    #sp-header #sp-menu .sp-megamenu-parent > li {
+        flex: 0 0 auto;
+        margin: 0;
+        padding: 0;
+    }
+    #sp-header #sp-menu .sp-megamenu-parent > li > a {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        padding: 10px 0;
+        line-height: 1.4;
+        font-size: 15px;
+        font-weight: 500;
+        letter-spacing: .2px;
         white-space: nowrap;
+        color: #fff;
+        opacity: .88;
+        text-decoration: none;
+        transition: color .18s ease, opacity .18s ease;
+    }
+    #sp-header #sp-menu .sp-megamenu-parent > li > a::before {
+        content: '';
+        position: absolute;
+        bottom: 3px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        border-radius: 2px;
+        background: #d5a357;
+        transform: scaleX(0);
+        transition: transform .18s ease;
+    }
+    #sp-header #sp-menu .sp-megamenu-parent > li > a:hover,
+    #sp-header #sp-menu .sp-megamenu-parent > li > a:focus-visible {
+        color: #e8c58f;
+        opacity: 1;
+    }
+    #sp-header #sp-menu .sp-megamenu-parent > li > a:hover::before,
+    #sp-header #sp-menu .sp-megamenu-parent > li > a:focus-visible::before,
+    #sp-header #sp-menu .sp-megamenu-parent > li.active > a::before {
+        transform: scaleX(1);
+    }
+    #sp-header #sp-menu .sp-megamenu-parent > li > a:focus-visible {
+        outline: 2px solid #d5a357;
+        outline-offset: 5px;
+        border-radius: 3px;
     }
 }
-
-@media (min-width: 992px) and (max-width: 1199.98px) {
-    #sp-header > .row {
-        display: grid;
-        grid-template-columns: 25% minmax(0, 1fr);
-    }
-
-    #sp-header > .row > #sp-logo,
-    #sp-header > .row > #sp-menu {
-        width: auto;
-        max-width: none;
-    }
-
-    #sp-menu {
-        padding-right: 15px;
-    }
-
-    #sp-menu .sp-megamenu-parent {
-        display: block;
-        width: auto;
-        gap: normal;
-    }
-
-    #sp-menu .sp-megamenu-parent > li {
-        flex: none;
-        min-width: auto;
-    }
-
-    #sp-menu .sp-megamenu-parent > li:not(:last-child) {
-        margin-right: 13.333px;
+@media (max-width: 991.98px) {
+    #sp-header #sp-menu .offcanvas-toggler-right {
+        float: none;
+        margin: 0;
     }
 }
-
-@media (min-width: 1200px) and (max-width: 1366px) {
-    #sp-header > .row {
-        display: grid;
-        grid-template-columns: 25% minmax(0, 1fr);
-    }
-
-    #sp-header > .row > #sp-logo,
-    #sp-header > .row > #sp-menu {
-        width: auto;
-        max-width: none;
-    }
-
-    #sp-menu .sp-megamenu-parent {
-        display: block;
-        width: auto;
-        gap: normal;
-    }
-
-    #sp-menu .sp-megamenu-parent > li {
-        flex: none;
-        min-width: auto;
-    }
-
-    #sp-menu .sp-megamenu-parent > li:not(:last-child) {
-        margin-right: 20px;
-    }
-
-    #sp-menu .sp-megamenu-parent > li > a,
-    #sp-menu .sp-megamenu-parent > li > span {
-        letter-spacing: 1.6px;
+@media (prefers-reduced-motion: reduce) {
+    #sp-header #sp-menu .sp-megamenu-parent > li > a,
+    #sp-header #sp-menu .sp-megamenu-parent > li > a::before {
+        transition: none;
     }
 }
