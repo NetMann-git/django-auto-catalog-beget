@@ -7,16 +7,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeButton = modal.querySelector('.car-inquiry__close');
     const headers = { 'X-Requested-With': 'XMLHttpRequest' };
     let activeTrigger = null;
+    let closeTimer;
+    let generation = 0;
+    let previousOverflow = '';
+    const isCurrent = (id) => id === generation && !modal.hidden;
 
     function close() {
+        clearTimeout(closeTimer);
+        generation += 1;
         modal.hidden = true;
-        document.body.style.overflow = '';
+        document.body.style.overflow = previousOverflow;
         activeTrigger?.focus();
     }
 
     triggers.forEach((trigger) => {
         trigger.addEventListener('click', async (event) => {
             event.preventDefault();
+            clearTimeout(closeTimer);
+            const requestId = ++generation;
+            if (modal.hidden) previousOverflow = document.body.style.overflow;
             activeTrigger = trigger;
             modal.hidden = false;
             document.body.style.overflow = 'hidden';
@@ -26,11 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const response = await fetch(trigger.href, { headers });
                 if (!response.ok) throw new Error('Не удалось загрузить форму');
                 const html = await response.text();
-                if (activeTrigger !== trigger) return;
+                if (!isCurrent(requestId)) return;
                 content.innerHTML = html;
                 content.querySelector('input:not([type="hidden"])')?.focus();
             } catch (error) {
-                if (activeTrigger !== trigger) return;
+                if (!isCurrent(requestId)) return;
                 content.textContent = 'Форма временно недоступна. Попробуйте открыть её отдельно.';
                 const link = document.createElement('a');
                 link.href = trigger.href;
@@ -41,16 +50,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     closeButton.addEventListener('click', close);
-    modal.addEventListener('click', (event) => {
-        if (event.target === modal) close();
-    });
     document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape' && !modal.hidden) close();
+        if (modal.hidden) return;
+        if (event.key === 'Escape') close();
+        if (event.key === 'Tab') {
+            const items = Array.from(modal.querySelectorAll('a[href], button, input:not([type="hidden"]), textarea, select, [tabindex="0"]'))
+                .filter(el => !el.disabled && el.tabIndex >= 0 && !el.closest('.car-inquiry__honeypot') && el.getClientRects().length);
+            const first = items[0];
+            const last = items[items.length - 1];
+            if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+            else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+        }
     });
 
     content.addEventListener('submit', async (event) => {
         if (!event.target.matches('.car-inquiry__form')) return;
         event.preventDefault();
+        const requestId = generation;
         const form = event.target;
         const button = form.querySelector('[type="submit"]');
         if (button.disabled) return;
@@ -64,12 +80,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers,
                 body: data,
             });
+            if (!isCurrent(requestId)) return;
             if (response.status === 400 || response.status === 429) {
-                content.innerHTML = await response.text();
+                const html = await response.text();
+                if (!isCurrent(requestId)) return;
+                content.innerHTML = html;
                 return;
             }
             if (!response.ok) throw new Error('Не удалось отправить запрос');
             const result = await response.json();
+            if (!isCurrent(requestId)) return;
             if (!result.success) throw new Error('Не удалось отправить запрос');
             content.innerHTML = '';
             const title = document.createElement('h2');
@@ -79,7 +99,9 @@ document.addEventListener('DOMContentLoaded', () => {
             message.textContent = result.message || 'Заявка получена. Менеджер свяжется с вами.';
             content.append(title, message);
             closeButton.focus();
+            closeTimer = setTimeout(close, 3000);
         } catch (error) {
+            if (!isCurrent(requestId)) return;
             button.disabled = false;
             let errorText = form.querySelector('.car-inquiry__error--submit');
             if (!errorText) {
