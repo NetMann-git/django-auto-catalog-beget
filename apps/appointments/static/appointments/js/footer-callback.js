@@ -25,8 +25,7 @@
         });
     });
     dialog.querySelector('.footer-callback__close').addEventListener('click', () => dialog.close());
-    // Close only with the explicit button or after a successful submission.
-    dialog.addEventListener('cancel', event => event.preventDefault());
+    // Native Escape closes the dialog; backdrop clicks do not.
     dialog.addEventListener('close', function () {
         clearTimeout(closeTimer);
         document.body.style.overflow = previousOverflow;
