@@ -1,0 +1,43 @@
+/* One isolated footer for all public page layouts. */
+footer.carstar-footer {
+    box-sizing: border-box;
+    width: 100%;
+    margin: auto 0 0;
+    padding: 44px 24px 22px;
+    background: #16232f;
+    border-top: 3px solid #d5a357;
+    color: #c6d0d9;
+    font-family: "Open Sans", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    text-align: left;
+}
+.carstar-footer *, .carstar-footer *::before, .carstar-footer *::after { box-sizing: border-box; }
+.carstar-footer .carstar-footer__inner { max-width: 1280px; margin: 0 auto; }
+.carstar-footer .carstar-footer__top { display: grid; grid-template-columns: 1fr 2.6fr; gap: 48px; }
+.carstar-footer .carstar-footer__name { display: inline-block; color: #fff; font-size: 24px; font-weight: 700; text-decoration: none; letter-spacing: -.5px; }
+.carstar-footer .carstar-footer__name span { color: #e9bb75; }
+.carstar-footer .carstar-footer__brand p { margin: 12px 0 20px; font-size: 13px; line-height: 1.8; color: #b2c0cd; }
+.carstar-footer .carstar-footer__contact { display: inline-flex; align-items: center; gap: 20px; padding: 9px 14px; border: 1px solid #52616e; border-radius: 8px; color: #fff; text-decoration: none; font-size: 13px; }
+.carstar-footer .carstar-footer-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin: 0; padding: 0; border: 0; background: none; }
+.carstar-footer .carstar-footer-nav__title { margin: 0 0 14px; padding: 0; color: #fff; font: 600 14px/1.5 "Open Sans", Arial, sans-serif; letter-spacing: .2px; text-transform: none; }
+.carstar-footer .carstar-footer-nav__list { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.carstar-footer .carstar-footer-nav__list li { display: block; margin: 0; padding: 0; list-style: none; }
+.carstar-footer .carstar-footer-nav__list a { display: inline-block; padding: 6px 0; color: #c6d0d9; font: 400 13px/1.6 "Open Sans", Arial, sans-serif; text-decoration: none; overflow-wrap: anywhere; }
+.carstar-footer .carstar-footer__bottom { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px 28px; margin-top: 32px; padding-top: 20px; border-top: 1px solid #35424f; }
+.carstar-footer .carstar-footer__bottom p { margin: 0; color: #a8b6c3; font-size: 12px; }
+.carstar-footer .footer-legal-links { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 8px 18px; margin: 0; padding: 0; }
+.carstar-footer .footer-legal-links a { color: #a8b6c3; font-size: 12px; line-height: 1.6; text-decoration: none; }
+.carstar-footer a:hover { color: #f3c78a; text-decoration: underline; text-underline-offset: 4px; }
+.carstar-footer a:focus-visible { outline: 2px solid #f3c78a; outline-offset: 4px; border-radius: 3px; }
+@media (max-width: 1000px) {
+    .carstar-footer .carstar-footer__top { grid-template-columns: 1fr; gap: 30px; }
+}
+@media (max-width: 600px) {
+    footer.carstar-footer { padding: 30px 20px 20px; }
+    .carstar-footer .carstar-footer-nav { grid-template-columns: 1fr; gap: 20px; }
+    .carstar-footer .carstar-footer-nav__group { padding-top: 18px; border-top: 1px solid #35424f; }
+    .carstar-footer .carstar-footer-nav__title { margin-bottom: 6px; }
+    .carstar-footer .carstar-footer-nav__list a { padding: 11px 0; }
+    .carstar-footer .footer-legal-links { flex-direction: column; gap: 12px; }
+}

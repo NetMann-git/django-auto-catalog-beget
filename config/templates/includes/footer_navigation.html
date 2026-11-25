@@ -1,23 +1,23 @@
-<nav class="footer-nav" aria-label="Меню в подвале">
-    <div class="footer-nav__group">
-        <h2 class="footer-nav__title">Автомобили</h2>
-        <ul class="footer-nav__list">
+<nav class="carstar-footer-nav" aria-label="Меню в подвале">
+    <div class="carstar-footer-nav__group">
+        <h2 class="carstar-footer-nav__title">Автомобили</h2>
+        <ul class="carstar-footer-nav__list">
             <li><a href="/">Главная</a></li>
             <li><a href="{% url 'catalog:catalog' %}">Каталог автомобилей</a></li>
             <li><a href="{% url 'wishlist:list' %}">Избранное</a></li>
             <li><a href="{% url 'catalog:comparison' %}">Сравнение автомобилей</a></li>
         </ul>
     </div>
-    <div class="footer-nav__group">
-        <h2 class="footer-nav__title">Калькуляторы</h2>
-        <ul class="footer-nav__list">
+    <div class="carstar-footer-nav__group">
+        <h2 class="carstar-footer-nav__title">Калькуляторы</h2>
+        <ul class="carstar-footer-nav__list">
             <li><a href="{% url 'calculator:customs_clearance' %}">Растаможка автомобиля</a></li>
             <li><a href="{% url 'calculator:utilization_fee' %}">Утилизационный сбор</a></li>
         </ul>
     </div>
-    <div class="footer-nav__group">
-        <h2 class="footer-nav__title">Ваш кабинет и связь</h2>
-        <ul class="footer-nav__list">
+    <div class="carstar-footer-nav__group">
+        <h2 class="carstar-footer-nav__title">Личный раздел</h2>
+        <ul class="carstar-footer-nav__list">
             {% if user.is_authenticated %}
                 <li><a href="{% url 'users:dashboard' %}">Личный кабинет</a></li>
             {% else %}

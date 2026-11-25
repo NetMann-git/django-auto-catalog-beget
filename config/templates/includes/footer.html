@@ -1,9 +1,16 @@
-<!-- config/templates/includes/footer.html -->
-
-<footer class="site-footer">
-    <div class="container">
-        {% include 'includes/footer_navigation.html' %}
-        <p class="footer-text">© {% now "Y" %} «Подберем АВТО». Все права защищены.</p>
-        {% include 'includes/footer_legal_links.html' %}
+<footer class="carstar-footer">
+    <div class="carstar-footer__inner">
+        <div class="carstar-footer__top">
+            <div class="carstar-footer__brand">
+                <a class="carstar-footer__name" href="/">Подберем <span>АВТО</span></a>
+                <p>Подбор и доставка автомобилей<br>из Кореи и Китая</p>
+                <a class="carstar-footer__contact" href="/#contacts">Связаться с нами <span aria-hidden="true">↗</span></a>
+            </div>
+            {% include 'includes/footer_navigation.html' %}
+        </div>
+        <div class="carstar-footer__bottom">
+            <p>© {% now "Y" %} «Подберем АВТО». Все права защищены.</p>
+            {% include 'includes/footer_legal_links.html' %}
+        </div>
     </div>
 </footer>
