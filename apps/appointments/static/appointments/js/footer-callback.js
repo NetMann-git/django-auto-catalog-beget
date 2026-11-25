@@ -7,10 +7,17 @@
     const status = dialog.querySelector('[role="status"]');
     let opener;
     let busy = false;
+    let closeTimer;
     let previousOverflow = '';
     document.querySelectorAll('[data-footer-callback]').forEach(function (link) {
         link.addEventListener('click', function (event) {
             event.preventDefault();
+            clearTimeout(closeTimer);
+            if (form.hidden) {
+                form.hidden = false;
+                status.textContent = '';
+                status.classList.remove('is-success');
+            }
             opener = link;
             previousOverflow = document.body.style.overflow;
             document.body.style.overflow = 'hidden';
@@ -18,11 +25,10 @@
         });
     });
     dialog.querySelector('.footer-callback__close').addEventListener('click', () => dialog.close());
-    dialog.addEventListener('click', function (event) {
-        const rect = dialog.getBoundingClientRect();
-        if (event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) dialog.close();
-    });
+    // Close only with the explicit button or after a successful submission.
+    dialog.addEventListener('cancel', event => event.preventDefault());
     dialog.addEventListener('close', function () {
+        clearTimeout(closeTimer);
         document.body.style.overflow = previousOverflow;
         if (opener) opener.focus();
     });
@@ -61,7 +67,10 @@
             form.hidden = true;
             status.textContent = 'Спасибо! Заявка получена. Менеджер свяжется с вами.';
             status.classList.add('is-success');
-            if (dialog.open) status.focus();
+            if (dialog.open) {
+                status.focus();
+                closeTimer = setTimeout(() => dialog.close(), 3000);
+            }
         } catch (error) {
             status.textContent = 'Не удалось подтвердить отправку. Проверьте соединение и попробуйте ещё раз.';
         } finally {
