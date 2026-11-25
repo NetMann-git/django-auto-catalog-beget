@@ -1,7 +1,8 @@
 /* Главная: отдельная сетка шапки, без зависимости от колонок Joomla. */
 #sp-header > .row {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    column-gap: 12px;
     align-items: center;
     width: 100%;
     margin: 0;
@@ -23,8 +24,8 @@
 }
 @media (min-width: 992px) {
     #sp-header > .row {
-        grid-template-columns: minmax(220px, 25%) minmax(0, 1fr);
-        column-gap: 24px;
+        grid-template-columns: 140px minmax(0, 1fr) 195px;
+        column-gap: 20px;
         padding: 0 clamp(24px, 3vw, 64px);
     }
     #sp-header #sp-menu > .sp-column {
@@ -39,7 +40,7 @@
         align-items: center;
         justify-content: center;
         flex-wrap: nowrap;
-        gap: clamp(12px, 1.8vw, 34px);
+        gap: clamp(16px, 1.8vw, 28px);
         width: 100%;
         margin: 0;
         padding: 0;
@@ -104,4 +105,51 @@
     #sp-header #sp-menu .sp-megamenu-parent > li > a::before {
         transition: none;
     }
+}
+
+/* Нет Bootstrap display-утилит: видимость списка задаётся здесь. */
+#sp-header #sp-menu .home-header__links { display: none; }
+#sp-header .home-header__contact {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: center;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    white-space: nowrap;
+}
+#sp-header .home-header__contact a {
+    color: #fff;
+    font: 600 15px/1.4 Arial, sans-serif;
+    text-decoration: none;
+}
+#sp-header .home-header__contact a:hover { color: #e8c58f; }
+#sp-header .home-header__contact a:focus-visible {
+    outline: 2px solid #d5a357;
+    outline-offset: 4px;
+}
+#sp-header .home-header__contact span {
+    color: #c8c8c8;
+    font: 400 11px/1.4 Arial, sans-serif;
+}
+#sp-header #sp-menu { grid-column: 3; grid-row: 1; }
+@media (min-width: 992px) {
+    #sp-header #sp-menu { grid-column: 2; }
+    #sp-header #sp-menu .home-header__links { display: flex; }
+    #sp-header .home-header__contact { grid-column: 3; justify-self: end; }
+    #sp-header .home-header__contact a { font-size: 17px; }
+    #sp-header .home-header__contact span { font-size: 12px; }
+    #sp-header #sp-logo .logo { padding-left: 0; padding-right: 0; }
+}
+@media (min-width: 992px) and (max-width: 1100px) {
+    #sp-header > .row { grid-template-columns: 100px minmax(0, 1fr) 180px; column-gap: 12px; padding: 0 20px; }
+    #sp-header #sp-menu .home-header__links { gap: 12px; }
+    #sp-header #sp-menu .sp-megamenu-parent > li > a { font-size: 14px; }
+    #sp-header .home-header__contact a { font-size: 15px; }
+}
+@media (max-width: 575.98px) {
+    #sp-header > .row { padding: 0 12px; gap: 8px; }
+    #sp-header #sp-logo .logo { padding: 10px 0; }
+    #sp-header .home-header__contact a { font-size: 13px; }
+    #sp-header .home-header__contact span { font-size: 10px; }
 }
