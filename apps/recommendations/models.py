@@ -11,6 +11,7 @@ class PromotedProduct(models.Model):
         ('wishlist', 'Избранное'),
         ('home', 'Главная страница'),
         ('comparison', 'Сравнение'),
+        ('calculators', 'Калькуляторы'),
     ]
 
     product = models.ForeignKey(

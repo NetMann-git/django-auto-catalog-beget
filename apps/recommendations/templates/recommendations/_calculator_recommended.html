@@ -1,0 +1,13 @@
+{% if recommended_products %}
+<section class="calculator-recommended" aria-labelledby="calculator-recommended-title">
+    <div class="calculator-recommended__heading">
+        <div><p>Подберите свой автомобиль</p><h2 id="calculator-recommended-title">Рекомендуем</h2></div>
+        <a href="{% url 'catalog:catalog' %}">Все автомобили →</a>
+    </div>
+    <div class="calculator-recommended__grid">
+        {% for product in recommended_products %}
+            {% include "products/_product_card.html" %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}

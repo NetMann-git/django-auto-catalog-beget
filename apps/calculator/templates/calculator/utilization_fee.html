@@ -1,9 +1,12 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static calculator_recommendations %}
 
 {% block title %}Калькулятор утилизационного сбора{% endblock %}
 
 {% block extra_css %}
+    <link rel="stylesheet" href="{% static 'products/css/product/_card.css' %}">
+    <link rel="stylesheet" href="{% static 'products/css/availability.css' %}">
+    <link rel="stylesheet" href="{% static 'calculator/css/recommendations.css' %}?v=82-70">
     <link rel="stylesheet" href="{% static 'calculator/css/utilization_fee.css' %}">
 {% endblock %}
 
@@ -197,6 +200,7 @@
         </div>
     </div>
 </main>
+{% calculator_recommendations %}
 
 {{ power_choices_by_powertrain|json_script:"util-sbor-power-options" }}
 {% endblock %}
