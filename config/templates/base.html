@@ -50,7 +50,7 @@
         <link rel="stylesheet" href="{% static 'css/modal.css' %}">
         <link rel="stylesheet" href="{% static 'css/header.css' %}">
         <link rel="stylesheet" href="{% static 'css/footer-legal.css' %}">
-        {% if request.resolver_match.namespace == 'catalog' %}
+        {% if request.resolver_match.namespace == 'catalog' or request.resolver_match.namespace == 'wishlist' %}
             <link rel="stylesheet" href="{% static 'home/css/v78/font-awesome.min.css' %}">
             <link rel="stylesheet" href="{% static 'home/css/home-contacts.css' %}">
             <link rel="stylesheet" href="{% static 'css/catalog-contacts.css' %}">
@@ -99,7 +99,7 @@
 
         {% block content %}{% endblock %}
 
-        {% if request.resolver_match.namespace == 'catalog' %}
+        {% if request.resolver_match.namespace == 'catalog' or request.resolver_match.namespace == 'wishlist' %}
             {% catalog_contacts %}
         {% endif %}
 
