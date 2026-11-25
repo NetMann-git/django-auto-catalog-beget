@@ -7,8 +7,11 @@ dialog.footer-callback { box-sizing: border-box; width: min(480px, calc(100% - 3
 .footer-callback p { margin: 0 0 22px; color: #536575; font-size: 14px; }
 .footer-callback .footer-callback__form { display: grid; gap: 6px; margin: 0; }
 .footer-callback label { margin: 0; font-size: 13px; font-weight: 600; }
-.footer-callback input { width: 100%; min-width: 0; height: 46px; margin: 0; padding: 10px 12px; border: 1px solid #a8b7c4; border-radius: 8px; background: #f8fafc; color: #16232f; font: inherit; }
-.footer-callback input[aria-invalid="true"] { border-color: #b42318; }
+#footer-callback-dialog input,
+#footer-callback-dialog input:hover,
+#footer-callback-dialog input:focus,
+#footer-callback-dialog input:active { width: 100%; min-width: 0; height: 46px; margin: 0; padding: 10px 12px; border: 1px solid #a8b7c4; border-radius: 8px; background: #f8fafc; color: #16232f; font: inherit; }
+#footer-callback-dialog input[aria-invalid="true"] { border-color: #b42318; }
 .footer-callback .footer-callback__error { color: #b42318; font-size: 12px; margin-bottom: 6px; }
 .footer-callback .footer-callback__submit { display: flex; justify-content: space-between; margin: 6px 0 8px; padding: 13px 18px; border: 0; border-radius: 8px; background: #192f41; color: #fff; font: 600 14px/1.5 "Open Sans", Arial, sans-serif; cursor: pointer; }
 .footer-callback .footer-callback__submit:hover { background: #284c67; }
@@ -21,3 +24,27 @@ dialog.footer-callback { box-sizing: border-box; width: min(480px, calc(100% - 3
 .footer-callback :focus-visible { outline: 2px solid #a87835; outline-offset: 3px; }
 .footer-callback [hidden] { display: none !important; }
 @media(max-width: 480px) { dialog.footer-callback { padding: 26px 20px; } .footer-callback h2 { font-size: 22px; } }
+
+/* Override legacy white input text on the home page, including autofill. */
+#footer-callback-dialog input {
+    -webkit-text-fill-color: #16232f;
+    caret-color: #16232f;
+    opacity: 1;
+}
+#footer-callback-dialog input::placeholder {
+    color: #667887;
+    -webkit-text-fill-color: #667887;
+    opacity: 1;
+}
+#footer-callback-dialog input:autofill {
+    color: #16232f;
+    background-color: #f8fafc;
+    caret-color: #16232f;
+}
+#footer-callback-dialog input:-webkit-autofill,
+#footer-callback-dialog input:-webkit-autofill:hover,
+#footer-callback-dialog input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #16232f;
+    -webkit-box-shadow: 0 0 0 1000px #f8fafc inset;
+    caret-color: #16232f;
+}
